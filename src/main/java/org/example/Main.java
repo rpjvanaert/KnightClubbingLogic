@@ -1,10 +1,10 @@
 package org.example;
 
-import org.example.data.*;
 import org.example.data.details.Color;
 import org.example.data.details.Coord;
 import org.example.data.details.MoveType;
 import org.example.data.details.PieceType;
+import org.example.data.move.MoveDraft;
 import org.example.logic.ChessGame;
 
 public class Main {

@@ -5,7 +5,9 @@ import org.example.data.details.Coord;
 import org.example.data.details.Piece;
 import org.example.data.details.PieceType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Board {
 
@@ -13,7 +15,7 @@ public class Board {
 
     private Color active;
     private String castlingRights;
-    private String enPassantSquare;
+    private Coord enPassantSquare;
     private int halfmoveClock;
     private int fullmoveNumber;
 
@@ -48,7 +50,11 @@ public class Board {
 
         this.active = fields[1].equals("w") ? Color.WHITE : Color.BLACK;
         this.castlingRights = fields[2];
-        this.enPassantSquare = fields[3];
+
+        this.enPassantSquare = null;
+        if (!fields[3].equals("-") && fields[3].length() == 2)
+            this.enPassantSquare = Coord.of(fields[3]);
+
         this.halfmoveClock = Integer.parseInt(fields[4]);
         this.fullmoveNumber = Integer.parseInt(fields[5]);
     }
@@ -80,7 +86,7 @@ public class Board {
 
         fenBuilder.append(" ").append(active == Color.WHITE ? "w" : "b");
         fenBuilder.append(" ").append(castlingRights);
-        fenBuilder.append(" ").append(enPassantSquare);
+        fenBuilder.append(" ").append(enPassantSquare == null ? "-" : enPassantSquare.getNotation());
         fenBuilder.append(" ").append(halfmoveClock);
         fenBuilder.append(" ").append(fullmoveNumber);
 
@@ -127,6 +133,40 @@ public class Board {
                 .count();
     }
 
+    public List<Coord> searchPieces(PieceType pieceType, Color color) {
+        List<Coord> result = new ArrayList<>();
+        for (int y = 0; y < board.length; y++) {
+            for (int x = 0; x < board[y].length; x++) {
+                Piece current = board[y][x];
+                if (current != null &&
+                        (pieceType == null || pieceType == current.pieceType()) &&
+                        (color == null || color == current.color())) {
+                    result.add(new Coord(x, y));
+                }
+            }
+        }
+        return result;
+    }
+
+    public boolean isValid(Coord coord) {
+        return coord.getX() >= 0 && coord.getX() < 8 && coord.getY() >= 0 && coord.getY() < 8;
+    }
+
+    public boolean isEmpty(Coord coord) {
+        return isValid(coord) && board[coord.getY()][coord.getX()] == null;
+    }
+
+    public boolean isFriendly(Coord coord, Color color) {
+        return isValid(coord) && board[coord.getY()][coord.getX()] != null &&
+                board[coord.getY()][coord.getX()].color() == color;
+    }
+
+    public boolean isEnemy(Coord coord, Color color) {
+        return isValid(coord) && board[coord.getY()][coord.getX()] != null &&
+                board[coord.getY()][coord.getX()].color() != color;
+    }
+
+
     public void emptySquare(Coord coord) {
         this.board[coord.getY()][coord.getX()] = null;
     }
@@ -147,11 +187,11 @@ public class Board {
         return castlingRights;
     }
 
-    public void setEnPassantSquare(String enPassantSquare) {
+    public void setEnPassantSquare(Coord enPassantSquare) {
         this.enPassantSquare = enPassantSquare;
     }
 
-    public String getEnPassantSquare() {
+    public Coord getEnPassantSquare() {
         return enPassantSquare;
     }
 
@@ -163,12 +203,20 @@ public class Board {
         this.halfmoveClock = 1;
     }
 
+    public void setHalfmoveClock(int i) {
+        this.halfmoveClock = i;
+    }
+
     public int getHalfmoveClock() {
         return halfmoveClock;
     }
 
     public int tickFullmoveNumber() {
         return ++this.fullmoveNumber;
+    }
+
+    public void setFullmoveNumber(int i ) {
+        this.fullmoveNumber = i;
     }
 
     public int getFullmoveNumber() {

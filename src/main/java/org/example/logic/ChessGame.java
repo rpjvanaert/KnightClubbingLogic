@@ -3,18 +3,23 @@ package org.example.logic;
 import org.example.data.ChessException;
 import org.example.MoveListener;
 import org.example.data.*;
-import org.example.data.details.Color;
-import org.example.data.details.Coord;
-import org.example.data.details.Piece;
-import org.example.data.details.PieceType;
+import org.example.data.details.*;
+import org.example.data.move.Move;
+import org.example.data.move.MoveDraft;
+import org.example.data.move.MoveState;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChessGame {
 
-    private final Board board;
+    protected final Board board;
     private final List<Move> moves;
+
+    private static final int[][] BISHOP_DIRECTIONS = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+    private static final int[][] ROOK_DIRECTIONS = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    private static final int[][] QUEEN_DIRECTIONS = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}, {1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
 
     private final List<MoveListener> listeners;
 
@@ -60,7 +65,6 @@ public class ChessGame {
     }
 
     private void isPseudoLegal(MoveDraft move) throws ChessException {
-        //TODO
         if (move.color() != board.getActive()) throw new ChessException("Not turn of given color");
 
         switch (move.type()) {
@@ -75,6 +79,161 @@ public class ChessGame {
             }
         }
     }
+
+    private List<MoveDraft> determineAllPseudoLegalMoves() {
+        List<MoveDraft> pseudoLegalMoves = new ArrayList<>();
+
+        for (Coord coord : board.searchPieces(null, board.getActive())) {
+            Piece piece = board.getPieceOn(coord);
+            pseudoLegalMoves.addAll(generatePieceMoves(piece, coord));
+        }
+
+        return pseudoLegalMoves;
+    }
+
+    private List<MoveDraft> generatePieceMoves(Piece piece, Coord position) {
+        List<MoveDraft> moves = new ArrayList<>();
+        PieceType type = piece.pieceType();
+        Color color = piece.color();
+
+        switch (type) {
+            case PAWN -> moves.addAll(generatePawnMoves(position, color));
+            case KNIGHT -> moves.addAll(generateKnightMoves(position, color));
+            case BISHOP -> moves.addAll(generateSlidingMoves(position, color, BISHOP_DIRECTIONS));
+            case ROOK -> moves.addAll(generateSlidingMoves(position, color, ROOK_DIRECTIONS));
+            case QUEEN -> moves.addAll(generateSlidingMoves(position, color, QUEEN_DIRECTIONS));
+            case KING -> moves.addAll(generateKingMoves(position, color));
+        }
+
+        return moves;
+    }
+
+    private List<MoveDraft> generatePawnMoves(Coord position, Color color) {
+        List<MoveDraft> moves = new ArrayList<>();
+        int direction = (color == Color.WHITE) ? 1 : -1;
+        Piece piece = board.getPieceOn(position);
+
+        Coord forward = position.getAdjacent(0, direction);
+        if (board.isEmpty(forward)) {
+            moves.add(new MoveDraft(
+                    isPromotionMove(position, forward) ? MoveType.PROMOTION : MoveType.NORMAL,
+                    piece.pieceType(),
+                    color,
+                    position,
+                    forward,
+                    ""
+            ));
+
+            if ((color == Color.WHITE && position.getY() == 1) || (color == Color.BLACK && position.getY() == 6)) {
+                Coord doubleMove = position.getAdjacent(0, 2 * direction);
+                if (board.isEmpty(doubleMove)) {
+                    moves.add(new MoveDraft(MoveType.NORMAL, piece.pieceType(), color, position, doubleMove, ""));
+                }
+            }
+        }
+
+        for (int dx : new int[]{-1, 1}) {
+            Coord capture = position.getAdjacent(dx, direction);
+            if (board.isEnemy(capture, color) || isEnPassantMove(position, capture)) {
+                moves.add(new MoveDraft(
+                        isPromotionMove(position, capture) ? MoveType.PROMOTION : MoveType.NORMAL,
+                        piece.pieceType(),
+                        color,
+                        position,
+                        capture,
+                        isEnPassantMove(position, capture) ? "en passant" : ""
+                ));
+            }
+        }
+
+        return moves;
+    }
+
+    private List<MoveDraft> generateKnightMoves(Coord position, Color color) {
+        List<MoveDraft> moves = new ArrayList<>();
+        Piece piece = board.getPieceOn(position);
+        int[][] knightOffsets = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1},
+                {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
+
+        for (int[] offset : knightOffsets) {
+            Coord target = position.getAdjacent(offset[0], offset[1]);
+            if (board.isValid(target) && !board.isFriendly(target, color)) {
+                moves.add(new MoveDraft(MoveType.NORMAL, piece.pieceType(), color, position, target, ""));
+            }
+        }
+
+        return moves;
+    }
+
+    private List<MoveDraft> generateSlidingMoves(Coord position, Color color, int[][] directions) {
+        List<MoveDraft> moves = new ArrayList<>();
+        Piece piece = board.getPieceOn(position);
+
+        for (int[] direction : directions) {
+            Coord target = position;
+            while (true) {
+                target = target.getAdjacent(direction[0], direction[1]);
+                if (!board.isValid(target)) break;
+
+                if (board.isEmpty(target)) {
+                    moves.add(new MoveDraft(MoveType.NORMAL, piece.pieceType(), color, position, target, ""));
+                } else {
+                    if (board.isEnemy(target, color)) {
+                        moves.add(new MoveDraft(MoveType.NORMAL, piece.pieceType(), color, position, target, "capture"));
+                    }
+                    break;
+                }
+            }
+        }
+
+        return moves;
+    }
+
+    private List<MoveDraft> generateKingMoves(Coord position, Color color) {
+        List<MoveDraft> moves = new ArrayList<>();
+        Piece piece = board.getPieceOn(position);
+
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                if (dx == 0 && dy == 0) continue;
+                Coord target = position.getAdjacent(dx, dy);
+                if (board.isValid(target) && !board.isFriendly(target, color)) {
+                    moves.add(new MoveDraft(
+                            isCastlingMove(position, target) ? MoveType.CASTLING : MoveType.NORMAL,
+                            piece.pieceType(),
+                            color,
+                            position,
+                            target,
+                            isCastlingMove(position, target) ? "castling" : ""
+                    ));
+                }
+            }
+        }
+
+        return moves;
+    }
+
+    private boolean isPromotionMove(Coord from, Coord to) {
+        Piece piece = board.getPieceOn(from);
+        return piece.pieceType() == PieceType.PAWN && (to.getY() == 0 || to.getY() == 7);
+    }
+
+    private boolean isCastlingMove(Coord from, Coord to) {
+        Piece piece = board.getPieceOn(from);
+        return piece.pieceType() == PieceType.KING && Math.abs(from.getX() - to.getX()) == 2;
+    }
+
+    private boolean isEnPassantMove(Coord from, Coord to) {
+        Piece piece = board.getPieceOn(from);
+
+        if (piece == null || piece.pieceType() != PieceType.PAWN) {
+            return false;
+        }
+
+        return board.getEnPassantSquare() != null && board.getEnPassantSquare().equals(to);
+    }
+
+
 
     private boolean isValidPromotion(MoveDraft move) {
         if (!move.pieceType().equals(PieceType.PAWN)) return false;
@@ -117,7 +276,7 @@ public class ChessGame {
 
         if (fileDiff == 0) {
 
-            if (board.getPieceOn(move.to()) != null) return false;
+            if (targetOccupied(move)) return false;
 
             if (rankDiff * direction > 1 && move.from().getY() != (move.color() == Color.WHITE ? 1 : 6)) return false;
             if (rankDiff > 2) return false;
@@ -125,24 +284,19 @@ public class ChessGame {
             if (rankDiff == 2) {
                 Coord intermediate = move.to().getAdjacent(0, -direction);
 
-                // Check if intermediate is empty
-                if (this.board.getPieceOn(intermediate) != null) return false;
+                return this.board.getPieceOn(intermediate) == null;
             }
         } else {
 
-            // Check if pawn is capturing diagonally
-
-            // Pawn can only move a single file when capturing
             if (fileDiff != 1 || rankDiff != 1) return false;
 
-            // Check if destination has an opponent piece
             Piece targetPiece = this.board.getPieceOn(move.to());
 
             if (move.special().equals("ep")) {
                 //TODO en passant
             }
 
-            if (targetPiece == null || targetPiece.color() == move.color()) return false;
+            return targetOccupiedByOtherColor(move);
 
 
         }
@@ -156,11 +310,7 @@ public class ChessGame {
 
         if (!((rankDiff == 2 && fileDiff == 1) || (rankDiff == 1 && fileDiff == 2))) return false;
 
-        Piece target = board.getPieceOn(move.to());
-
-        if (target != null && target.color() == move.color()) return false;
-
-        return true;
+        return targetNotOccupiedByOwnColor(move);
     }
 
     private boolean isValidBishopMove(MoveDraft move) {
@@ -182,10 +332,7 @@ public class ChessGame {
             currentRank += rankDirection;
         }
 
-        Piece target = board.getPieceOn(move.to());
-        if (target != null && target.color() == move.color()) return false;
-
-        return true;
+        return targetNotOccupiedByOwnColor(move);
     }
 
     private boolean isValidRookMove(MoveDraft move) {
@@ -207,10 +354,7 @@ public class ChessGame {
             currentRank += rankDirection;
         }
 
-        Piece target = board.getPieceOn(move.to());
-        if (target != null && target.color() == move.color()) return false;
-
-        return true;
+        return targetNotOccupiedByOwnColor(move);
     }
 
     private boolean isValidQueenMove(MoveDraft move) {
@@ -235,11 +379,7 @@ public class ChessGame {
             currentFile += fileDirection;
         }
 
-        Piece targetPiece = board.getPieceOn(move.to());
-        if (targetPiece != null && targetPiece.color() == move.color()) return false;
-
-        // All checks passed, the move is valid
-        return true;
+        return targetNotOccupiedByOwnColor(move);
     }
 
     private boolean isValidKingMove(MoveDraft move) {
@@ -248,10 +388,7 @@ public class ChessGame {
 
         if (rankDiff > 1 || fileDiff > 1) return false;
 
-        Piece target = board.getPieceOn(move.to());
-        if (target != null && target.color() == move.color()) return false;
-
-        return true;
+        return targetNotOccupiedByOwnColor(move);
     }
 
     private boolean isValidCastling(MoveDraft move) {
@@ -261,12 +398,95 @@ public class ChessGame {
         return this.board.getCastlingRights().contains(side);
     }
 
-    private Move getLegalMove(MoveDraft move) throws ChessException {
-        //TODO do checks for king. That is; checks, checkmates, hard pins and stalemates.
+    private Move getLegalMove(MoveDraft moveDraft) throws ChessException {
+        Move move = transformDraftToMove(moveDraft, ThreatType.NULL);
+        MoveState moveState = applyMoveTemporarily(move);
+
+        if (isKingInCheck(move.color())) {
+            undoMove(moveState);
+            throw new ChessException("Move leaves king in check.");
+        }
+
+        ThreatType threat = assessThreat(move.color().other());
+
+        undoMove(moveState);
+
+        return transformDraftToMove(moveDraft, threat);
+    }
+
+    public boolean isKingInCheck(Color color) {
+        Coord kingPosition = this.board.searchPieces(PieceType.KING, color).get(0);
+        if (kingPosition == null) {
+            return false;
+        }
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Coord from = new Coord(row, col);
+                Piece piece = board.getPieceOn(from);
+
+                if (piece != null && piece.color() != color) {
+                    List<MoveDraft> possibleMoves = generatePieceMoves(piece, from);
+                    for (MoveDraft move : possibleMoves) {
+                        if (move.to().equals(kingPosition)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private ThreatType assessThreat(Color opponentColor) {
+        Coord kingPosition = board.searchPieces(PieceType.KING, opponentColor).get(0);
+        boolean inCheck = isUnderAttack(kingPosition);
+
+        if (inCheck) {
+            boolean hasLegalMoves = hasLegalMoves(opponentColor);
+            return hasLegalMoves ? ThreatType.CHECK : ThreatType.CHECKMATE;
+        } else {
+            boolean hasLegalMoves = hasLegalMoves(opponentColor);
+            return hasLegalMoves ? ThreatType.NULL : ThreatType.STALEMATE;
+        }
+    }
+    private boolean hasLegalMoves(Color color) {
+        List<MoveDraft> moves = determineAllPseudoLegalMoves();
+        for (MoveDraft moveDraft : moves) {
+            MoveState tempState = applyMoveTemporarily(transformDraftToMove(moveDraft, ThreatType.NULL));
+            boolean safe = !isKingInCheck(color);
+            undoMove(tempState);
+            if (safe) return true;
+        }
+        return false;
+    }
 
 
+
+    private MoveState applyMoveTemporarily(Move move) {
+        MoveState moveState = new MoveState(this, move); // Save state
+
+        board.emptySquare(move.from());
+        board.setPieceOn(move.getPiece(), move.to());
+        board.setActive(move.color().other());
+
+        return moveState;
+    }
+
+    private void undoMove(MoveState moveState) {
+        board.setPieceOn(moveState.movedPiece, moveState.from);
+        board.setPieceOn(moveState.capturedPiece, moveState.to);
+        board.setCastlingRights(moveState.previousCastlingRights);
+        board.setEnPassantSquare(moveState.previousEnPassantTarget);
+        board.setHalfmoveClock(moveState.previousHalfMoveClock);
+        board.setFullmoveNumber(moveState.previousFullMoveNumber);
+        board.setActive(moveState.movedPiece.color());
+    }
+
+
+    private static Move transformDraftToMove(MoveDraft move, ThreatType threat) {
         return new Move(
-                "todo", // TODO
+                getNotation(move, threat),
                 move.type(),
                 move.pieceType(),
                 move.color(),
@@ -274,6 +494,32 @@ public class ChessGame {
                 move.to(),
                 move.special()
         );
+    }
+
+    private boolean isUnderAttack(Coord coord) {
+
+        Color opponentColor = this.board.getActive().other();
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Coord from = new Coord(row, col);
+                Piece piece = board.getPieceOn(from);
+
+                if (piece != null && piece.color() == opponentColor) {
+                    List<MoveDraft> possibleMoves = generatePieceMoves(piece, from);
+                    for (MoveDraft move : possibleMoves) {
+                        if (move.to().equals(coord)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private static String getNotation(MoveDraft move, ThreatType threat) {
+        return (move.getPiece().pieceType().fen() + move.to().getNotation() + threat.getSign()).trim();
     }
 
     private void executeMove(Move move) {
@@ -308,26 +554,21 @@ public class ChessGame {
          */
     }
 
-    private void moveKnightNormal(Move move) {
-
+    private boolean targetNotOccupiedByOwnColor(MoveDraft move) {
+        Piece target = board.getPieceOn(move.to());
+        return target == null || target.color() != move.color();
     }
 
-    private void moveBishopNormal(Move move) {
+    private boolean targetNotOccupied(MoveDraft move) {
+        return board.getPieceOn(move.to()) == null;
     }
 
-    private void moveRookNormal(Move move) {
+    private boolean targetOccupied(MoveDraft move) {
+        return board.getPieceOn(move.to()) != null;
     }
 
-    private void moveQueenNormal(Move move) {
-    }
-
-    private void moveKingNormal(Move move) {
-    }
-
-    private void movePawnNormal(Move move) {
-        this.board.emptySquare(move.from());
-        this.board.setPieceOn(move.getPiece(), move.to());
-        this.moves.add(move);
-        this.board.setActive(move.color().other());
+    private boolean targetOccupiedByOtherColor(MoveDraft move) {
+        Piece piece = board.getPieceOn(move.to());
+        return piece != null && piece.color() == move.color().other();
     }
 }

@@ -7,6 +7,8 @@ import org.example.data.details.PieceType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
@@ -104,6 +106,76 @@ class BoardTest {
     }
 
     @Test
+    void equals() {
+        assertEquals(new Coord(0, 0), new Coord(0, 0));
+        assertEquals(new Coord(2, 0), new Coord(2, 0));
+        assertEquals(new Coord(0, 5), new Coord(0, 5));
+
+        assertNotEquals(new Coord(0, 0), new Coord(0, 3));
+        assertNotEquals(new Coord(0, 0), null);
+        assertNotEquals(new Coord(0, 0), PieceType.PAWN);
+    }
+
+    @Test
+    void searchPieces() {
+        assertEquals(8, this.board.searchPieces(PieceType.PAWN, Color.WHITE).size());
+        assertEquals(2, this.board.searchPieces(PieceType.ROOK, Color.WHITE).size());
+        assertEquals(2, this.board.searchPieces(PieceType.KNIGHT, Color.WHITE).size());
+        assertEquals(2, this.board.searchPieces(PieceType.BISHOP, Color.WHITE).size());
+        assertEquals(1, this.board.searchPieces(PieceType.QUEEN, Color.WHITE).size());
+        assertEquals(1, this.board.searchPieces(PieceType.KING, Color.WHITE).size());
+
+        assertEquals(8, this.board.searchPieces(PieceType.PAWN, Color.BLACK).size());
+        assertEquals(2, this.board.searchPieces(PieceType.ROOK, Color.BLACK).size());
+        assertEquals(2, this.board.searchPieces(PieceType.KNIGHT, Color.BLACK).size());
+        assertEquals(2, this.board.searchPieces(PieceType.BISHOP, Color.BLACK).size());
+        assertEquals(1, this.board.searchPieces(PieceType.QUEEN, Color.BLACK).size());
+        assertEquals(1, this.board.searchPieces(PieceType.KING, Color.BLACK).size());
+
+        List<Coord> coords;
+        coords = this.board.searchPieces(PieceType.PAWN, Color.BLACK);
+        assertTrue(coords.contains(Coord.of('a', '7')));
+        assertTrue(coords.contains(Coord.of('b', '7')));
+        assertTrue(coords.contains(Coord.of('c', '7')));
+        assertTrue(coords.contains(Coord.of('d', '7')));
+        assertTrue(coords.contains(Coord.of('e', '7')));
+        assertTrue(coords.contains(Coord.of('f', '7')));
+        assertTrue(coords.contains(Coord.of('g', '7')));
+        assertTrue(coords.contains(Coord.of('h', '7')));
+
+        coords = this.board.searchPieces(PieceType.KNIGHT, Color.WHITE);
+        assertTrue(coords.contains(Coord.of('b', '1')));
+        assertTrue(coords.contains(Coord.of('g', '1')));
+
+        coords = this.board.searchPieces(PieceType.QUEEN, Color.BLACK);
+        assertTrue(coords.contains(Coord.of('d', '8')));
+
+        coords = this.board.searchPieces(PieceType.KING, null);
+        assertEquals(2, coords.size());
+        assertTrue(coords.contains(Coord.of('e', '1')));
+        assertTrue(coords.contains(Coord.of('e', '8')));
+
+        coords = this.board.searchPieces(null, Color.WHITE);
+        assertEquals(16, coords.size());
+        assertTrue(coords.contains(Coord.of('a', '1')));
+        assertTrue(coords.contains(Coord.of('b', '1')));
+        assertTrue(coords.contains(Coord.of('c', '1')));
+        assertTrue(coords.contains(Coord.of('d', '1')));
+        assertTrue(coords.contains(Coord.of('e', '1')));
+        assertTrue(coords.contains(Coord.of('f', '1')));
+        assertTrue(coords.contains(Coord.of('g', '1')));
+        assertTrue(coords.contains(Coord.of('h', '1')));
+        assertTrue(coords.contains(Coord.of('a', '2')));
+        assertTrue(coords.contains(Coord.of('b', '2')));
+        assertTrue(coords.contains(Coord.of('c', '2')));
+        assertTrue(coords.contains(Coord.of('d', '2')));
+        assertTrue(coords.contains(Coord.of('e', '2')));
+        assertTrue(coords.contains(Coord.of('f', '2')));
+        assertTrue(coords.contains(Coord.of('g', '2')));
+        assertTrue(coords.contains(Coord.of('h', '2')));
+    }
+
+    @Test
     void emptySquare() {
         Piece piece = new Piece(PieceType.ROOK, Color.WHITE);
         Coord coord = new Coord(0,0);
@@ -134,11 +206,11 @@ class BoardTest {
 
     @Test
     void getEnPassantSquare() {
-        assertEquals("-", this.board.getEnPassantSquare());
+        assertEquals(null, this.board.getEnPassantSquare());
 
-        this.board.setEnPassantSquare("e3");
+        this.board.setEnPassantSquare(Coord.of("e3"));
 
-        assertEquals("e3", this.board.getEnPassantSquare());
+        assertEquals(Coord.of("e3"), this.board.getEnPassantSquare());
     }
 
     @Test

@@ -1,4 +1,4 @@
-package org.example.data;
+package org.example.data.move;
 
 import org.example.data.details.*;
 
