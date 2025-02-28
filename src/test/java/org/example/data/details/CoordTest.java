@@ -251,7 +251,21 @@ public class CoordTest {
 
     @Test
     void testToString() {
-        Coord coord = new Coord(2, 3);
-        assertEquals("Coord{2, 3}", coord.toString());
+        Coord coord;
+
+        coord = new Coord(2, 3);
+        assertEquals("c4", coord.toString());
+
+        coord = new Coord(7,7);
+        assertEquals("h8", coord.toString());
+
+        coord = new Coord(0, 0);
+        assertEquals("a1", coord.toString());
+
+        coord = new Coord(4, 4);
+        assertEquals("e5", coord.toString());
+
+        coord = new Coord(1, 4);
+        assertEquals("b5", coord.toString());
     }
 }

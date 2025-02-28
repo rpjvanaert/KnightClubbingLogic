@@ -31,6 +31,14 @@ public class Coord {
     }
 
     public Coord getAdjacent(int xDiff, int yDiff) {
+        int xNew = x + xDiff;
+        int yNew = y + yDiff;
+        if (0 > xNew || xNew > 7)
+            return null;
+
+        if (0 > yNew || yNew > 7)
+            return null;
+
         return new Coord(
                 this.x + xDiff,
                 this.y + yDiff
@@ -82,7 +90,7 @@ public class Coord {
 
     @Override
     public String toString() {
-        return "Coord{" + x + ", " + y + '}';
+        return this.getNotation();
     }
 
     @Override

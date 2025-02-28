@@ -58,10 +58,15 @@ public class ChessGameTest_Bishop {
                 ""
         );
 
+        System.out.println(this.chessGame.getBoard().getDisplay());
         assertTrue(this.chessGame.submitMove(moveDraft1));
+        System.out.println(this.chessGame.getBoard().getDisplay());
         assertTrue(this.chessGame.submitMove(moveDraft2));
+        System.out.println(this.chessGame.getBoard().getDisplay());
         assertTrue(this.chessGame.submitMove(moveDraft3));
+        System.out.println(this.chessGame.getBoard().getDisplay());
         assertTrue(this.chessGame.submitMove(moveDraft4));
+        System.out.println(this.chessGame.getBoard().getDisplay());
 
         Board board = this.chessGame.getBoard();
         assertNull(board.getPieceOn(moveDraft1.from()));
@@ -72,6 +77,15 @@ public class ChessGameTest_Bishop {
         assertEquals(moveDraft3.getPiece(), board.getPieceOn(moveDraft3.to()));
         assertNull(board.getPieceOn(moveDraft4.from()));
         assertEquals(moveDraft4.getPiece(), board.getPieceOn(moveDraft4.to()));
+        assertEquals("r  n  b  q  k  -  n  r  \n" +
+                "p  p  p  p  -  p  p  p  \n" +
+                "-  -  -  -  -  -  -  -  \n" +
+                "-  -  b  -  p  -  -  -  \n" +
+                "-  -  B  -  P  -  -  -  \n" +
+                "-  -  -  -  -  -  -  -  \n" +
+                "P  P  P  P  -  P  P  P  \n" +
+                "R  N  B  Q  K  -  N  R  \n",board.getDisplay());
+        System.out.println(board.getDisplay());
     }
 
     @Test

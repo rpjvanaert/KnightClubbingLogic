@@ -17,13 +17,11 @@ public class Main {
                 MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
-                new Coord(1, 2),
-                new Coord(1, 2),
+                Coord.of("e2"),
+                Coord.of("e4"),
                 ""
         )));
 
         System.out.println(chessGame.getBoard().getDisplay());
-        System.out.println(chessGame.getBoard().getPieceOn(new Coord(0, 0)).getChar());
-        System.out.println(chessGame.getBoard().getPieceOn(new Coord(3, 0)).getChar());
     }
 }

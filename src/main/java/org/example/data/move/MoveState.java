@@ -24,5 +24,30 @@ public class MoveState {
         this.previousHalfMoveClock = game.getBoard().getHalfmoveClock();
         this.previousFullMoveNumber = game.getBoard().getFullmoveNumber();
     }
+
+    public MoveState(Coord from, Coord to, Piece movedPiece, Piece capturedPiece, String previousCastlingRights, Coord previousEnPassantTarget, int previousHalfMoveClock, int previousFullMoveNumber) {
+        this.from = from;
+        this.to = to;
+        this.movedPiece = movedPiece;
+        this.capturedPiece = capturedPiece;
+        this.previousCastlingRights = previousCastlingRights;
+        this.previousEnPassantTarget = previousEnPassantTarget;
+        this.previousHalfMoveClock = previousHalfMoveClock;
+        this.previousFullMoveNumber = previousFullMoveNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "MoveState{" +
+                "from=" + from +
+                ", to=" + to +
+                ", movedPiece=" + movedPiece +
+                ", capturedPiece=" + capturedPiece +
+                ", previousCastlingRights='" + previousCastlingRights + '\'' +
+                ", previousEnPassantTarget=" + previousEnPassantTarget +
+                ", previousHalfMoveClock=" + previousHalfMoveClock +
+                ", previousFullMoveNumber=" + previousFullMoveNumber +
+                '}';
+    }
 }
 
