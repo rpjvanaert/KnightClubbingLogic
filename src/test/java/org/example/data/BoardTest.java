@@ -1,9 +1,6 @@
 package org.example.data;
 
-import org.example.data.details.Color;
-import org.example.data.details.Coord;
-import org.example.data.details.Piece;
-import org.example.data.details.PieceType;
+import org.example.data.details.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -206,7 +203,7 @@ class BoardTest {
 
     @Test
     void getEnPassantSquare() {
-        assertEquals(null, this.board.getEnPassantSquare());
+        assertNull(this.board.getEnPassantSquare());
 
         this.board.setEnPassantSquare(Coord.of("e3"));
 
@@ -237,5 +234,65 @@ class BoardTest {
         assertEquals(3, this.board.tickFullmoveNumber());
 
         assertEquals(3, this.board.getFullmoveNumber());
+    }
+
+    @Test
+    void getCastlingRightsForWhite() {
+        List<MoveType> expected = List.of(MoveType.CASTLE_SHORT, MoveType.CASTLE_LONG);
+
+        List<MoveType> result = this.board.getCastlingRights(Color.WHITE);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void getCastlingRightsForBlack() {
+        List<MoveType> expected = List.of(MoveType.CASTLE_SHORT, MoveType.CASTLE_LONG);
+
+        List<MoveType> result = this.board.getCastlingRights(Color.BLACK);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void getCastlingRightsWithExclusion() {
+        this.board.setCastlingRights("Kk");
+
+        List<MoveType> expected = List.of(MoveType.CASTLE_SHORT);
+        List<MoveType> result;
+
+        result = this.board.getCastlingRights(Color.WHITE);
+        assertEquals(expected, result);
+
+        result = this.board.getCastlingRights(Color.BLACK);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void getCastlingRightsWithNothing() {
+        this.board.setCastlingRights("-");
+        List<MoveType> expected = List.of();
+
+        List<MoveType> result = this.board.getCastlingRights(Color.WHITE);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void getCastlingRightsWithDifferentSides() {
+        this.board.setCastlingRights("Kq");
+
+        List<MoveType> expected;
+        List<MoveType> result;
+
+        expected = List.of(MoveType.CASTLE_SHORT);
+
+        result = this.board.getCastlingRights(Color.WHITE);
+        assertEquals(expected, result);
+
+        expected = List.of(MoveType.CASTLE_LONG);
+
+        result = this.board.getCastlingRights(Color.BLACK);
+        assertEquals(expected, result);
     }
 }

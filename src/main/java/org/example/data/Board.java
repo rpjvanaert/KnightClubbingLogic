@@ -1,9 +1,6 @@
 package org.example.data;
 
-import org.example.data.details.Color;
-import org.example.data.details.Coord;
-import org.example.data.details.Piece;
-import org.example.data.details.PieceType;
+import org.example.data.details.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +8,7 @@ import java.util.List;
 
 public class Board {
 
-    private Piece[][] board;
+    private final Piece[][] board;
 
     private Color active;
     private String castlingRights;
@@ -185,6 +182,30 @@ public class Board {
 
     public String getCastlingRights() {
         return castlingRights;
+    }
+
+    public List<MoveType> getCastlingRights(Color color) {
+        List<MoveType> moveTypes = new ArrayList<>();
+
+        if (this.castlingRights.contains("-"))
+            return moveTypes;
+
+        if (Color.WHITE.equals(color)) {
+            if (this.castlingRights.contains("K"))
+                moveTypes.add(MoveType.CASTLE_SHORT);
+
+            if (this.castlingRights.contains("Q"))
+                moveTypes.add(MoveType.CASTLE_LONG);
+
+        } else if (Color.BLACK.equals(color)) {
+            if (this.castlingRights.contains("k"))
+                moveTypes.add(MoveType.CASTLE_SHORT);
+
+            if (this.castlingRights.contains("q"))
+                moveTypes.add(MoveType.CASTLE_LONG);
+        }
+
+        return moveTypes;
     }
 
     public void setEnPassantSquare(Coord enPassantSquare) {
