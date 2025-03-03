@@ -5,7 +5,6 @@ import org.example.data.move.Move;
 import org.example.data.move.MoveDraft;
 import org.example.data.details.Color;
 import org.example.data.details.Coord;
-import org.example.data.details.MoveType;
 import org.example.data.details.PieceType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,12 +23,10 @@ public class ChessGameTest_Knight {
     @Test
     void testMove() {
         MoveDraft moveDraft = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.WHITE,
                 Coord.of('b', 1),
-                Coord.of('c', 3),
-                ""
+                Coord.of('c', 3)
         );
 
         this.chessGame.submitMove(moveDraft);
@@ -41,18 +38,16 @@ public class ChessGameTest_Knight {
         assertEquals(moveDraft.color(), result.color());
         assertEquals(moveDraft.from(), result.from());
         assertEquals(moveDraft.to(), result.to());
-        assertEquals(moveDraft.special(), result.special());
+        assertEquals(moveDraft.type(), result.type());
     }
 
     @Test
     void testInvalidMove_ColorInactive() {
         MoveDraft moveDraft = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.BLACK,
                 Coord.of('b', 1),
-                Coord.of('c', 3),
-                ""
+                Coord.of('c', 3)
         );
 
         assertFalse(this.chessGame.submitMove(moveDraft));
@@ -62,12 +57,10 @@ public class ChessGameTest_Knight {
     @Test
     void testInvalidMove_toWrong1() {
         MoveDraft moveDraft = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.WHITE,
                 Coord.of('b', 1),
-                Coord.of('b', 3),
-                ""
+                Coord.of('b', 3)
         );
 
         assertFalse(this.chessGame.submitMove(moveDraft));
@@ -77,12 +70,10 @@ public class ChessGameTest_Knight {
     @Test
     void testInvalidMove_toWrong2() {
         MoveDraft moveDraft = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.WHITE,
                 Coord.of('b', 1),
-                Coord.of('c', 4),
-                ""
+                Coord.of('c', 4)
         );
 
         assertFalse(this.chessGame.submitMove(moveDraft));
@@ -92,12 +83,10 @@ public class ChessGameTest_Knight {
     @Test
     void testInvalidMove_toOccupied() {
         MoveDraft moveDraft = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.WHITE,
                 Coord.of('b', 1),
-                Coord.of('d', 2),
-                ""
+                Coord.of('d', 2)
         );
 
         assertFalse(this.chessGame.submitMove(moveDraft));
@@ -107,39 +96,31 @@ public class ChessGameTest_Knight {
     @Test
     void testMove_knightsOut() {
         MoveDraft moveDraft1 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.WHITE,
                 Coord.of('b', 1),
-                Coord.of('c', 3),
-                ""
+                Coord.of('c', 3)
         );
 
         MoveDraft moveDraft2 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.BLACK,
                 Coord.of('b', 8),
-                Coord.of('c', 6),
-                ""
+                Coord.of('c', 6)
         );
 
         MoveDraft moveDraft3 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.WHITE,
                 Coord.of('g', 1),
-                Coord.of('f', 3),
-                ""
+                Coord.of('f', 3)
         );
 
         MoveDraft moveDraft4 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.BLACK,
                 Coord.of('g', 8),
-                Coord.of('f', 6),
-                ""
+                Coord.of('f', 6)
         );
 
         assertTrue(this.chessGame.submitMove(moveDraft1));
@@ -161,39 +142,31 @@ public class ChessGameTest_Knight {
     @Test
     void testMove_knightsInNOut() {
         MoveDraft moveDraft1 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.WHITE,
                 Coord.of('b', 1),
-                Coord.of('c', 3),
-                ""
+                Coord.of('c', 3)
         );
 
         MoveDraft moveDraft2 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.BLACK,
                 Coord.of('b', 8),
-                Coord.of('c', 6),
-                ""
+                Coord.of('c', 6)
         );
 
         MoveDraft moveDraft3 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.WHITE,
                 Coord.of('c', 3),
-                Coord.of('b', 1),
-                ""
+                Coord.of('b', 1)
         );
 
         MoveDraft moveDraft4 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.BLACK,
                 Coord.of('c', 6),
-                Coord.of('b', 8),
-                ""
+                Coord.of('b', 8)
         );
 
         assertTrue(this.chessGame.submitMove(moveDraft1));
@@ -218,57 +191,45 @@ public class ChessGameTest_Knight {
     @Test
     void testMove_knightsAround() {
         MoveDraft moveDraft1 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.WHITE,
                 Coord.of('b', 1),
-                Coord.of('c', 3),
-                ""
+                Coord.of('c', 3)
         );
 
         MoveDraft moveDraft2 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.BLACK,
                 Coord.of('g', 8),
-                Coord.of('f', 6),
-                ""
+                Coord.of('f', 6)
         );
 
         MoveDraft moveDraft3 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.WHITE,
                 Coord.of('c', 3),
-                Coord.of('d', 5),
-                ""
+                Coord.of('d', 5)
         );
 
         MoveDraft moveDraft4 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.BLACK,
                 Coord.of('f', 6),
-                Coord.of('e', 4),
-                ""
+                Coord.of('e', 4)
         );
 
         MoveDraft moveDraft5 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.WHITE,
                 Coord.of('d', 5),
-                Coord.of('e', 3),
-                ""
+                Coord.of('e', 3)
         );
 
         MoveDraft moveDraft6 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.KNIGHT,
                 Color.BLACK,
                 Coord.of('e', 4),
-                Coord.of('d', 6),
-                ""
+                Coord.of('d', 6)
         );
 
         assertTrue(this.chessGame.submitMove(moveDraft1));

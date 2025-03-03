@@ -14,12 +14,11 @@ public class Main {
         System.out.println(chessGame.getBoard().getDisplay());
 
         System.out.println(chessGame.submitMove(new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of("e2"),
                 Coord.of("e4"),
-                ""
+                MoveType.NORMAL
         )));
 
         System.out.println(chessGame.getBoard().getDisplay());

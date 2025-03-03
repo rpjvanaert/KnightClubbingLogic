@@ -4,7 +4,6 @@ import org.example.data.Board;
 import org.example.data.move.MoveDraft;
 import org.example.data.details.Color;
 import org.example.data.details.Coord;
-import org.example.data.details.MoveType;
 import org.example.data.details.PieceType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,39 +22,31 @@ public class ChessGameTest_Rook {
     @Test
     void testMove() {
         MoveDraft moveDraft1 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('a', 2),
-                Coord.of('a', 4),
-                ""
+                Coord.of('a', 4)
         );
 
         MoveDraft moveDraft2 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.BLACK,
                 Coord.of('a', 7),
-                Coord.of('a', 5),
-                ""
+                Coord.of('a', 5)
         );
 
         MoveDraft moveDraft3 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.WHITE,
                 Coord.of('a', 1),
-                Coord.of('a', 3),
-                ""
+                Coord.of('a', 3)
         );
 
         MoveDraft moveDraft4 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.BLACK,
                 Coord.of('a', 8),
-                Coord.of('a', 6),
-                ""
+                Coord.of('a', 6)
         );
 
         assertTrue(this.chessGame.submitMove(moveDraft1));
@@ -77,57 +68,45 @@ public class ChessGameTest_Rook {
     @Test
     void testMove_multiple() {
         MoveDraft moveDraft1 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('a', 2),
-                Coord.of('a', 4),
-                ""
+                Coord.of('a', 4)
         );
 
         MoveDraft moveDraft2 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.BLACK,
                 Coord.of('h', 7),
-                Coord.of('h', 5),
-                ""
+                Coord.of('h', 5)
         );
 
         MoveDraft moveDraft3 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.WHITE,
                 Coord.of('a', 1),
-                Coord.of('a', 3),
-                ""
+                Coord.of('a', 3)
         );
 
         MoveDraft moveDraft4 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.BLACK,
                 Coord.of('h', 8),
-                Coord.of('h', 6),
-                ""
+                Coord.of('h', 6)
         );
 
         MoveDraft moveDraft5 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.WHITE,
                 Coord.of('a', 3),
-                Coord.of('f', 3),
-                ""
+                Coord.of('f', 3)
         );
 
         MoveDraft moveDraft6 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.BLACK,
                 Coord.of('h', 6),
-                Coord.of('c', 6),
-                ""
+                Coord.of('c', 6)
         );
 
         assertTrue(this.chessGame.submitMove(moveDraft1));
@@ -158,57 +137,45 @@ public class ChessGameTest_Rook {
     @Test
     void testMove_back() {
         MoveDraft moveDraft1 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('a', 2),
-                Coord.of('a', 4),
-                ""
+                Coord.of('a', 4)
         );
 
         MoveDraft moveDraft2 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.BLACK,
                 Coord.of('h', 7),
-                Coord.of('h', 5),
-                ""
+                Coord.of('h', 5)
         );
 
         MoveDraft moveDraft3 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.WHITE,
                 Coord.of('a', 1),
-                Coord.of('a', 3),
-                ""
+                Coord.of('a', 3)
         );
 
         MoveDraft moveDraft4 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.BLACK,
                 Coord.of('h', 8),
-                Coord.of('h', 6),
-                ""
+                Coord.of('h', 6)
         );
 
         MoveDraft moveDraft5 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.WHITE,
                 Coord.of('a', 3),
-                Coord.of('a', 1),
-                ""
+                Coord.of('a', 1)
         );
 
         MoveDraft moveDraft6 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.BLACK,
                 Coord.of('h', 6),
-                Coord.of('h', 8),
-                ""
+                Coord.of('h', 8)
         );
 
         assertTrue(this.chessGame.submitMove(moveDraft1));
@@ -239,57 +206,45 @@ public class ChessGameTest_Rook {
     @Test
     void testInvalidMove_diagonal() {
         MoveDraft moveDraft1 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('a', 2),
-                Coord.of('a', 4),
-                ""
+                Coord.of('a', 4)
         );
 
         MoveDraft moveDraft2 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.BLACK,
                 Coord.of('h', 7),
-                Coord.of('h', 5),
-                ""
+                Coord.of('h', 5)
         );
 
         MoveDraft moveDraft3 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.WHITE,
                 Coord.of('a', 1),
-                Coord.of('a', 3),
-                ""
+                Coord.of('a', 3)
         );
 
         MoveDraft moveDraft4 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.BLACK,
                 Coord.of('h', 8),
-                Coord.of('h', 6),
-                ""
+                Coord.of('h', 6)
         );
 
         MoveDraft moveDraft5 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.WHITE,
                 Coord.of('a', 3),
-                Coord.of('c', 1),
-                ""
+                Coord.of('c', 1)
         );
 
         MoveDraft moveDraft6 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.ROOK,
                 Color.BLACK,
                 Coord.of('h', 6),
-                Coord.of('f', 8),
-                ""
+                Coord.of('f', 8)
         );
 
         assertTrue(this.chessGame.submitMove(moveDraft1));

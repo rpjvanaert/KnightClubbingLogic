@@ -1,10 +1,10 @@
 package org.example.logic;
 
 import org.example.data.Board;
+import org.example.data.details.MoveType;
 import org.example.data.move.MoveDraft;
 import org.example.data.details.Color;
 import org.example.data.details.Coord;
-import org.example.data.details.MoveType;
 import org.example.data.details.PieceType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,39 +23,31 @@ public class ChessGameTest_Bishop {
     @Test
     void testMove() {
         MoveDraft moveDraft1 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('e', 2),
-                Coord.of('e', 4),
-                ""
+                Coord.of('e', 4)
         );
 
         MoveDraft moveDraft2 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.BLACK,
                 Coord.of('e', 7),
-                Coord.of('e', 5),
-                ""
+                Coord.of('e', 5)
         );
 
         MoveDraft moveDraft3 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.BISHOP,
                 Color.WHITE,
                 Coord.of('f', 1),
-                Coord.of('c', 4),
-                ""
+                Coord.of('c', 4)
         );
 
         MoveDraft moveDraft4 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.BISHOP,
                 Color.BLACK,
                 Coord.of('f', 8),
-                Coord.of('c', 5),
-                ""
+                Coord.of('c', 5)
         );
 
         System.out.println(this.chessGame.getBoard().getDisplay());
@@ -91,30 +83,24 @@ public class ChessGameTest_Bishop {
     @Test
     void testInvalidMove_vertical() {
         MoveDraft moveDraft1 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('e', 2),
-                Coord.of('e', 4),
-                ""
+                Coord.of('e', 4)
         );
 
         MoveDraft moveDraft2 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.BLACK,
                 Coord.of('e', 7),
-                Coord.of('e', 5),
-                ""
+                Coord.of('e', 5)
         );
 
         MoveDraft moveDraft3 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.BISHOP,
                 Color.WHITE,
                 Coord.of('f', 1),
-                Coord.of('f', 4),
-                ""
+                Coord.of('f', 4)
         );
 
         assertTrue(this.chessGame.submitMove(moveDraft1));
@@ -132,30 +118,24 @@ public class ChessGameTest_Bishop {
     @Test
     void testInvalidMove_weird() {
         MoveDraft moveDraft1 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('e', 2),
-                Coord.of('e', 4),
-                ""
+                Coord.of('e', 4)
         );
 
         MoveDraft moveDraft2 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.BLACK,
                 Coord.of('e', 7),
-                Coord.of('e', 5),
-                ""
+                Coord.of('e', 5)
         );
 
         MoveDraft moveDraft3 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.BISHOP,
                 Color.WHITE,
                 Coord.of('f', 1),
-                Coord.of('c', 5),
-                ""
+                Coord.of('c', 5)
         );
 
         assertTrue(this.chessGame.submitMove(moveDraft1));

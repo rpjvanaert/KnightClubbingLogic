@@ -4,12 +4,11 @@ import org.example.data.details.*;
 
 public record Move (
         String notation,
-        MoveType type,
         PieceType pieceType,
         Color color,
         Coord from,
         Coord to,
-        String special
+        MoveType type
 ) {
 
     public Piece getPiece() {

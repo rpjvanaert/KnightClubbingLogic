@@ -24,6 +24,12 @@ public class ChessGame {
         this.listeners = new ArrayList<>();
     }
 
+    public ChessGame(String fen) {
+        this.board = new Board(fen);
+        this.moves = new ArrayList<>();
+        this.listeners = new ArrayList<>();
+    }
+
     public Board getBoard() {
         return board;
     }
@@ -63,15 +69,20 @@ public class ChessGame {
         if (move.color() != board.getActive()) throw new ChessException("Not turn of given color");
 
         switch (move.type()) {
-            case CASTLING -> {
+            case CASTLE_LONG:
+            case CASTLE_SHORT:
                 if (!isValidCastling(move)) throw new ChessException(("Not valid castling move"));
-            }
-            case PROMOTION -> {
+                break;
+            case PROMOTION_QUEEN:
+            case PROMOTION_ROOK:
+            case PROMOTION_BISHOP:
+            case PROMOTION_KNIGHT:
                 if (!isValidNormal(move) && !isValidPromotion(move)) throw new ChessException("Not valid promotion move");
-            }
-            case NORMAL -> {
+                break;
+            case NORMAL:
+            case EN_PASSANT:
                 if (!isValidNormal(move)) throw new ChessException("Not valid move");
-            }
+                break;
         }
     }
 
@@ -120,12 +131,10 @@ public class ChessGame {
 
         if (rank != backRank) return false;
 
-        PieceType promotionPieceType = PieceType.fromFEN(move.special().charAt(0));
-
         return
-                promotionPieceType != null
-                && promotionPieceType != PieceType.PAWN
-                && promotionPieceType != PieceType.KING;
+                move.type().pieceType != null
+                && move.type().pieceType != PieceType.PAWN
+                && move.type().pieceType != PieceType.KING;
     }
 
     private boolean isValidNormal(MoveDraft move) {
@@ -158,7 +167,7 @@ public class ChessGame {
 
             Piece targetPiece = this.board.getPieceOn(move.to());
 
-            if (move.special().equals("ep")) {
+            if (move.type().equals("ep")) {
                 //TODO en passant
             }
 
@@ -257,8 +266,8 @@ public class ChessGame {
         return targetNotOccupiedByOwnColor(move);
     }
 
-    private boolean isValidCastling(MoveDraft move) {
-        String side = String.valueOf(move.special().charAt(0));
+    private boolean isValidCastling(MoveDraft move) { //todo
+        String side = String.valueOf(move.type().notation);
         if (move.color() == Color.WHITE) side = side.toUpperCase();
 
         return this.board.getCastlingRights().contains(side);
@@ -341,12 +350,11 @@ public class ChessGame {
     private static Move transformDraftToMove(MoveDraft move, ThreatType threat) {
         return new Move(
                 getNotation(move, threat),
-                move.type(),
                 move.pieceType(),
                 move.color(),
                 move.from(),
                 move.to(),
-                move.special()
+                move.type()
         );
     }
 
@@ -354,11 +362,12 @@ public class ChessGame {
         return (move.getPiece().pieceType().fen() + move.to().getNotation() + threat.getSign()).trim();
     }
 
-    private void executeMove(Move move) {
+    private void executeMove(Move move) {//todo every moveType.
         switch (move.type()) {
             case NORMAL -> executeNormal(move);
-            case CASTLING -> executeCastling(move);
-            case PROMOTION -> executePromotion(move);
+            case CASTLE_LONG -> executeCastling(move);
+            case CASTLE_SHORT -> executeCastling(move);
+            case PROMOTION_QUEEN -> executePromotion(move);
         }
     }
 
@@ -374,16 +383,6 @@ public class ChessGame {
         this.board.setPieceOn(move.getPiece(), move.to());
         this.moves.add(move);
         this.board.setActive(move.color().other());
-        /*
-        switch (move.pieceType()) {
-            case PAWN -> movePawnNormal(move);
-            case KING -> moveKingNormal(move);
-            case QUEEN -> moveQueenNormal(move);
-            case ROOK -> moveRookNormal(move);
-            case BISHOP -> moveBishopNormal(move);
-            case KNIGHT -> moveKnightNormal(move);
-        }
-         */
     }
 
     private boolean targetNotOccupiedByOwnColor(MoveDraft move) {

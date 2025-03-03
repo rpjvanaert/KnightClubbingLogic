@@ -4,7 +4,6 @@ import org.example.data.move.Move;
 import org.example.data.move.MoveDraft;
 import org.example.data.details.Color;
 import org.example.data.details.Coord;
-import org.example.data.details.MoveType;
 import org.example.data.details.PieceType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,12 +22,10 @@ class ChessGameTest_Pawn {
     @Test
     void testSingleMove() {
         MoveDraft moveDraft = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('e', 2),
-                Coord.of('e', 3),
-                ""
+                Coord.of('e', 3)
         );
 
         this.chessGame.submitMove(moveDraft);
@@ -40,19 +37,17 @@ class ChessGameTest_Pawn {
         assertEquals(moveDraft.color(), result.color());
         assertEquals(moveDraft.from(), result.from());
         assertEquals(moveDraft.to(), result.to());
-        assertEquals(moveDraft.special(), result.special());
+        assertEquals(moveDraft.type(), result.type());
         System.out.println(this.chessGame.getBoard().getDisplay());
     }
 
     @Test
     void testDoubleMove() {
         MoveDraft moveDraft = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('e', 2),
-                Coord.of('e', 4),
-                ""
+                Coord.of('e', 4)
         );
 
         this.chessGame.submitMove(moveDraft);
@@ -64,19 +59,17 @@ class ChessGameTest_Pawn {
         assertEquals(moveDraft.color(), result.color());
         assertEquals(moveDraft.from(), result.from());
         assertEquals(moveDraft.to(), result.to());
-        assertEquals(moveDraft.special(), result.special());
+        assertEquals(moveDraft.type(), result.type());
         System.out.println(this.chessGame.getBoard().getDisplay());
     }
 
     @Test
     void testInvalidDoubleMove() {
         MoveDraft moveDraft = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('e', 3),
-                Coord.of('e', 5),
-                ""
+                Coord.of('e', 5)
         );
 
         assertFalse(this.chessGame.submitMove(moveDraft));
@@ -87,12 +80,10 @@ class ChessGameTest_Pawn {
     @Test
     void testInvalidMove_ColorInactive() {
         MoveDraft moveDraft = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.BLACK,
                 Coord.of('e', 7),
-                Coord.of('e', 6),
-                ""
+                Coord.of('e', 6)
         );
 
         assertFalse(this.chessGame.submitMove(moveDraft));
@@ -103,12 +94,10 @@ class ChessGameTest_Pawn {
     @Test
     void testInvalidMove_changeRow_noTake() {
         MoveDraft moveDraft = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('e', 2),
-                Coord.of('f', 3),
-                ""
+                Coord.of('f', 3)
         );
 
         assertFalse(this.chessGame.submitMove(moveDraft));
@@ -119,12 +108,10 @@ class ChessGameTest_Pawn {
     @Test
     void testInvalidMove_tooFar() {
         MoveDraft moveDraft = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('e', 2),
-                Coord.of('e', 5),
-                ""
+                Coord.of('e', 5)
         );
 
         assertFalse(this.chessGame.submitMove(moveDraft));
@@ -135,30 +122,24 @@ class ChessGameTest_Pawn {
     @Test
     void testInvalidMove_intoOccupied() {
         MoveDraft moveDraft1 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('e', 2),
-                Coord.of('e', 4),
-                ""
+                Coord.of('e', 4)
         );
 
         MoveDraft moveDraft2 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.BLACK,
                 Coord.of('e', 7),
-                Coord.of('e', 5),
-                ""
+                Coord.of('e', 5)
         );
 
         MoveDraft moveDraft3 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('e', 4),
-                Coord.of('e', 5),
-                ""
+                Coord.of('e', 5)
         );
 
         assertTrue(this.chessGame.submitMove(moveDraft1));
@@ -176,30 +157,24 @@ class ChessGameTest_Pawn {
     @Test
     void testMove_setOfThree() {
         MoveDraft moveDraft1 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('e', 2),
-                Coord.of('e', 4),
-                ""
+                Coord.of('e', 4)
         );
 
         MoveDraft moveDraft2 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.BLACK,
                 Coord.of('e', 7),
-                Coord.of('e', 5),
-                ""
+                Coord.of('e', 5)
         );
 
         MoveDraft moveDraft3 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('d', 2),
-                Coord.of('d', 4),
-                ""
+                Coord.of('d', 4)
         );
 
         assertTrue(this.chessGame.submitMove(moveDraft1));
@@ -219,48 +194,38 @@ class ChessGameTest_Pawn {
     @Test
     void testInvalidMove_doubleIntoOccupied() {
         MoveDraft moveDraft1 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('a', 2),
-                Coord.of('a', 3),
-                ""
+                Coord.of('a', 3)
         );
 
         MoveDraft moveDraft2 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.BLACK,
                 Coord.of('e', 7),
-                Coord.of('e', 5),
-                ""
+                Coord.of('e', 5)
         );
 
         MoveDraft moveDraft3 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('a', 3),
-                Coord.of('a', 4),
-                ""
+                Coord.of('a', 4)
         );
 
         MoveDraft moveDraft4 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.BLACK,
                 Coord.of('e', 5),
-                Coord.of('e', 4),
-                ""
+                Coord.of('e', 4)
         );
 
         MoveDraft moveDraft5 = new MoveDraft(
-                MoveType.NORMAL,
                 PieceType.PAWN,
                 Color.WHITE,
                 Coord.of('e', 2),
-                Coord.of('e', 4),
-                ""
+                Coord.of('e', 4)
         );
 
         assertTrue(this.chessGame.submitMove(moveDraft1));

@@ -42,25 +42,27 @@ public class MoveMaker {
         Coord oneForward = from.getAdjacent(0, direction);
         if (board.isEmpty(oneForward)) {
             moves.add(new MoveDraft(
-                    isPromotionSquare(from, oneForward) ? MoveType.PROMOTION : MoveType.NORMAL,
                     piece.pieceType(),
                     piece.color(),
                     from,
                     oneForward,
-                    ""
+                    MoveType.NORMAL
             ));
+
+            if (isPromotionSquare(oneForward)) {
+                moves.addAll(createEveryPromotionMove(from, oneForward, piece)); //todo generate pawn moves for promotion has to be looked at every possibility
+            }
             
 
             if (isPawnFromStart(from, piece)) {
                 Coord twoForward = from.getAdjacent(0, 2 * direction);
                 if (board.isEmpty(twoForward)) {
                     moves.add(new MoveDraft(
-                            MoveType.NORMAL,
                             piece.pieceType(),
                             piece.color(),
                             from,
                             twoForward,
-                            ""
+                            MoveType.NORMAL
                     ));
                 }
             }
@@ -73,6 +75,27 @@ public class MoveMaker {
         return moves;
     }
 
+    private static List<MoveDraft> createEveryPromotionMove(Coord from, Coord target, Piece piece) {
+        List<MoveDraft> moves = new ArrayList<>(List.of());
+
+        moves.add(createPromotionMove(from, target, piece.color(), MoveType.PROMOTION_QUEEN));
+        moves.add(createPromotionMove(from, target, piece.color(), MoveType.PROMOTION_ROOK));
+        moves.add(createPromotionMove(from, target, piece.color(), MoveType.PROMOTION_BISHOP));
+        moves.add(createPromotionMove(from, target, piece.color(), MoveType.PROMOTION_KNIGHT));
+
+        return moves;
+    }
+
+    private static MoveDraft createPromotionMove(Coord from, Coord target, Color color, MoveType moveType) {
+        return new MoveDraft(
+                PieceType.PAWN,
+                color,
+                from,
+                target,
+                moveType
+        );
+    }
+
     private static MoveDraft createPawnTakeMove(Board board, Coord from, Piece piece, Coord toCapture) {
         if (toCapture == null)
             return null;
@@ -80,12 +103,11 @@ public class MoveMaker {
         boolean isEnPassant = isEnPassantMove(board.getEnPassantSquare(), toCapture);
         if (board.isEnemy(toCapture, piece.color()) || isEnPassant) {
             return new MoveDraft(
-                    isPromotionSquare(from, toCapture) ? MoveType.PROMOTION : MoveType.NORMAL,
                     piece.pieceType(),
                     piece.color(),
                     from,
                     toCapture,
-                    isEnPassant ? "ep" : ""
+                    isEnPassant ? MoveType.EN_PASSANT : isPromotionSquare(toCapture) ? MoveType.PROMOTION_QUEEN : MoveType.NORMAL
             );
         }
         return null;
@@ -114,7 +136,7 @@ public class MoveMaker {
 
                     Coord target = coord.getAdjacent(x, y);
                     if (target != null && board.isValid(target) && !board.isFriendly(target, piece.color())) {
-                        moves.add(new MoveDraft(MoveType.NORMAL, piece.pieceType(), piece.color(), coord, target, ""));
+                        moves.add(new MoveDraft(piece.pieceType(), piece.color(), coord, target));
                     }
 
                 }
@@ -200,10 +222,12 @@ public class MoveMaker {
             }
         }
 
+
+
         return moves;
     }
 
-    public static boolean isPromotionSquare(Coord from, Coord to) {
+    public static boolean isPromotionSquare(Coord to) {
         return (to.getY() == 0 || to.getY() == 7);
     }
 }

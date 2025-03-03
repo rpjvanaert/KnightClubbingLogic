@@ -3,16 +3,15 @@ package org.example.data.move;
 import org.example.data.details.*;
 
 public record MoveDraft(
-        MoveType type,
         PieceType pieceType,
         Color color,
         Coord from,
         Coord to,
-        String special
+        MoveType type
 ) {
 
     public MoveDraft(PieceType pieceType, Color color, Coord from, Coord to) {
-        this(MoveType.NORMAL, pieceType, color, from, to, "");
+        this(pieceType, color, from, to, MoveType.NORMAL);
     }
 
     public Piece getPiece() {

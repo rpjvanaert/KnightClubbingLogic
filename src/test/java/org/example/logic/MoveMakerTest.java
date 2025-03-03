@@ -2,7 +2,6 @@ package org.example.logic;
 
 import org.example.data.details.Color;
 import org.example.data.details.Coord;
-import org.example.data.details.MoveType;
 import org.example.data.details.PieceType;
 import org.example.data.move.MoveDraft;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,55 +26,55 @@ class MoveMakerTest {
         List<MoveDraft> result;
 
         expectedFirst = List.of(
-                new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.WHITE, Coord.of("e2"), Coord.of("e3"), ""),
-                new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.WHITE, Coord.of("e2"), Coord.of("e4"), "")
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("e2"), Coord.of("e3")),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("e2"), Coord.of("e4"))
         );
         result = MoveMaker.generatePawnMoves(chessGame.getBoard(), Coord.of("e2"));
         assertEquals(expectedFirst, result);
-        assertTrue(chessGame.submitMove(new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.WHITE, Coord.of("e2"), Coord.of("e4"), "")));
+        assertTrue(chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("e2"), Coord.of("e4"))));
 
 
         expectedFirst = List.of(
-                new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.BLACK, Coord.of("e7"), Coord.of("e6"), ""),
-                new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.BLACK, Coord.of("e7"), Coord.of("e5"), "")
+                new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("e7"), Coord.of("e6")),
+                new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("e7"), Coord.of("e5"))
         );
         result = MoveMaker.generatePawnMoves(chessGame.getBoard(), Coord.of("e7"));
         assertEquals(expectedFirst, result);
-        assertTrue(chessGame.submitMove(new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.BLACK, Coord.of("e7"), Coord.of("e6"), "")));
+        assertTrue(chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("e7"), Coord.of("e6"))));
 
         expectedFirst = List.of(
-                new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.WHITE, Coord.of("d2"), Coord.of("d3"), ""),
-                new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.WHITE, Coord.of("d2"), Coord.of("d4"), "")
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("d2"), Coord.of("d3")),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("d2"), Coord.of("d4"))
         );
         result = MoveMaker.generatePawnMoves(chessGame.getBoard(), Coord.of("d2"));
         assertEquals(expectedFirst, result);
-        assertTrue(chessGame.submitMove(new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.WHITE, Coord.of("d2"), Coord.of("d4"), "")));
+        assertTrue(chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("d2"), Coord.of("d4"))));
 
 
         expectedFirst = List.of(
-                new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.BLACK, Coord.of("d7"), Coord.of("d6"), ""),
-                new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.BLACK, Coord.of("d7"), Coord.of("d5"), "")
+                new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("d7"), Coord.of("d6")),
+                new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("d7"), Coord.of("d5"))
         );
         result = MoveMaker.generatePawnMoves(chessGame.getBoard(), Coord.of("d7"));
         assertEquals(expectedFirst, result);
-        assertTrue(chessGame.submitMove(new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.BLACK, Coord.of("d7"), Coord.of("d5"), "")));
+        assertTrue(chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("d7"), Coord.of("d5"))));
 
         expectedFirst = List.of(
-                new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.WHITE, Coord.of("e4"), Coord.of("e5"), ""),
-                new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.WHITE, Coord.of("e4"), Coord.of("d5"), "")
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("e4"), Coord.of("e5")),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("e4"), Coord.of("d5"))
         );
         result = MoveMaker.generatePawnMoves(chessGame.getBoard(), Coord.of("e4"));
         assertEquals(expectedFirst, result);
-        assertTrue(chessGame.submitMove(new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.WHITE, Coord.of("e4"), Coord.of("d5"), "")));
+        assertTrue(chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("e4"), Coord.of("d5"))));
 
 
         expectedFirst = List.of(
-                new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.BLACK, Coord.of("e6"), Coord.of("e5"), ""),
-                new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.BLACK, Coord.of("e6"), Coord.of("d5"), "")
+                new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("e6"), Coord.of("e5")),
+                new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("e6"), Coord.of("d5"))
         );
         result = MoveMaker.generatePawnMoves(chessGame.getBoard(), Coord.of("e6"));
         assertEquals(expectedFirst, result);
-        assertTrue(chessGame.submitMove(new MoveDraft(MoveType.NORMAL, PieceType.PAWN, Color.BLACK, Coord.of("e6"), Coord.of("d5"), "")));
+        assertTrue(chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("e6"), Coord.of("d5"))));
     }
 
     @Test
@@ -89,15 +88,15 @@ class MoveMakerTest {
         );
         result = MoveMaker.generateKnightMoves(chessGame.getBoard(), Coord.of("g1"));
         assertEquals(expectedFirst, result);
-        assertTrue(chessGame.submitMove(new MoveDraft(MoveType.NORMAL, PieceType.KNIGHT, Color.WHITE, Coord.of("g1"), Coord.of("f3"), "")));
+        assertTrue(chessGame.submitMove(new MoveDraft(PieceType.KNIGHT, Color.WHITE, Coord.of("g1"), Coord.of("f3"))));
 
         expectedFirst = List.of(
-                new MoveDraft(MoveType.NORMAL, PieceType.KNIGHT, Color.BLACK, Coord.of("g8"), Coord.of("f6"), ""),
-                new MoveDraft(MoveType.NORMAL, PieceType.KNIGHT, Color.BLACK, Coord.of("g8"), Coord.of("h6"), "")
+                new MoveDraft(PieceType.KNIGHT, Color.BLACK, Coord.of("g8"), Coord.of("f6")),
+                new MoveDraft(PieceType.KNIGHT, Color.BLACK, Coord.of("g8"), Coord.of("h6"))
         );
         result = MoveMaker.generateKnightMoves(chessGame.getBoard(), Coord.of("g8"));
         assertEquals(expectedFirst, result);
-        assertTrue(chessGame.submitMove(new MoveDraft(MoveType.NORMAL, PieceType.KNIGHT, Color.BLACK, Coord.of("g8"), Coord.of("h6"), "")));
+        assertTrue(chessGame.submitMove(new MoveDraft(PieceType.KNIGHT, Color.BLACK, Coord.of("g8"), Coord.of("h6"))));
 
         expectedFirst = List.of(
                 new MoveDraft(PieceType.KNIGHT, Color.WHITE, Coord.of("f3"), Coord.of("d4")),
@@ -108,7 +107,7 @@ class MoveMakerTest {
         );
         result = MoveMaker.generateKnightMoves(chessGame.getBoard(), Coord.of("f3"));
         assertEquals(expectedFirst, result);
-        assertTrue(chessGame.submitMove(new MoveDraft(MoveType.NORMAL, PieceType.KNIGHT, Color.WHITE, Coord.of("f3"), Coord.of("e5"), "")));
+        assertTrue(chessGame.submitMove(new MoveDraft(PieceType.KNIGHT, Color.WHITE, Coord.of("f3"), Coord.of("e5"))));
 
         expectedFirst = List.of(
                 new MoveDraft(PieceType.KNIGHT, Color.BLACK, Coord.of("h6"), Coord.of("f5")),
@@ -117,7 +116,7 @@ class MoveMakerTest {
         );
         result = MoveMaker.generateKnightMoves(chessGame.getBoard(), Coord.of("h6"));
         assertEquals(expectedFirst, result);
-        assertTrue(chessGame.submitMove(new MoveDraft(MoveType.NORMAL, PieceType.KNIGHT, Color.BLACK, Coord.of("h6"), Coord.of("f5"), "")));
+        assertTrue(chessGame.submitMove(new MoveDraft(PieceType.KNIGHT, Color.BLACK, Coord.of("h6"), Coord.of("f5"))));
     }
 
     @Test
