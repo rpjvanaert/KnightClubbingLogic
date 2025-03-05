@@ -1,10 +1,12 @@
 package org.example.data.move;
 
 import org.example.data.details.Coord;
+import org.example.data.details.MoveType;
 import org.example.data.details.Piece;
 import org.example.logic.ChessGame;
 
 public class MoveState {
+    public final MoveType moveType;
     public final Coord from;
     public final Coord to;
     public final Piece movedPiece;
@@ -15,6 +17,7 @@ public class MoveState {
     public final int previousFullMoveNumber;
 
     public MoveState(ChessGame game, Move move) {
+        this.moveType = move.type();
         this.from = move.from();
         this.to = move.to();
         this.movedPiece = game.getBoard().getPieceOn(from);
@@ -25,7 +28,8 @@ public class MoveState {
         this.previousFullMoveNumber = game.getBoard().getFullmoveNumber();
     }
 
-    public MoveState(Coord from, Coord to, Piece movedPiece, Piece capturedPiece, String previousCastlingRights, Coord previousEnPassantTarget, int previousHalfMoveClock, int previousFullMoveNumber) {
+    public MoveState(MoveType moveType, Coord from, Coord to, Piece movedPiece, Piece capturedPiece, String previousCastlingRights, Coord previousEnPassantTarget, int previousHalfMoveClock, int previousFullMoveNumber) {
+        this.moveType = moveType;
         this.from = from;
         this.to = to;
         this.movedPiece = movedPiece;

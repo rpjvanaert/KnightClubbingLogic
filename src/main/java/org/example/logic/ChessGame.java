@@ -68,22 +68,7 @@ public class ChessGame {
     private void isPseudoLegal(MoveDraft move) throws ChessException {
         if (move.color() != board.getActive()) throw new ChessException("Not turn of given color");
 
-        switch (move.type()) {
-            case CASTLE_LONG:
-            case CASTLE_SHORT:
-                if (!isValidCastling(move)) throw new ChessException(("Not valid castling move"));
-                break;
-            case PROMOTION_QUEEN:
-            case PROMOTION_ROOK:
-            case PROMOTION_BISHOP:
-            case PROMOTION_KNIGHT:
-                if (!isValidNormal(move) && !isValidPromotion(move)) throw new ChessException("Not valid promotion move");
-                break;
-            case NORMAL:
-            case EN_PASSANT:
-                if (!isValidNormal(move)) throw new ChessException("Not valid move");
-                break;
-        }
+        if (!isValidNormal(move)) throw new ChessException("Not a valid move");
     }
 
     private List<MoveDraft> determineAllPseudoLegalMoves() {
@@ -167,8 +152,9 @@ public class ChessGame {
         return false;
     }
 
-    private MoveState applyMoveTemporarily(Move move) {
+    private MoveState applyMoveTemporarily(Move move) {//todo castling
         MoveState moveState = new MoveState(
+                move.type(),
                 move.from(),
                 move.to(),
                 move.getPiece(),
@@ -178,7 +164,6 @@ public class ChessGame {
                 this.board.getHalfmoveClock(),
                 this.board.getFullmoveNumber()
         );
-        //MoveState moveState = new MoveState(this, move);
 
         board.emptySquare(move.from());
         board.setPieceOn(move.getPiece(), move.to());
@@ -187,7 +172,7 @@ public class ChessGame {
         return moveState;
     }
 
-    private void undoMove(MoveState moveState) {
+    private void undoMove(MoveState moveState) {//todo castling
         board.setPieceOn(moveState.movedPiece, moveState.from);
         board.setPieceOn(moveState.capturedPiece, moveState.to);
         board.setCastlingRights(moveState.previousCastlingRights);
