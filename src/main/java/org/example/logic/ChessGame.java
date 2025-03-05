@@ -97,28 +97,6 @@ public class ChessGame {
         return pseudoLegalMoves;
     }
 
-    private boolean isPromotionMove(Coord from, Coord to) {
-        Piece piece = board.getPieceOn(from);
-        return piece.pieceType() == PieceType.PAWN && (to.getY() == 0 || to.getY() == 7);
-    }
-
-    private boolean isCastlingMove(Coord from, Coord to) {
-        Piece piece = board.getPieceOn(from);
-        return piece.pieceType() == PieceType.KING && Math.abs(from.getX() - to.getX()) == 2;
-    }
-
-    private boolean isEnPassantMove(Coord from, Coord to) {
-        Piece piece = board.getPieceOn(from);
-
-        if (piece == null || piece.pieceType() != PieceType.PAWN) {
-            return false;
-        }
-
-        return board.getEnPassantSquare() != null && board.getEnPassantSquare().equals(to);
-    }
-
-
-
     private boolean isValidPromotion(MoveDraft move) {
         if (!move.pieceType().equals(PieceType.PAWN)) return false;
 
@@ -258,23 +236,5 @@ public class ChessGame {
         this.board.setPieceOn(move.getPiece(), move.to());
         this.moves.add(move);
         this.board.setActive(move.color().other());
-    }
-
-    private boolean targetNotOccupiedByOwnColor(MoveDraft move) {
-        Piece target = board.getPieceOn(move.to());
-        return target == null || target.color() != move.color();
-    }
-
-    private boolean targetNotOccupied(MoveDraft move) {
-        return board.getPieceOn(move.to()) == null;
-    }
-
-    private boolean targetOccupied(MoveDraft move) {
-        return board.getPieceOn(move.to()) != null;
-    }
-
-    private boolean targetOccupiedByOtherColor(MoveDraft move) {
-        Piece piece = board.getPieceOn(move.to());
-        return piece != null && piece.color() == move.color().other();
     }
 }
