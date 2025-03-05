@@ -1,4 +1,4 @@
-package org.example.logic;
+package org.example.logic.Specifics;
 
 import org.example.data.Board;
 import org.example.data.move.Move;
@@ -6,6 +6,7 @@ import org.example.data.move.MoveDraft;
 import org.example.data.details.Color;
 import org.example.data.details.Coord;
 import org.example.data.details.PieceType;
+import org.example.logic.ChessGame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

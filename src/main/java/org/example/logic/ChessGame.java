@@ -306,7 +306,6 @@ public class ChessGame {
         boolean safe;
         for (MoveDraft moveDraft : moves) {
             MoveState tempState = applyMoveTemporarily(transformDraftToMove(moveDraft, ThreatType.NULL)); //todo here is issue
-            //System.out.println(tempState);
             safe = !RuleChecker.isKingInCheck(board, color);
             undoMove(tempState); //todo here is issue or here
             if (safe) return true;

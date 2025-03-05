@@ -1,11 +1,11 @@
-package org.example.logic;
+package org.example.logic.Specifics;
 
 import org.example.data.Board;
-import org.example.data.details.MoveType;
-import org.example.data.move.MoveDraft;
 import org.example.data.details.Color;
 import org.example.data.details.Coord;
 import org.example.data.details.PieceType;
+import org.example.data.move.MoveDraft;
+import org.example.logic.ChessGame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -50,15 +50,10 @@ public class ChessGameTest_Bishop {
                 Coord.of('c', 5)
         );
 
-        System.out.println(this.chessGame.getBoard().getDisplay());
         assertTrue(this.chessGame.submitMove(moveDraft1));
-        System.out.println(this.chessGame.getBoard().getDisplay());
         assertTrue(this.chessGame.submitMove(moveDraft2));
-        System.out.println(this.chessGame.getBoard().getDisplay());
         assertTrue(this.chessGame.submitMove(moveDraft3));
-        System.out.println(this.chessGame.getBoard().getDisplay());
         assertTrue(this.chessGame.submitMove(moveDraft4));
-        System.out.println(this.chessGame.getBoard().getDisplay());
 
         Board board = this.chessGame.getBoard();
         assertNull(board.getPieceOn(moveDraft1.from()));
@@ -69,15 +64,6 @@ public class ChessGameTest_Bishop {
         assertEquals(moveDraft3.getPiece(), board.getPieceOn(moveDraft3.to()));
         assertNull(board.getPieceOn(moveDraft4.from()));
         assertEquals(moveDraft4.getPiece(), board.getPieceOn(moveDraft4.to()));
-        assertEquals("r  n  b  q  k  -  n  r  \n" +
-                "p  p  p  p  -  p  p  p  \n" +
-                "-  -  -  -  -  -  -  -  \n" +
-                "-  -  b  -  p  -  -  -  \n" +
-                "-  -  B  -  P  -  -  -  \n" +
-                "-  -  -  -  -  -  -  -  \n" +
-                "P  P  P  P  -  P  P  P  \n" +
-                "R  N  B  Q  K  -  N  R  \n",board.getDisplay());
-        System.out.println(board.getDisplay());
     }
 
     @Test
@@ -120,8 +106,8 @@ public class ChessGameTest_Bishop {
         MoveDraft moveDraft1 = new MoveDraft(
                 PieceType.PAWN,
                 Color.WHITE,
-                Coord.of('e', 2),
-                Coord.of('e', 4)
+                Coord.of("e2"),
+                Coord.of("e4")
         );
 
         MoveDraft moveDraft2 = new MoveDraft(

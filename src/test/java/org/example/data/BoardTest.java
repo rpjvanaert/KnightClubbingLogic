@@ -66,14 +66,8 @@ class BoardTest {
         String fen = "k4r1r/6P1/8/8/8/8/8/K7 w - - 0 1";
         Board board = new Board(fen);
 
-        System.out.println(board.getDisplay());
-        System.out.println(board.searchPieces(PieceType.KING, Color.WHITE));
-        System.out.println(board.searchPieces(PieceType.KING, null));
-        System.out.println(board.searchPieces(PieceType.ROOK, null));
-        System.out.println(board.searchPieces(PieceType.PAWN, null));
-
         assertEquals(new Piece(PieceType.KING, Color.WHITE), board.getPieceOn(new Coord(0,0)));
-        //assertEquals(new Piece(PieceType.PAWN, Color.WHITE), board.getPieceOn(new Coord(6,6)));
+        assertEquals(new Piece(PieceType.PAWN, Color.WHITE), board.getPieceOn(new Coord(6,6)));
         assertEquals(new Piece(PieceType.KING, Color.BLACK), board.getPieceOn(new Coord(0,7)));
         assertEquals(new Piece(PieceType.ROOK, Color.BLACK), board.getPieceOn(new Coord(7,7)));
         assertEquals(new Piece(PieceType.ROOK, Color.BLACK), board.getPieceOn(new Coord(5,7)));

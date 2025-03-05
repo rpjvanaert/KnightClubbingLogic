@@ -34,25 +34,25 @@ public class MoveMaker {
 
     public static List<MoveDraft> generatePawnMoves(Board board, Coord from, Piece piece) {
         List<MoveDraft> moves = new ArrayList<>();
-        if (!piece.pieceType().equals(PieceType.PAWN))
+        if (!PieceType.PAWN.equals(piece.pieceType()))
             throw new IllegalArgumentException("Not a pawn given to generate pawn moves.");
 
         int direction = piece.color().direction;
         
         Coord oneForward = from.getAdjacent(0, direction);
         if (board.isEmpty(oneForward)) {
-            moves.add(new MoveDraft(
-                    piece.pieceType(),
-                    piece.color(),
-                    from,
-                    oneForward,
-                    MoveType.NORMAL
-            ));
 
             if (isPromotionSquare(oneForward)) {
-                moves.addAll(createEveryPromotionMove(from, oneForward, piece)); //todo generate pawn moves for promotion has to be looked at every possibility
+                moves.addAll(createEveryPromotionMove(from, oneForward, piece));
+            } else {
+                moves.add(new MoveDraft(
+                        piece.pieceType(),
+                        piece.color(),
+                        from,
+                        oneForward,
+                        MoveType.NORMAL
+                ));
             }
-            
 
             if (isPawnFromStart(from, piece)) {
                 Coord twoForward = from.getAdjacent(0, 2 * direction);
@@ -68,8 +68,8 @@ public class MoveMaker {
             }
         }
 
-        moves.add(createPawnTakeMove(board, from, piece, from.getAdjacent(-1, direction)));
-        moves.add(createPawnTakeMove(board, from, piece, from.getAdjacent(1, direction)));
+        moves.addAll(createPawnTakeMove(board, from, piece, from.getAdjacent(-1, direction)).stream().filter(Objects::nonNull).toList());
+        moves.addAll(createPawnTakeMove(board, from, piece, from.getAdjacent(1, direction)).stream().filter(Objects::nonNull).toList());
         moves = moves.stream().filter(Objects::nonNull).collect(Collectors.toList());
 
         return moves;
@@ -96,21 +96,26 @@ public class MoveMaker {
         );
     }
 
-    private static MoveDraft createPawnTakeMove(Board board, Coord from, Piece piece, Coord toCapture) {
+    private static List<MoveDraft> createPawnTakeMove(Board board, Coord from, Piece piece, Coord toCapture) {
         if (toCapture == null)
-            return null;
+            return List.of();
 
         boolean isEnPassant = isEnPassantMove(board.getEnPassantSquare(), toCapture);
+        boolean isPromotion = isPromotionSquare(toCapture);
+
+        if (isPromotion && board.isEnemy(toCapture, piece.color())) {
+            return createEveryPromotionMove(from, toCapture, piece);
+        }
         if (board.isEnemy(toCapture, piece.color()) || isEnPassant) {
-            return new MoveDraft(
+            return List.of(new MoveDraft(
                     piece.pieceType(),
                     piece.color(),
                     from,
                     toCapture,
-                    isEnPassant ? MoveType.EN_PASSANT : isPromotionSquare(toCapture) ? MoveType.PROMOTION_QUEEN : MoveType.NORMAL
-            );
+                    isEnPassant ? MoveType.EN_PASSANT : MoveType.NORMAL
+            ));
         }
-        return null;
+        return List.of();
     }
 
     private static boolean isEnPassantMove(Coord enPassantSquare, Coord toCapture) {
@@ -222,10 +227,30 @@ public class MoveMaker {
             }
         }
 
+        if (RuleChecker.isCastlingPossible(board, piece.color(), MoveType.CASTLE_SHORT)) {
+            moves.add(new MoveDraft(
+                    PieceType.KING,
+                    piece.color(),
+                    coord,
+                    coord.getAdjacent(2,0),
+                    MoveType.CASTLE_SHORT
+            ));
+        }
 
+        if (RuleChecker.isCastlingPossible(board, piece.color(), MoveType.CASTLE_LONG)) {
+            moves.add(new MoveDraft(
+                    PieceType.KING,
+                    piece.color(),
+                    coord,
+                    coord.getAdjacent(-2,0),
+                    MoveType.CASTLE_LONG
+            ));
+        }
 
         return moves;
     }
+
+
 
     public static boolean isPromotionSquare(Coord to) {
         return (to.getY() == 0 || to.getY() == 7);

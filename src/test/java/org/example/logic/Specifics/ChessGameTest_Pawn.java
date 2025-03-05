@@ -1,10 +1,11 @@
-package org.example.logic;
+package org.example.logic.Specifics;
 
 import org.example.data.move.Move;
 import org.example.data.move.MoveDraft;
 import org.example.data.details.Color;
 import org.example.data.details.Coord;
 import org.example.data.details.PieceType;
+import org.example.logic.ChessGame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +39,6 @@ class ChessGameTest_Pawn {
         assertEquals(moveDraft.from(), result.from());
         assertEquals(moveDraft.to(), result.to());
         assertEquals(moveDraft.type(), result.type());
-        System.out.println(this.chessGame.getBoard().getDisplay());
     }
 
     @Test
@@ -60,7 +60,6 @@ class ChessGameTest_Pawn {
         assertEquals(moveDraft.from(), result.from());
         assertEquals(moveDraft.to(), result.to());
         assertEquals(moveDraft.type(), result.type());
-        System.out.println(this.chessGame.getBoard().getDisplay());
     }
 
     @Test
@@ -74,7 +73,6 @@ class ChessGameTest_Pawn {
 
         assertFalse(this.chessGame.submitMove(moveDraft));
         assertEquals(0, this.chessGame.getMoves().size());
-        System.out.println(this.chessGame.getBoard().getDisplay());
     }
 
     @Test
@@ -88,7 +86,6 @@ class ChessGameTest_Pawn {
 
         assertFalse(this.chessGame.submitMove(moveDraft));
         assertEquals(0, this.chessGame.getMoves().size());
-        System.out.println(this.chessGame.getBoard().getDisplay());
     }
 
     @Test
@@ -102,7 +99,6 @@ class ChessGameTest_Pawn {
 
         assertFalse(this.chessGame.submitMove(moveDraft));
         assertEquals(0, this.chessGame.getMoves().size());
-        System.out.println(this.chessGame.getBoard().getDisplay());
     }
 
     @Test
@@ -116,7 +112,6 @@ class ChessGameTest_Pawn {
 
         assertFalse(this.chessGame.submitMove(moveDraft));
         assertEquals(0, this.chessGame.getMoves().size());
-        System.out.println(this.chessGame.getBoard().getDisplay());
     }
 
     @Test
@@ -151,7 +146,6 @@ class ChessGameTest_Pawn {
         assertNotEquals(null, this.chessGame.getBoard().getPieceOn(Coord.of('e', 4)));
         assertNull(this.chessGame.getBoard().getPieceOn(Coord.of('e', 7)));
         assertNotEquals(null, this.chessGame.getBoard().getPieceOn(Coord.of('e', 5)));
-        System.out.println(this.chessGame.getBoard().getDisplay());
     }
 
     @Test
@@ -188,7 +182,6 @@ class ChessGameTest_Pawn {
         assertNotEquals(null, this.chessGame.getBoard().getPieceOn(Coord.of('e', 5)));
         assertNull(this.chessGame.getBoard().getPieceOn(Coord.of('d', 2)));
         assertNotEquals(null, this.chessGame.getBoard().getPieceOn(Coord.of('d', 4)));
-        System.out.println(this.chessGame.getBoard().getDisplay());
     }
 
     @Test
@@ -229,13 +222,9 @@ class ChessGameTest_Pawn {
         );
 
         assertTrue(this.chessGame.submitMove(moveDraft1));
-        System.out.println(this.chessGame.getBoard().getDisplay());
         assertTrue(this.chessGame.submitMove(moveDraft2));
-        System.out.println(this.chessGame.getBoard().getDisplay());
         assertTrue(this.chessGame.submitMove(moveDraft3));
-        System.out.println(this.chessGame.getBoard().getDisplay());
         assertTrue(this.chessGame.submitMove(moveDraft4));
-        System.out.println(this.chessGame.getBoard().getDisplay());
         assertFalse(this.chessGame.submitMove(moveDraft5));
     }
 }
