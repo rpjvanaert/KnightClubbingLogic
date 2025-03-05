@@ -24,14 +24,14 @@ class BoardTest {
 
     @Test
     void getDisplay() {
-        assertEquals("r  n  b  q  k  b  n  r  \n" +
-                "p  p  p  p  p  p  p  p  \n" +
-                "-  -  -  -  -  -  -  -  \n" +
-                "-  -  -  -  -  -  -  -  \n" +
-                "-  -  -  -  -  -  -  -  \n" +
-                "-  -  -  -  -  -  -  -  \n" +
-                "P  P  P  P  P  P  P  P  \n" +
-                "R  N  B  Q  K  B  N  R  \n",
+        assertEquals("R  N  B  Q  K  B  N  R  \n" +
+                        "P  P  P  P  P  P  P  P  \n" +
+                        "-  -  -  -  -  -  -  -  \n" +
+                        "-  -  -  -  -  -  -  -  \n" +
+                        "-  -  -  -  -  -  -  -  \n" +
+                        "-  -  -  -  -  -  -  -  \n" +
+                        "p  p  p  p  p  p  p  p  \n" +
+                        "r  n  b  q  k  b  n  r  \n",
                 this.board.getDisplay());
     }
 
@@ -39,9 +39,7 @@ class BoardTest {
     void getBoard() {
         Piece[][] actualBoard = board.getBoard();
 
-        // Define the expected piece layout based on the FEN
         Piece[][] expectedBoard = {
-                // Ranks 8 to 1 (from top to bottom)
                 {new Piece(PieceType.ROOK, Color.WHITE), new Piece(PieceType.PAWN, Color.WHITE), null, null, null, null, new Piece(PieceType.PAWN, Color.BLACK), new Piece(PieceType.ROOK, Color.BLACK)},
                 {new Piece(PieceType.KNIGHT, Color.WHITE), new Piece(PieceType.PAWN, Color.WHITE), null, null, null, null, new Piece(PieceType.PAWN, Color.BLACK), new Piece(PieceType.KNIGHT, Color.BLACK)},
                 {new Piece(PieceType.BISHOP, Color.WHITE), new Piece(PieceType.PAWN, Color.WHITE), null, null, null, null, new Piece(PieceType.PAWN, Color.BLACK), new Piece(PieceType.BISHOP, Color.BLACK)},
@@ -52,7 +50,6 @@ class BoardTest {
                 {new Piece(PieceType.ROOK, Color.WHITE), new Piece(PieceType.PAWN, Color.WHITE), null, null, null, null, new Piece(PieceType.PAWN, Color.BLACK), new Piece(PieceType.ROOK, Color.BLACK)}
         };
 
-        // Check each position on the board against the expected board layout
         for (int rank = 0; rank < 8; rank++) {
             for (int file = 0; file < 8; file++) {
                 if (expectedBoard[rank][file] == null) {
@@ -65,9 +62,34 @@ class BoardTest {
     }
 
     @Test
+    void testImportFen() {
+        String fen = "k4r1r/6P1/8/8/8/8/8/K7 w - - 0 1";
+        Board board = new Board(fen);
+
+        System.out.println(board.getDisplay());
+        System.out.println(board.searchPieces(PieceType.KING, Color.WHITE));
+        System.out.println(board.searchPieces(PieceType.KING, null));
+        System.out.println(board.searchPieces(PieceType.ROOK, null));
+        System.out.println(board.searchPieces(PieceType.PAWN, null));
+
+        assertEquals(new Piece(PieceType.KING, Color.WHITE), board.getPieceOn(new Coord(0,0)));
+        //assertEquals(new Piece(PieceType.PAWN, Color.WHITE), board.getPieceOn(new Coord(6,6)));
+        assertEquals(new Piece(PieceType.KING, Color.BLACK), board.getPieceOn(new Coord(0,7)));
+        assertEquals(new Piece(PieceType.ROOK, Color.BLACK), board.getPieceOn(new Coord(7,7)));
+        assertEquals(new Piece(PieceType.ROOK, Color.BLACK), board.getPieceOn(new Coord(5,7)));
+    }
+
+    @Test
     void getPieceOn() {
-        Coord coord = new Coord(1,0);
-        Piece piece = new Piece(PieceType.KNIGHT, Color.WHITE);
+        Coord coord = new Coord(1,7);
+        Piece piece = new Piece(PieceType.KNIGHT, Color.BLACK);
+        assertEquals(piece, board.getPieceOn(coord));
+    }
+
+    @Test
+    void testRightSide_on_RightSide() {
+        Coord coord = Coord.of("e1");
+        Piece piece = new Piece(PieceType.KING, Color.WHITE);
         assertEquals(piece, board.getPieceOn(coord));
     }
 

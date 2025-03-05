@@ -38,8 +38,8 @@ public class Board {
                     fileIndex += Character.getNumericValue(c);
                 } else {
                     PieceType pieceType = PieceType.fromFEN(c);
-                    Color color = Character.isLowerCase(c) ? Color.WHITE : Color.BLACK;
-                    board[rankIndex][fileIndex] = new Piece(pieceType, color);
+                    Color color = Character.isUpperCase(c) ? Color.WHITE : Color.BLACK;
+                    board[7 - rankIndex][fileIndex] = new Piece(pieceType, color);
                     fileIndex++;
                 }
             }
@@ -62,7 +62,7 @@ public class Board {
         for (int rankIndex = 0; rankIndex < board.length; rankIndex++) {
             int emptyCount = 0;
             for (int fileIndex = 0; fileIndex < board[rankIndex].length; fileIndex++) {
-                Piece piece = board[rankIndex][fileIndex];
+                Piece piece = board[7 - rankIndex][fileIndex];
                 if (piece == null) {
                     emptyCount++;
                 } else {

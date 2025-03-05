@@ -3,7 +3,7 @@ package org.example.data.details;
 public record Piece(PieceType pieceType, Color color) {
 
     public char getChar() {
-        return color.equals(Color.WHITE) ? Character.toLowerCase(pieceType.fen()) : pieceType.fen();
+        return color.equals(Color.WHITE) ? pieceType.fen() : Character.toLowerCase(pieceType.fen());
     }
 
     @Override
