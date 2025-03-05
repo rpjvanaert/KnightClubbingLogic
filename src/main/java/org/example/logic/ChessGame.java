@@ -141,132 +141,8 @@ public class ChessGame {
         return MoveMaker.generatePieceMoves(board, move.from()).contains(move);
     }
 
-    private boolean isValidPawnMove(MoveDraft move) {
 
-        int direction = move.color() == Color.WHITE ? 1 : -1;
-        int rankDiff = move.to().getY() - move.from().getY();
-        int fileDiff = move.to().getX() - move.from().getX();
-
-        if (rankDiff * direction <= 0) return false;
-
-        if (fileDiff == 0) {
-
-            if (targetOccupied(move)) return false;
-
-            if (rankDiff * direction > 1 && move.from().getY() != (move.color() == Color.WHITE ? 1 : 6)) return false;
-            if (rankDiff > 2) return false;
-
-            if (rankDiff == 2) {
-                Coord intermediate = move.to().getAdjacent(0, -direction);
-
-                return this.board.getPieceOn(intermediate) == null;
-            }
-        } else {
-
-            if (fileDiff != 1 || rankDiff != 1) return false;
-
-            Piece targetPiece = this.board.getPieceOn(move.to());
-
-            if (move.type().equals("ep")) {
-                //TODO en passant
-            }
-
-            return targetOccupiedByOtherColor(move);
-
-
-        }
-
-        return true;
-    }
-
-    private boolean isValidKnightMove(MoveDraft move) {
-        int rankDiff = Math.abs(move.to().getY() - move.from().getY());
-        int fileDiff = Math.abs(move.to().getX() - move.from().getX());
-
-        if (!((rankDiff == 2 && fileDiff == 1) || (rankDiff == 1 && fileDiff == 2))) return false;
-
-        return targetNotOccupiedByOwnColor(move);
-    }
-
-    private boolean isValidBishopMove(MoveDraft move) {
-        int rankDiff = Math.abs(move.to().getY() - move.from().getY());
-        int fileDiff = Math.abs(move.to().getX() - move.from().getX());
-
-        if (rankDiff != fileDiff) return false;
-
-        int rankDirection = Integer.compare(move.to().getY(), move.from().getY());
-        int fileDirection = Integer.compare(move.to().getX(), move.from().getX());
-
-        int currentRank = move.from().getY() + rankDirection;
-        int currentFile = move.from().getX() + fileDirection;
-
-        while (currentFile != move.to().getX() || currentRank != move.to().getY()) {
-            if (this.board.getPieceOn(new Coord(currentFile, currentRank)) != null) return false;
-
-            currentFile += fileDirection;
-            currentRank += rankDirection;
-        }
-
-        return targetNotOccupiedByOwnColor(move);
-    }
-
-    private boolean isValidRookMove(MoveDraft move) {
-        int rankDiff = Math.abs(move.to().getY() - move.from().getY());
-        int fileDiff = Math.abs(move.to().getX() - move.from().getX());
-
-        if (!(rankDiff == 0 && fileDiff > 0) && !(rankDiff > 0 && fileDiff == 0)) return false;
-
-        int rankDirection = Integer.compare(move.to().getY(), move.from().getY());
-        int fileDirection = Integer.compare(move.to().getX(), move.from().getX());
-
-        int currentRank = move.from().getY() + rankDirection;
-        int currentFile = move.from().getX() + fileDirection;
-
-        while (currentFile != move.to().getX() || currentRank != move.to().getY()) {
-            if (this.board.getPieceOn(new Coord(currentFile, currentRank)) != null) return false;
-
-            currentFile += fileDirection;
-            currentRank += rankDirection;
-        }
-
-        return targetNotOccupiedByOwnColor(move);
-    }
-
-    private boolean isValidQueenMove(MoveDraft move) {
-        int rankDiff = Math.abs(move.to().getY() - move.from().getY());
-        int fileDiff = Math.abs(move.to().getX() - move.from().getX());
-
-        boolean isRookMove = (rankDiff == 0 && fileDiff > 0) || (rankDiff > 0 && fileDiff == 0);
-        boolean isBishopMove = (rankDiff == fileDiff);
-
-        if (!isRookMove && !isBishopMove) return false;
-
-        int rankDirection = Integer.compare(move.to().getY(), move.from().getY());
-        int fileDirection = Integer.compare(move.to().getX(), move.from().getX());
-
-        int currentRank = move.from().getY() + rankDirection;
-        int currentFile = move.from().getX() + fileDirection;
-
-        while (currentFile != move.to().getX() || currentRank != move.to().getY()) {
-            if (board.getPieceOn(new Coord(currentFile, currentRank)) != null) return false;
-
-            currentRank += rankDirection;
-            currentFile += fileDirection;
-        }
-
-        return targetNotOccupiedByOwnColor(move);
-    }
-
-    private boolean isValidKingMove(MoveDraft move) {
-        int rankDiff = Math.abs(move.to().getY() - move.from().getY());
-        int fileDiff = Math.abs(move.to().getX() - move.from().getX());
-
-        if (rankDiff > 1 || fileDiff > 1) return false;
-
-        return targetNotOccupiedByOwnColor(move);
-    }
-
-    private boolean isValidCastling(MoveDraft move) { //todo
+    private boolean isValidCastling(MoveDraft move) {
         String side = String.valueOf(move.type().notation);
         if (move.color() == Color.WHITE) side = side.toUpperCase();
 
@@ -305,15 +181,13 @@ public class ChessGame {
         List<MoveDraft> moves = determineAllPseudoLegalMoves();
         boolean safe;
         for (MoveDraft moveDraft : moves) {
-            MoveState tempState = applyMoveTemporarily(transformDraftToMove(moveDraft, ThreatType.NULL)); //todo here is issue
+            MoveState tempState = applyMoveTemporarily(transformDraftToMove(moveDraft, ThreatType.NULL));
             safe = !RuleChecker.isKingInCheck(board, color);
-            undoMove(tempState); //todo here is issue or here
+            undoMove(tempState);
             if (safe) return true;
         }
         return false;
     }
-
-
 
     private MoveState applyMoveTemporarily(Move move) {
         MoveState moveState = new MoveState(
@@ -361,19 +235,21 @@ public class ChessGame {
         return (move.getPiece().pieceType().fen() + move.to().getNotation() + threat.getSign()).trim();
     }
 
-    private void executeMove(Move move) {//todo every moveType.
+    private void executeMove(Move move) {
         switch (move.type()) {
-            case NORMAL -> executeNormal(move);
-            case CASTLE_LONG -> executeCastling(move);
-            case CASTLE_SHORT -> executeCastling(move);
-            case PROMOTION_QUEEN -> executePromotion(move);
+            case NORMAL ->
+                    executeNormal(move);
+            case CASTLE_LONG, CASTLE_SHORT ->
+                    executeCastling(move);
+            case PROMOTION_QUEEN, PROMOTION_ROOK, PROMOTION_BISHOP, PROMOTION_KNIGHT ->
+                    executePromotion(move);
         }
     }
 
-    private void executePromotion(Move move) {
+    private void executePromotion(Move move) {//todo
     }
 
-    private void executeCastling(Move move) {
+    private void executeCastling(Move move) {//todo
 
     }
 
