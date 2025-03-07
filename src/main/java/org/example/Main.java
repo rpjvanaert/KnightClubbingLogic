@@ -19,7 +19,6 @@ public class Main {
             System.out.println("Current board:");
             System.out.println(game.getBoard().getColorDisplay());
 
-            // Player move
             System.out.print("Enter your move (e.g., e2e4): ");
             String inputMove = scanner.nextLine();
 
@@ -34,10 +33,8 @@ public class Main {
                 continue;
             }
 
-            // Check game state
             //if (isGameOver(game)) break;
 
-            // Random AI move
             List<Move> possibleMoves = game.determineAllLegalMoves();
             if (possibleMoves.isEmpty()) {
                 System.out.println("No legal moves for AI. Game over.");
@@ -47,7 +44,6 @@ public class Main {
             System.out.println("AI moves: " + aiMove.from().getNotation() + aiMove.to().getNotation());
             game.submitMove(new MoveDraft(aiMove.pieceType(), aiMove.color(), aiMove.from(), aiMove.to(), aiMove.type()));
 
-            // Check game state
             //if (isGameOver(game)) break;
         }
         scanner.close();
