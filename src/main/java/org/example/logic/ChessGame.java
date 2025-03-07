@@ -59,7 +59,7 @@ public class ChessGame {
             notifyListeners(move);
 
         } catch (ChessException exception) {
-            System.err.println(exception.getMessage());
+            //System.err.println(exception.getMessage());
             return false;
         }
         return true;
