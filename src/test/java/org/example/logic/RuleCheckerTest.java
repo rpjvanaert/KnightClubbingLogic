@@ -1,9 +1,9 @@
 package org.example.logic;
 
 import org.example.data.Board;
+import org.example.data.details.Castling;
 import org.example.data.details.Color;
 import org.example.data.details.Coord;
-import org.example.data.details.MoveType;
 import org.example.data.details.PieceType;
 import org.example.data.move.MoveDraft;
 import org.junit.jupiter.api.Test;
@@ -48,16 +48,16 @@ class RuleCheckerTest {
         Board board;
 
         board = new Board("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
-        assertTrue(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_SHORT));
+        assertTrue(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.KING));
 
         board = new Board("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R b KQkq - 0 1");
-        assertTrue(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_SHORT));
+        assertTrue(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.KING));
 
         board = new Board("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w KQkq - 0 1");
-        assertTrue(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_LONG));
+        assertTrue(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.QUEEN));
 
         board = new Board("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR b KQkq - 0 1");
-        assertTrue(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_LONG));
+        assertTrue(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.QUEEN));
     }
 
     @Test
@@ -65,22 +65,22 @@ class RuleCheckerTest {
         Board board;
 
         board = new Board();
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_SHORT));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.KING));
 
         board = new Board();
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_SHORT));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.KING));
 
         board = new Board();
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_LONG));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.QUEEN));
 
         board = new Board();
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_LONG));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.QUEEN));
 
         board = new Board("rn2k1nr/pppppppp/8/8/8/8/PPPPPPPP/RN2K1NR w KQkq - 0 1");
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_SHORT));
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_SHORT));
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_LONG));
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_LONG));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.KING));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.KING));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.QUEEN));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.QUEEN));
     }
 
     @Test
@@ -88,22 +88,22 @@ class RuleCheckerTest {
         Board board;
 
         board = new Board("r3k2r/pp1p1ppp/8/2Q5/2q5/8/PP1P1PPP/R3K2R w KQkq - 0 1");
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_SHORT));
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_SHORT));
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_LONG));
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_LONG));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.KING));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.KING));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.QUEEN));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.QUEEN));
 
         board = new Board("r3k2r/pppp1ppp/8/4Q3/4q3/8/PPPP1PPP/R3K2R w KQkq - 0 1");
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_SHORT));
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_SHORT));
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_LONG));
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_LONG));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.KING));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.KING));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.QUEEN));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.QUEEN));
 
         board = new Board("r3k2r/8/b6b/8/8/B6B/8/R3K2R w KQkq - 0 1");
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_SHORT));
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_SHORT));
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_LONG));
-        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_LONG));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.KING));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.KING));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.QUEEN));
+        assertFalse(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.QUEEN));
     }
 
     @Test
@@ -111,9 +111,9 @@ class RuleCheckerTest {
         Board board;
 
         board = new Board("r3k2r/2ppppp1/8/RR5R/rr5r/8/2PPPPP1/R3K2R w KQkq - 0 1");
-        assertTrue(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_SHORT));
-        assertTrue(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_SHORT));
-        assertTrue(RuleChecker.isCastlingPossible(board, Color.WHITE, MoveType.CASTLE_LONG));
-        assertTrue(RuleChecker.isCastlingPossible(board, Color.BLACK, MoveType.CASTLE_LONG));
+        assertTrue(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.KING));
+        assertTrue(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.KING));
+        assertTrue(RuleChecker.isCastlingPossible(board, Color.WHITE, Castling.QUEEN));
+        assertTrue(RuleChecker.isCastlingPossible(board, Color.BLACK, Castling.QUEEN));
     }
 }

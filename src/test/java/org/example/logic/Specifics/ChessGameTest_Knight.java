@@ -34,12 +34,10 @@ public class ChessGameTest_Knight {
         assertEquals(1, this.chessGame.getMoves().size());
         Move result = this.chessGame.getMoves().get(0);
 
-        assertEquals(moveDraft.type(), result.type());
         assertEquals(moveDraft.pieceType(), result.pieceType());
         assertEquals(moveDraft.color(), result.color());
         assertEquals(moveDraft.from(), result.from());
         assertEquals(moveDraft.to(), result.to());
-        assertEquals(moveDraft.type(), result.type());
     }
 
     @Test

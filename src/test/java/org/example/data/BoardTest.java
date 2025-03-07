@@ -267,18 +267,18 @@ class BoardTest {
 
     @Test
     void getCastlingRightsForWhite() {
-        List<MoveType> expected = List.of(MoveType.CASTLE_SHORT, MoveType.CASTLE_LONG);
+        List<Castling> expected = List.of(Castling.KING, Castling.QUEEN);
 
-        List<MoveType> result = this.board.getCastlingRights(Color.WHITE);
+        List<Castling> result = this.board.getCastlingRights(Color.WHITE);
 
         assertEquals(expected, result);
     }
 
     @Test
     void getCastlingRightsForBlack() {
-        List<MoveType> expected = List.of(MoveType.CASTLE_SHORT, MoveType.CASTLE_LONG);
+        List<Castling> expected = List.of(Castling.KING, Castling.QUEEN);
 
-        List<MoveType> result = this.board.getCastlingRights(Color.BLACK);
+        List<Castling> result = this.board.getCastlingRights(Color.BLACK);
 
         assertEquals(expected, result);
     }
@@ -287,8 +287,8 @@ class BoardTest {
     void getCastlingRightsWithExclusion() {
         this.board.setCastlingRights("Kk");
 
-        List<MoveType> expected = List.of(MoveType.CASTLE_SHORT);
-        List<MoveType> result;
+        List<Castling> expected = List.of(Castling.KING);
+        List<Castling> result;
 
         result = this.board.getCastlingRights(Color.WHITE);
         assertEquals(expected, result);
@@ -300,9 +300,9 @@ class BoardTest {
     @Test
     void getCastlingRightsWithNothing() {
         this.board.setCastlingRights("-");
-        List<MoveType> expected = List.of();
+        List<Castling> expected = List.of();
 
-        List<MoveType> result = this.board.getCastlingRights(Color.WHITE);
+        List<Castling> result = this.board.getCastlingRights(Color.WHITE);
 
         assertEquals(expected, result);
     }
@@ -311,15 +311,15 @@ class BoardTest {
     void getCastlingRightsWithDifferentSides() {
         this.board.setCastlingRights("Kq");
 
-        List<MoveType> expected;
-        List<MoveType> result;
+        List<Castling> expected;
+        List<Castling> result;
 
-        expected = List.of(MoveType.CASTLE_SHORT);
+        expected = List.of(Castling.KING);
 
         result = this.board.getCastlingRights(Color.WHITE);
         assertEquals(expected, result);
 
-        expected = List.of(MoveType.CASTLE_LONG);
+        expected = List.of(Castling.QUEEN);
 
         result = this.board.getCastlingRights(Color.BLACK);
         assertEquals(expected, result);

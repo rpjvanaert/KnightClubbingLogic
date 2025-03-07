@@ -37,18 +37,39 @@ public class RuleChecker {
         return false;
     }
 
-    public static boolean isCastlingPossible(Board board, Color color, MoveType moveType) {
-        if (!board.getCastlingRights(color).contains(moveType))
+    public static boolean isCastlingPossible(Board board, Color color, Castling castling) {
+        if (!board.getCastlingRights(color).contains(castling))
             return false;
+
+        if (Color.WHITE.equals(color)) {
+            if (!PieceType.KING.equals(board.getPieceOn(new Coord(4,0)).pieceType()))
+                return false;
+
+            if (Castling.KING.equals(castling) && !PieceType.ROOK.equals(board.getPieceOn(new Coord(7,0)).pieceType()))
+                return false;
+
+            if (Castling.QUEEN.equals(castling) && !PieceType.ROOK.equals(board.getPieceOn(new Coord(0,0)).pieceType()))
+                return false;
+
+        } else if(Color.BLACK.equals(color)) {
+            if (!PieceType.KING.equals(board.getPieceOn(new Coord(4,7)).pieceType()))
+                return false;
+
+            if (Castling.KING.equals(castling) && !PieceType.ROOK.equals(board.getPieceOn(new Coord(7,7)).pieceType()))
+                return false;
+
+            if (Castling.QUEEN.equals(castling) && !PieceType.ROOK.equals(board.getPieceOn(new Coord(0,7)).pieceType()))
+                return false;
+        }
 
         Coord targetKing = board.searchPieces(PieceType.KING, color).get(0);
         Coord targetRook = null;
         int direction = 0;
-        if (MoveType.CASTLE_SHORT.equals(moveType)) {
+        if (Castling.KING.equals(castling)) {
             targetRook = new Coord(7, targetKing.getY());
             direction = 1;
 
-        } else if (MoveType.CASTLE_LONG.equals(moveType)) {
+        } else if (Castling.QUEEN.equals(castling)) {
             targetRook = new Coord(0, targetKing.getY());
             direction = -1;
         }

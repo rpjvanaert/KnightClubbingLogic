@@ -140,7 +140,6 @@ public class ChessGame {
 
     private MoveState applyMoveTemporarily(Move move) {
         MoveState moveState = new MoveState(
-                move.type(),
                 move.from(),
                 move.to(),
                 move.getPiece(),
@@ -148,7 +147,8 @@ public class ChessGame {
                 this.board.getCastlingRights(),
                 this.board.getEnPassantSquare(),
                 this.board.getHalfmoveClock(),
-                this.board.getFullmoveNumber()
+                this.board.getFullmoveNumber(),
+                move.promotion()
         );
 
         this.executeMove(move);
@@ -169,10 +169,10 @@ public class ChessGame {
         board.setFullmoveNumber(moveState.previousFullMoveNumber);
         board.setActive(moveState.movedPiece.color());
 
-        this.moves.remove(moves.size()-1);
-
-        if (moveState.moveType.equals(MoveType.CASTLE_SHORT) || moveState.moveType.equals(MoveType.CASTLE_LONG))
+        if (moveState.movedPiece.pieceType().equals(PieceType.KING) && Math.abs(moveState.from.getX() - moveState.to.getX()) == 2)
             undoCastling(moveState);
+
+        this.moves.remove(moves.size()-1);
     }
 
 
@@ -183,7 +183,7 @@ public class ChessGame {
                 move.color(),
                 move.from(),
                 move.to(),
-                move.type()
+                move.promotion()
         );
     }
 
@@ -196,72 +196,65 @@ public class ChessGame {
     }
 
     private void executeMove(Move move) {
-        switch (move.type()) {
-            case NORMAL ->
-                    executeNormal(move);
-            case CASTLE_LONG, CASTLE_SHORT ->
-                    executeCastling(move);
-            case PROMOTION_QUEEN, PROMOTION_ROOK, PROMOTION_BISHOP, PROMOTION_KNIGHT ->
-                    executePromotion(move);
+        if (move.promotion() != null) {
+            executePromotion(move);
+            return;
         }
+
+        if (move.pieceType().equals(PieceType.KING) && Math.abs(move.from().getX() - move.to().getX()) == 2) {
+            executeCastling(move);
+            return;
+        }
+
+        executeNormal(move);
     }
 
     private void executePromotion(Move move) {
         this.board.emptySquare(move.from());
-        this.board.setPieceOn(new Piece(move.type().pieceType, move.color()), move.to());
+        this.board.setPieceOn(new Piece(move.promotion().pieceType, move.color()), move.to());
         this.moves.add(move);
         this.board.setActive(move.color().other());
     }
 
     private void executeCastling(Move move) {
         this.board.removeCastlingRights(move.color());
-        executeRookMoveCastling(move);
-        executeNormal(move);
-    }
 
-    private void executeRookMoveCastling(Move move) {
-        if (move.color().equals(Color.WHITE) && move.type().equals(MoveType.CASTLE_SHORT)) {
-            Piece piece = this.board.getPieceOn(Coord.of("h1"));
-            this.board.setPieceOn(piece, Coord.of("f1"));
-            this.board.emptySquare(Coord.of("h1"));
+        if (move.color().equals(Color.WHITE) && move.to().equals(Coord.of("g1"))) {
+            executeMoveRookOver("h1", "f1");
+            executeNormal(move);
 
-        } else if (move.color().equals(Color.WHITE) && move.type().equals(MoveType.CASTLE_LONG)) {
-            Piece piece = this.board.getPieceOn(Coord.of("a1"));
-            this.board.setPieceOn(piece, Coord.of("d1"));
-            this.board.emptySquare(Coord.of("a1"));
+        } else if (move.color().equals(Color.WHITE) && move.to().equals(Coord.of("c1"))) {
+            executeMoveRookOver("a1", "d1");
+            executeNormal(move);
 
-        } else if (move.color().equals(Color.BLACK) && move.type().equals(MoveType.CASTLE_SHORT)) {
-            Piece piece = this.board.getPieceOn(Coord.of("h8"));
-            this.board.setPieceOn(piece, Coord.of("f8"));
-            this.board.emptySquare(Coord.of("h8"));
+        } else if (move.color().equals(Color.BLACK) && move.to().equals(Coord.of("g8"))) {
+            executeMoveRookOver("h8", "f8");
+            executeNormal(move);
 
-        } else if (move.color().equals(Color.BLACK) && move.type().equals(MoveType.CASTLE_LONG)) {
-            Piece piece = this.board.getPieceOn(Coord.of("a8"));
-            this.board.setPieceOn(piece, Coord.of("d8"));
-            this.board.emptySquare(Coord.of("a8"));
+        } else if (move.color().equals(Color.BLACK) && move.to().equals(Coord.of("c8"))) {
+            executeMoveRookOver("a8", "d8");
+            executeNormal(move);
         }
     }
 
+    private void executeMoveRookOver(String from, String to) {
+        Piece piece = this.board.getPieceOn(Coord.of(from));
+        this.board.setPieceOn(piece, Coord.of(to));
+        this.board.emptySquare(Coord.of(from));
+    }
+
     private void undoCastling(MoveState moveState) {
-        if (moveState.movedPiece.color().equals(Color.WHITE) && moveState.moveType.equals(MoveType.CASTLE_SHORT)) {
-            Piece piece = this.board.getPieceOn(Coord.of("f1"));
-            this.board.setPieceOn(piece, Coord.of("h1"));
-            this.board.emptySquare(Coord.of("f1"));
+        if (moveState.movedPiece.color().equals(Color.WHITE) && moveState.to.equals(Coord.of("f1"))) {
+            executeMoveRookOver("f1", "h1");
 
-        } else if (moveState.movedPiece.color().equals(Color.WHITE) && moveState.moveType.equals(MoveType.CASTLE_LONG)) {
-            Piece piece = this.board.getPieceOn(Coord.of("d1"));
-            this.board.setPieceOn(piece, Coord.of("a1"));
-            this.board.emptySquare(Coord.of("d1"));
+        } else if (moveState.movedPiece.color().equals(Color.WHITE) && moveState.to.equals(Coord.of("c1"))) {
+            executeMoveRookOver("d1", "a1");
 
-        } else if (moveState.movedPiece.color().equals(Color.BLACK) && moveState.moveType.equals(MoveType.CASTLE_SHORT)) {
-            Piece piece = this.board.getPieceOn(Coord.of("f8"));
-            this.board.setPieceOn(piece, Coord.of("h8"));
-            this.board.emptySquare(Coord.of("f8"));
+        } else if (moveState.movedPiece.color().equals(Color.BLACK) && moveState.to.equals(Coord.of("f8"))) {
+            executeMoveRookOver("f8", "h8");
 
-        } else if (moveState.movedPiece.color().equals(Color.BLACK) && moveState.moveType.equals(MoveType.CASTLE_LONG)) {
-            Piece piece = this.board.getPieceOn(Coord.of("d8"));
-            this.board.setPieceOn(piece, Coord.of("a8"));
-            this.board.emptySquare(Coord.of("d8"));
+        } else if (moveState.movedPiece.color().equals(Color.BLACK) && moveState.to.equals(Coord.of("c8"))) {
+            executeMoveRookOver("d8", "a8");
         }
     }
 
@@ -277,15 +270,15 @@ public class ChessGame {
 
             } else if (move.pieceType().equals(PieceType.ROOK)) {
                 if (move.from().getX() == 0) {
-                    this.board.removeCastlingRights(move.color(), MoveType.CASTLE_LONG);
+                    this.board.removeCastlingRights(move.color(), Castling.QUEEN);
                 } else if (move.from().getX() == 7) {
-                    this.board.removeCastlingRights(move.color(), MoveType.CASTLE_SHORT);
+                    this.board.removeCastlingRights(move.color(), Castling.KING);
                 }
             }
         }
     }
 
-    public String exportPgn() {
+    public String exportPgn() { //todo fully if possible
         StringBuilder pgn = new StringBuilder();
 
         int fullMove = 1;

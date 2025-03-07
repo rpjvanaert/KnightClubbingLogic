@@ -3,8 +3,8 @@ package org.example.logic;
 import org.example.data.Board;
 import org.example.data.details.Color;
 import org.example.data.details.Coord;
-import org.example.data.details.MoveType;
 import org.example.data.details.PieceType;
+import org.example.data.details.Promotion;
 import org.example.data.move.MoveDraft;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,18 +87,18 @@ class MoveMakerTest {
 
         board = new Board("k4r1r/6P1/8/8/8/8/8/K7 w - - 0 1");
         expected = List.of(
-                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("g8"), MoveType.PROMOTION_QUEEN),
-                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("g8"), MoveType.PROMOTION_ROOK),
-                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("g8"), MoveType.PROMOTION_BISHOP),
-                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("g8"), MoveType.PROMOTION_KNIGHT),
-                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("f8"), MoveType.PROMOTION_QUEEN),
-                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("f8"), MoveType.PROMOTION_ROOK),
-                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("f8"), MoveType.PROMOTION_BISHOP),
-                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("f8"), MoveType.PROMOTION_KNIGHT),
-                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("h8"), MoveType.PROMOTION_QUEEN),
-                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("h8"), MoveType.PROMOTION_ROOK),
-                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("h8"), MoveType.PROMOTION_BISHOP),
-                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("h8"), MoveType.PROMOTION_KNIGHT)
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("g8"), Promotion.PROMOTION_QUEEN),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("g8"), Promotion.PROMOTION_ROOK),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("g8"), Promotion.PROMOTION_BISHOP),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("g8"), Promotion.PROMOTION_KNIGHT),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("f8"), Promotion.PROMOTION_QUEEN),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("f8"), Promotion.PROMOTION_ROOK),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("f8"), Promotion.PROMOTION_BISHOP),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("f8"), Promotion.PROMOTION_KNIGHT),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("h8"), Promotion.PROMOTION_QUEEN),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("h8"), Promotion.PROMOTION_ROOK),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("h8"), Promotion.PROMOTION_BISHOP),
+                new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("g7"), Coord.of("h8"), Promotion.PROMOTION_KNIGHT)
         );
 
         result = MoveMaker.generatePawnMoves(board, Coord.of("g7"));

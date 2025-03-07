@@ -7,11 +7,11 @@ public record MoveDraft(
         Color color,
         Coord from,
         Coord to,
-        MoveType type
+        Promotion promotion
 ) {
 
     public MoveDraft(PieceType pieceType, Color color, Coord from, Coord to) {
-        this(pieceType, color, from, to, MoveType.NORMAL);
+        this(pieceType, color, from, to, null);
     }
 
     public Piece getPiece() {

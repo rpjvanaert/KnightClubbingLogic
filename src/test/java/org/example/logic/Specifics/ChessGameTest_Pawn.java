@@ -1,6 +1,5 @@
 package org.example.logic.Specifics;
 
-import org.example.data.details.MoveType;
 import org.example.data.move.Move;
 import org.example.data.move.MoveDraft;
 import org.example.data.details.Color;
@@ -34,12 +33,11 @@ class ChessGameTest_Pawn {
         assertEquals(1, this.chessGame.getMoves().size());
         Move result = this.chessGame.getMoves().get(0);
 
-        assertEquals(moveDraft.type(), result.type());
         assertEquals(moveDraft.pieceType(), result.pieceType());
         assertEquals(moveDraft.color(), result.color());
         assertEquals(moveDraft.from(), result.from());
         assertEquals(moveDraft.to(), result.to());
-        assertEquals(moveDraft.type(), result.type());
+        assertEquals(moveDraft.promotion(), result.promotion());
     }
 
     @Test
@@ -55,12 +53,11 @@ class ChessGameTest_Pawn {
         assertEquals(1, this.chessGame.getMoves().size());
         Move result = this.chessGame.getMoves().get(0);
 
-        assertEquals(moveDraft.type(), result.type());
         assertEquals(moveDraft.pieceType(), result.pieceType());
         assertEquals(moveDraft.color(), result.color());
         assertEquals(moveDraft.from(), result.from());
         assertEquals(moveDraft.to(), result.to());
-        assertEquals(moveDraft.type(), result.type());
+        assertEquals(moveDraft.promotion(), result.promotion());
     }
 
     @Test
@@ -231,8 +228,8 @@ class ChessGameTest_Pawn {
 
     @Test
     void testTakeMoveSpecial() {
-        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("e2"), Coord.of("e4"), MoveType.NORMAL)));
-        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("f7"), Coord.of("f5"), MoveType.NORMAL)));
-        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("e4"), Coord.of("f5"), MoveType.NORMAL)));
+        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("e2"), Coord.of("e4"))));
+        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("f7"), Coord.of("f5"))));
+        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("e4"), Coord.of("f5"))));
     }
 }

@@ -49,8 +49,7 @@ public class MoveMaker {
                         piece.pieceType(),
                         piece.color(),
                         from,
-                        oneForward,
-                        MoveType.NORMAL
+                        oneForward
                 ));
             }
 
@@ -61,8 +60,7 @@ public class MoveMaker {
                             piece.pieceType(),
                             piece.color(),
                             from,
-                            twoForward,
-                            MoveType.NORMAL
+                            twoForward
                     ));
                 }
             }
@@ -78,21 +76,21 @@ public class MoveMaker {
     private static List<MoveDraft> createEveryPromotionMove(Coord from, Coord target, Piece piece) {
         List<MoveDraft> moves = new ArrayList<>(List.of());
 
-        moves.add(createPromotionMove(from, target, piece.color(), MoveType.PROMOTION_QUEEN));
-        moves.add(createPromotionMove(from, target, piece.color(), MoveType.PROMOTION_ROOK));
-        moves.add(createPromotionMove(from, target, piece.color(), MoveType.PROMOTION_BISHOP));
-        moves.add(createPromotionMove(from, target, piece.color(), MoveType.PROMOTION_KNIGHT));
+        moves.add(createPromotionMove(from, target, piece.color(), Promotion.PROMOTION_QUEEN));
+        moves.add(createPromotionMove(from, target, piece.color(), Promotion.PROMOTION_ROOK));
+        moves.add(createPromotionMove(from, target, piece.color(), Promotion.PROMOTION_BISHOP));
+        moves.add(createPromotionMove(from, target, piece.color(), Promotion.PROMOTION_KNIGHT));
 
         return moves;
     }
 
-    private static MoveDraft createPromotionMove(Coord from, Coord target, Color color, MoveType moveType) {
+    private static MoveDraft createPromotionMove(Coord from, Coord target, Color color, Promotion promotion) {
         return new MoveDraft(
                 PieceType.PAWN,
                 color,
                 from,
                 target,
-                moveType
+                promotion
         );
     }
 
@@ -111,8 +109,7 @@ public class MoveMaker {
                     piece.pieceType(),
                     piece.color(),
                     from,
-                    toCapture,
-                    isEnPassant ? MoveType.EN_PASSANT : MoveType.NORMAL
+                    toCapture
             ));
         }
         return List.of();
@@ -227,23 +224,21 @@ public class MoveMaker {
             }
         }
 
-        if (RuleChecker.isCastlingPossible(board, piece.color(), MoveType.CASTLE_SHORT)) {
+        if (RuleChecker.isCastlingPossible(board, piece.color(), Castling.KING)) {
             moves.add(new MoveDraft(
                     PieceType.KING,
                     piece.color(),
                     coord,
-                    coord.getAdjacent(2,0),
-                    MoveType.CASTLE_SHORT
+                    coord.getAdjacent(2,0)
             ));
         }
 
-        if (RuleChecker.isCastlingPossible(board, piece.color(), MoveType.CASTLE_LONG)) {
+        if (RuleChecker.isCastlingPossible(board, piece.color(), Castling.QUEEN)) {
             moves.add(new MoveDraft(
                     PieceType.KING,
                     piece.color(),
                     coord,
-                    coord.getAdjacent(-2,0),
-                    MoveType.CASTLE_LONG
+                    coord.getAdjacent(-2,0)
             ));
         }
 

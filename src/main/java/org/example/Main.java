@@ -42,7 +42,7 @@ public class Main {
             }
             Move aiMove = possibleMoves.get(random.nextInt(possibleMoves.size()));
             System.out.println("AI moves: " + aiMove.from().getNotation() + aiMove.to().getNotation());
-            game.submitMove(new MoveDraft(aiMove.pieceType(), aiMove.color(), aiMove.from(), aiMove.to(), aiMove.type()));
+            game.submitMove(new MoveDraft(aiMove.pieceType(), aiMove.color(), aiMove.from(), aiMove.to(), aiMove.promotion()));
 
             //if (isGameOver(game)) break;
         }

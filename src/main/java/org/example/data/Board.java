@@ -210,36 +210,36 @@ public class Board {
         return castlingRights;
     }
 
-    public List<MoveType> getCastlingRights(Color color) {
-        List<MoveType> moveTypes = new ArrayList<>();
+    public List<Castling> getCastlingRights(Color color) {
+        List<Castling> moveTypes = new ArrayList<>();
 
         if (this.castlingRights.contains("-"))
             return moveTypes;
 
         if (Color.WHITE.equals(color)) {
             if (this.castlingRights.contains("K"))
-                moveTypes.add(MoveType.CASTLE_SHORT);
+                moveTypes.add(Castling.KING);
 
             if (this.castlingRights.contains("Q"))
-                moveTypes.add(MoveType.CASTLE_LONG);
+                moveTypes.add(Castling.QUEEN);
 
         } else if (Color.BLACK.equals(color)) {
             if (this.castlingRights.contains("k"))
-                moveTypes.add(MoveType.CASTLE_SHORT);
+                moveTypes.add(Castling.KING);
 
             if (this.castlingRights.contains("q"))
-                moveTypes.add(MoveType.CASTLE_LONG);
+                moveTypes.add(Castling.QUEEN);
         }
 
         return moveTypes;
     }
 
-    public void removeCastlingRights(Color color, MoveType moveType) {
+    public void removeCastlingRights(Color color, Castling castling) {
         String side = "";
 
-        if (moveType.equals(MoveType.CASTLE_SHORT)) {
+        if (castling.equals(Castling.KING)) {
             side = "k";
-        } else if (moveType.equals(MoveType.CASTLE_LONG)) {
+        } else if (castling.equals(Castling.QUEEN)) {
             side = "q";
         }
 
@@ -258,8 +258,8 @@ public class Board {
     }
 
     public void removeCastlingRights(Color color) {
-        removeCastlingRights(color, MoveType.CASTLE_SHORT);
-        removeCastlingRights(color, MoveType.CASTLE_LONG);
+        removeCastlingRights(color, Castling.KING);
+        removeCastlingRights(color, Castling.QUEEN);
     }
 
     public void setEnPassantSquare(Coord enPassantSquare) {

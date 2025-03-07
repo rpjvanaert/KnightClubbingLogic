@@ -8,7 +8,7 @@ public record Move (
         Color color,
         Coord from,
         Coord to,
-        MoveType type
+        Promotion promotion
 ) {
 
     public Piece getPiece() {
