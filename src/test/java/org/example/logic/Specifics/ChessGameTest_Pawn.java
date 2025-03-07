@@ -1,5 +1,6 @@
 package org.example.logic.Specifics;
 
+import org.example.data.details.MoveType;
 import org.example.data.move.Move;
 import org.example.data.move.MoveDraft;
 import org.example.data.details.Color;
@@ -226,5 +227,12 @@ class ChessGameTest_Pawn {
         assertTrue(this.chessGame.submitMove(moveDraft3));
         assertTrue(this.chessGame.submitMove(moveDraft4));
         assertFalse(this.chessGame.submitMove(moveDraft5));
+    }
+
+    @Test
+    void testTakeMoveSpecial() {
+        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("e2"), Coord.of("e4"), MoveType.NORMAL)));
+        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("f7"), Coord.of("f5"), MoveType.NORMAL)));
+        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("e4"), Coord.of("f5"), MoveType.NORMAL)));
     }
 }
