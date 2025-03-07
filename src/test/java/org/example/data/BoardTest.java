@@ -24,15 +24,28 @@ class BoardTest {
 
     @Test
     void getDisplay() {
-        assertEquals("R  N  B  Q  K  B  N  R  \n" +
-                        "P  P  P  P  P  P  P  P  \n" +
-                        "-  -  -  -  -  -  -  -  \n" +
-                        "-  -  -  -  -  -  -  -  \n" +
-                        "-  -  -  -  -  -  -  -  \n" +
-                        "-  -  -  -  -  -  -  -  \n" +
+        assertEquals("r  n  b  q  k  b  n  r  \n" +
                         "p  p  p  p  p  p  p  p  \n" +
-                        "r  n  b  q  k  b  n  r  \n",
+                        "-  -  -  -  -  -  -  -  \n" +
+                        "-  -  -  -  -  -  -  -  \n" +
+                        "-  -  -  -  -  -  -  -  \n" +
+                        "-  -  -  -  -  -  -  -  \n" +
+                        "P  P  P  P  P  P  P  P  \n" +
+                        "R  N  B  Q  K  B  N  R  \n",
                 this.board.getDisplay());
+    }
+
+    @Test
+    void getColorDisplay() {
+        assertEquals("\u001B[34mR\u001B[0m  \u001B[34mN\u001B[0m  \u001B[34mB\u001B[0m  \u001B[34mQ\u001B[0m  \u001B[34mK\u001B[0m  \u001B[34mB\u001B[0m  \u001B[34mN\u001B[0m  \u001B[34mR\u001B[0m  \n" +
+                        "\u001B[34mP\u001B[0m  \u001B[34mP\u001B[0m  \u001B[34mP\u001B[0m  \u001B[34mP\u001B[0m  \u001B[34mP\u001B[0m  \u001B[34mP\u001B[0m  \u001B[34mP\u001B[0m  \u001B[34mP\u001B[0m  \n" +
+                        "\u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \n" +
+                        "\u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \n" +
+                        "\u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \n" +
+                        "\u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \u001B[90m-\u001B[0m  \n" +
+                        "\u001B[97mP\u001B[0m  \u001B[97mP\u001B[0m  \u001B[97mP\u001B[0m  \u001B[97mP\u001B[0m  \u001B[97mP\u001B[0m  \u001B[97mP\u001B[0m  \u001B[97mP\u001B[0m  \u001B[97mP\u001B[0m  \n" +
+                        "\u001B[97mR\u001B[0m  \u001B[97mN\u001B[0m  \u001B[97mB\u001B[0m  \u001B[97mQ\u001B[0m  \u001B[97mK\u001B[0m  \u001B[97mB\u001B[0m  \u001B[97mN\u001B[0m  \u001B[97mR\u001B[0m  \n",
+                this.board.getColorDisplay());
     }
 
     @Test

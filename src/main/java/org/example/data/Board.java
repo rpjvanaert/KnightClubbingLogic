@@ -92,8 +92,9 @@ public class Board {
 
     public String getDisplay() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Piece[] rank : board) {
-            for (Piece piece : rank) {
+        for (int i = board.length - 1; i >= 0; i--) {
+            for (int j = 0; j < board[i].length; j++) {
+                Piece piece = board[i][j];
                 if (piece == null) {
                     stringBuilder.append("-");
                 } else {
@@ -106,6 +107,31 @@ public class Board {
 
         return stringBuilder.toString();
     }
+
+    public String getColorDisplay() {
+        final String RESET = "\u001B[0m";
+        final String WHITE_PIECE = "\u001B[97m";
+        final String BLACK_PIECE = "\u001B[34m";
+        final String EMPTY = "\u001B[90m";
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = board.length - 1; i >= 0; i--) {
+            for (int j = 0; j < board[i].length; j++) {
+                Piece piece = board[i][j];
+                if (piece == null) {
+                    stringBuilder.append(EMPTY).append("-").append(RESET);
+                } else {
+                    String color = piece.color().equals(Color.WHITE) ? WHITE_PIECE : BLACK_PIECE;
+                    stringBuilder.append(color).append(Character.toUpperCase(piece.getChar())).append(RESET);
+                }
+                stringBuilder.append("  ");
+            }
+            stringBuilder.append("\n");
+        }
+
+        return stringBuilder.toString();
+    }
+
 
     public Piece[][] getBoard() {
         return board;
@@ -206,6 +232,34 @@ public class Board {
         }
 
         return moveTypes;
+    }
+
+    public void removeCastlingRights(Color color, MoveType moveType) {
+        String side = "";
+
+        if (moveType.equals(MoveType.CASTLE_SHORT)) {
+            side = "k";
+        } else if (moveType.equals(MoveType.CASTLE_LONG)) {
+            side = "q";
+        }
+
+        removeCastlingRights(color, side);
+    }
+
+    private void removeCastlingRights(Color color, String side) {
+        if (color.equals(Color.WHITE))
+            side = side.toUpperCase();
+
+        removeCastlingRights(side);
+    }
+
+    private void removeCastlingRights(String side) {
+        this.castlingRights = this.castlingRights.replace(side, "");
+    }
+
+    public void removeCastlingRights(Color color) {
+        removeCastlingRights(color, MoveType.CASTLE_SHORT);
+        removeCastlingRights(color, MoveType.CASTLE_LONG);
     }
 
     public void setEnPassantSquare(Coord enPassantSquare) {
