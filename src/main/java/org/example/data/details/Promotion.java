@@ -15,4 +15,15 @@ public enum Promotion {
         this.fullNotation = fullNotation;
         this.pieceType = pieceType;
     }
+
+    public static Promotion fromChar(char c) {
+        return switch (Character.toUpperCase(c)) {
+            case 'Q' -> PROMOTION_QUEEN;
+            case 'R' -> PROMOTION_ROOK;
+            case 'B' -> PROMOTION_BISHOP;
+            case 'N' -> PROMOTION_KNIGHT;
+            default -> throw new IllegalArgumentException("Invalid promotion character: " + c);
+        };
+    }
+
 }

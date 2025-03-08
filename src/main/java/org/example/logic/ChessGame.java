@@ -139,13 +139,25 @@ public class ChessGame {
     }
 
     private MoveState applyMoveTemporarily(Move move) {
+        Coord enPassantTarget = this.board.getEnPassantSquare(); // Store previous en passant square
+        Piece capturedPiece = this.board.getPieceOn(move.to());
+
+        // Handle en passant capture
+        if (move.pieceType() == PieceType.PAWN &&
+                enPassantTarget != null &&
+                move.to().equals(enPassantTarget)) {
+
+            capturedPiece = this.board.getPieceOn(enPassantTarget.getAdjacent(0, move.color().other().direction));
+            this.board.emptySquare(enPassantTarget.getAdjacent(0, move.color().other().direction));
+        }
+
         MoveState moveState = new MoveState(
                 move.from(),
                 move.to(),
                 move.getPiece(),
-                this.board.getPieceOn(move.to()),
+                capturedPiece,
                 this.board.getCastlingRights(),
-                this.board.getEnPassantSquare(),
+                enPassantTarget,  // Store previous en passant target
                 this.board.getHalfmoveClock(),
                 this.board.getFullmoveNumber(),
                 move.promotion()
@@ -158,21 +170,31 @@ public class ChessGame {
 
     private void undoMove(MoveState moveState) {
         board.setPieceOn(moveState.movedPiece, moveState.from);
+
         if (moveState.capturedPiece == null) {
             board.emptySquare(moveState.to);
         } else {
-            board.setPieceOn(moveState.capturedPiece, moveState.to);
+            // Restore en passant capture properly
+            if (moveState.movedPiece.pieceType() == PieceType.PAWN &&
+                    moveState.to.equals(moveState.previousEnPassantTarget)) {
+                board.setPieceOn(moveState.capturedPiece, moveState.to.getAdjacent(0, moveState.movedPiece.color().other().direction));
+            } else {
+                board.setPieceOn(moveState.capturedPiece, moveState.to);
+            }
         }
+
         board.setCastlingRights(moveState.previousCastlingRights);
         board.setEnPassantSquare(moveState.previousEnPassantTarget);
         board.setHalfmoveClock(moveState.previousHalfMoveClock);
         board.setFullmoveNumber(moveState.previousFullMoveNumber);
         board.setActive(moveState.movedPiece.color());
 
-        if (moveState.movedPiece.pieceType().equals(PieceType.KING) && Math.abs(moveState.from.getX() - moveState.to.getX()) == 2)
+        if (moveState.movedPiece.pieceType() == PieceType.KING
+                && Math.abs(moveState.from.getX() - moveState.to.getX()) == 2) {
             undoCastling(moveState);
+        }
 
-        this.moves.remove(moves.size()-1);
+        this.moves.remove(moves.size() - 1);
     }
 
 
@@ -263,6 +285,19 @@ public class ChessGame {
         this.board.setPieceOn(move.getPiece(), move.to());
         this.moves.add(move);
         this.board.setActive(move.color().other());
+
+        if (move.pieceType() == PieceType.PAWN && Math.abs(move.from().getY() - move.to().getY()) == 2) {
+            this.board.setEnPassantSquare(new Coord(move.from().getX(), (move.from().getY() + move.to().getY()) / 2));
+        } else if (
+                Math.abs(move.from().getX() - move.to().getX()) == 1 &&
+                Math.abs(move.from().getY() - move.to().getY()) == 1 &&
+                this.board.getEnPassantSquare() != null &&
+                this.board.getEnPassantSquare().equals(move.to())
+        ) {
+            this.board.emptySquare(move.to().getAdjacent(0, move.color().other().direction));
+        } else {
+            this.board.setEnPassantSquare(null);
+        }
 
         if (!this.board.getCastlingRights().isEmpty()) {
             if (move.pieceType().equals(PieceType.KING)) {

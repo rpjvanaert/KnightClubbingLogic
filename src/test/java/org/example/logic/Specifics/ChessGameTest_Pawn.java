@@ -232,4 +232,13 @@ class ChessGameTest_Pawn {
         assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("f7"), Coord.of("f5"))));
         assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("e4"), Coord.of("f5"))));
     }
+
+    @Test
+    void testEnPassant() {
+        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("a2"), Coord.of("a4"))));
+        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("a7"), Coord.of("a6"))));
+        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("a4"), Coord.of("a5"))));
+        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.BLACK, Coord.of("b7"), Coord.of("b5"))));
+        assertTrue(this.chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("a5"), Coord.of("b6"))));
+    }
 }

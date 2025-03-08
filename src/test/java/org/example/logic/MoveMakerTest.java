@@ -49,6 +49,7 @@ class MoveMakerTest {
                 new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("d2"), Coord.of("d4"))
         );
         result = MoveMaker.generatePawnMoves(chessGame.getBoard(), Coord.of("d2"));
+        System.out.println(chessGame.getBoard().getColorDisplay());
         assertEquals(expectedFirst, result);
         assertTrue(chessGame.submitMove(new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("d2"), Coord.of("d4"))));
 
