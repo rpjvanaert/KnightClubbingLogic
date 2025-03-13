@@ -59,7 +59,7 @@ public class ChessGame {
             notifyListeners(move);
 
         } catch (ChessException exception) {
-            //System.err.println(exception.getMessage());
+            System.err.println(exception.getMessage());
             return false;
         }
         return true;
@@ -138,11 +138,10 @@ public class ChessGame {
         return false;
     }
 
-    private MoveState applyMoveTemporarily(Move move) {
-        Coord enPassantTarget = this.board.getEnPassantSquare(); // Store previous en passant square
+    protected MoveState applyMoveTemporarily(Move move) {
+        Coord enPassantTarget = this.board.getEnPassantSquare();
         Piece capturedPiece = this.board.getPieceOn(move.to());
 
-        // Handle en passant capture
         if (move.pieceType() == PieceType.PAWN &&
                 enPassantTarget != null &&
                 move.to().equals(enPassantTarget)) {
@@ -157,7 +156,7 @@ public class ChessGame {
                 move.getPiece(),
                 capturedPiece,
                 this.board.getCastlingRights(),
-                enPassantTarget,  // Store previous en passant target
+                enPassantTarget,
                 this.board.getHalfmoveClock(),
                 this.board.getFullmoveNumber(),
                 move.promotion()
@@ -168,13 +167,12 @@ public class ChessGame {
         return moveState;
     }
 
-    private void undoMove(MoveState moveState) {
+    protected void undoMove(MoveState moveState) {
         board.setPieceOn(moveState.movedPiece, moveState.from);
 
         if (moveState.capturedPiece == null) {
             board.emptySquare(moveState.to);
         } else {
-            // Restore en passant capture properly
             if (moveState.movedPiece.pieceType() == PieceType.PAWN &&
                     moveState.to.equals(moveState.previousEnPassantTarget)) {
                 board.setPieceOn(moveState.capturedPiece, moveState.to.getAdjacent(0, moveState.movedPiece.color().other().direction));
@@ -328,4 +326,33 @@ public class ChessGame {
 
         return pgn.toString();
     }
+
+    public long perft(int depth) {
+        if (depth == 0) return 1;
+
+        long nodes = 0;
+        for (Move move : determineAllLegalMoves()) {
+            MoveState state = applyMoveTemporarily(move);
+            nodes += perft(depth - 1);
+            undoMove(state);
+        }
+        return nodes;
+    }
+
+    public long perftDivide(int depth) {
+        long totalNodes = 0;
+
+        for (Move move : determineAllLegalMoves()) {
+            MoveState state = applyMoveTemporarily(move);
+            long moveNodes = perft(depth - 1);
+            undoMove(state);
+
+            System.out.println(move.notation() + ": " + moveNodes);
+            totalNodes += moveNodes;
+        }
+
+        System.out.println("Total: " + totalNodes);
+        return totalNodes;
+    }
+
 }

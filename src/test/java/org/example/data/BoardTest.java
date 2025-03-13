@@ -84,6 +84,19 @@ class BoardTest {
         assertEquals(new Piece(PieceType.KING, Color.BLACK), board.getPieceOn(new Coord(0,7)));
         assertEquals(new Piece(PieceType.ROOK, Color.BLACK), board.getPieceOn(new Coord(7,7)));
         assertEquals(new Piece(PieceType.ROOK, Color.BLACK), board.getPieceOn(new Coord(5,7)));
+
+        assertEquals(Color.WHITE, board.getActive());
+
+        fen = "k4r1r/6P1/8/8/8/8/8/K7 b - - 0 1";
+        board = new Board(fen);
+
+        assertEquals(new Piece(PieceType.KING, Color.WHITE), board.getPieceOn(new Coord(0,0)));
+        assertEquals(new Piece(PieceType.PAWN, Color.WHITE), board.getPieceOn(new Coord(6,6)));
+        assertEquals(new Piece(PieceType.KING, Color.BLACK), board.getPieceOn(new Coord(0,7)));
+        assertEquals(new Piece(PieceType.ROOK, Color.BLACK), board.getPieceOn(new Coord(7,7)));
+        assertEquals(new Piece(PieceType.ROOK, Color.BLACK), board.getPieceOn(new Coord(5,7)));
+
+        assertEquals(Color.BLACK, board.getActive());
     }
 
     @Test
