@@ -1,0 +1,95 @@
+package knight.clubbing.logic;
+
+import knight.clubbing.data.Board;
+import knight.clubbing.data.details.*;
+import knight.clubbing.data.move.MoveDraft;
+
+import java.util.List;
+
+public class RuleChecker {
+    public static boolean isKingInCheck(Board board, Color color) {
+        Coord kingPosition = board.searchPieces(PieceType.KING, color).get(0);
+        if (kingPosition == null) {
+            return false;
+        }
+
+        return isUnderAttack(board, color, kingPosition, true);
+    }
+
+    private static boolean isUnderAttack(Board board, Color color, Coord position, boolean excludeKings) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Coord from = new Coord(row, col);
+                Piece piece = board.getPieceOn(from);
+
+                if (piece != null && piece.color() != color) {
+                    if (!(excludeKings && piece.pieceType().equals(PieceType.KING))) {
+                        List<MoveDraft> possibleMoves = MoveMaker.generatePieceMoves(board, piece, from);
+                        for (MoveDraft move : possibleMoves) {
+                            if (move.to().equals(position)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isCastlingPossible(Board board, Color color, Castling castling) {
+        if (!board.getCastlingRights(color).contains(castling))
+            return false;
+
+        if (Color.WHITE.equals(color)) {
+            if (!PieceType.KING.equals(board.getPieceOn(new Coord(4,0)).pieceType()))
+                return false;
+
+            if (Castling.KING.equals(castling) && !PieceType.ROOK.equals(board.getPieceOn(new Coord(7,0)).pieceType()))
+                return false;
+
+            if (Castling.QUEEN.equals(castling) && !PieceType.ROOK.equals(board.getPieceOn(new Coord(0,0)).pieceType()))
+                return false;
+
+        } else if(Color.BLACK.equals(color)) {
+            if (!PieceType.KING.equals(board.getPieceOn(new Coord(4,7)).pieceType()))
+                return false;
+
+            if (Castling.KING.equals(castling) && !PieceType.ROOK.equals(board.getPieceOn(new Coord(7,7)).pieceType()))
+                return false;
+
+            if (Castling.QUEEN.equals(castling) && !PieceType.ROOK.equals(board.getPieceOn(new Coord(0,7)).pieceType()))
+                return false;
+        }
+
+        Coord targetKing = board.searchPieces(PieceType.KING, color).get(0);
+        Coord targetRook = null;
+        int direction = 0;
+        if (Castling.KING.equals(castling)) {
+            targetRook = new Coord(7, targetKing.getY());
+            direction = 1;
+
+        } else if (Castling.QUEEN.equals(castling)) {
+            targetRook = new Coord(0, targetKing.getY());
+            direction = -1;
+        }
+
+        Coord target = targetKing.getAdjacent(0, 0);
+        int step = 0;
+        while (true) {
+            if (step <= 2 && isUnderAttack(board, color, target, true))
+                return false;
+
+            step++;
+            target = target.getAdjacent(direction, 0);
+
+            if (target.equals(targetRook))
+                return true;
+
+            if (!board.isEmpty(target))
+                return false;
+
+
+        }
+    }
+}
