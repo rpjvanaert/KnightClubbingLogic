@@ -264,13 +264,13 @@ public class ChessGame {
     }
 
     private void undoCastling(MoveState moveState) {
-        if (moveState.movedPiece.color().equals(Color.WHITE) && moveState.to.equals(Coord.of("f1"))) {
+        if (moveState.movedPiece.color().equals(Color.WHITE) && moveState.to.equals(Coord.of("g1"))) {
             executeMoveRookOver("f1", "h1");
 
         } else if (moveState.movedPiece.color().equals(Color.WHITE) && moveState.to.equals(Coord.of("c1"))) {
             executeMoveRookOver("d1", "a1");
 
-        } else if (moveState.movedPiece.color().equals(Color.BLACK) && moveState.to.equals(Coord.of("f8"))) {
+        } else if (moveState.movedPiece.color().equals(Color.BLACK) && moveState.to.equals(Coord.of("g8"))) {
             executeMoveRookOver("f8", "h8");
 
         } else if (moveState.movedPiece.color().equals(Color.BLACK) && moveState.to.equals(Coord.of("c8"))) {
