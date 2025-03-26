@@ -3,7 +3,6 @@ package knight.clubbing.data.move;
 import knight.clubbing.data.details.*;
 
 public record Move (
-        String notation,
         PieceType pieceType,
         Color color,
         Coord from,
@@ -13,5 +12,9 @@ public record Move (
 
     public Piece getPiece() {
         return new Piece(this.pieceType, this.color);
+    }
+
+    public String getUci() {
+        return from.getNotation() + to.getNotation() + (promotion == null ? "" : promotion.notation.toLowerCase());
     }
 }
