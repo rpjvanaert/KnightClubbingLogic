@@ -68,7 +68,7 @@ class ChessGameTest {
     @Test
     void testApplyAndUndoNormalMove() {
         ChessGame game = new ChessGame();
-        Move move = new Move("e2e4", PieceType.PAWN, Color.WHITE, Coord.of("e2"), Coord.of("e4"), null);
+        Move move = new Move(PieceType.PAWN, Color.WHITE, Coord.of("e2"), Coord.of("e4"), null);
         MoveState state = game.applyMoveTemporarily(move);
         assertNull(game.getBoard().getPieceOn(Coord.of("e2")));
         assertNotNull(game.getBoard().getPieceOn(Coord.of("e4")));
@@ -83,7 +83,7 @@ class ChessGameTest {
         ChessGame game = new ChessGame("rnbqkbnr/ppp2ppp/8/3pp3/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 1");
         Piece movedPiece = game.getBoard().getPieceOn(Coord.of("e4"));
         Piece capturedPiece = game.getBoard().getPieceOn(Coord.of("d5"));
-        Move move = new Move("e2e4", PieceType.PAWN, Color.WHITE, Coord.of("e4"), Coord.of("d5"), null);
+        Move move = new Move(PieceType.PAWN, Color.WHITE, Coord.of("e4"), Coord.of("d5"), null);
         MoveState state = game.applyMoveTemporarily(move);
         assertNull(game.getBoard().getPieceOn(Coord.of("e4")));
         assertNotNull(game.getBoard().getPieceOn(Coord.of("d5")));
@@ -96,7 +96,7 @@ class ChessGameTest {
     @Test
     void testApplyAndUndoCastling() {
         ChessGame game = new ChessGame("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
-        Move move = new Move("e1g1" , PieceType.KING, Color.WHITE, Coord.of("e1"), Coord.of("g1"), null);
+        Move move = new Move(PieceType.KING, Color.WHITE, Coord.of("e1"), Coord.of("g1"), null);
         MoveState state = game.applyMoveTemporarily(move);
         assertNull(game.getBoard().getPieceOn(Coord.of("e1")));
         assertEquals(new Piece(PieceType.KING, Color.WHITE), game.getBoard().getPieceOn(Coord.of("g1")));
@@ -108,7 +108,7 @@ class ChessGameTest {
 
         assertTrue(game.submitMove(new MoveDraft(PieceType.KING, Color.WHITE, Coord.of("e1"), Coord.of("g1"), null)));
 
-        move = new Move("e8g8" , PieceType.KING, Color.BLACK, Coord.of("e8"), Coord.of("c8"), null);
+        move = new Move(PieceType.KING, Color.BLACK, Coord.of("e8"), Coord.of("c8"), null);
         state = game.applyMoveTemporarily(move);
         assertNull(game.getBoard().getPieceOn(Coord.of("e8")));
         assertEquals(new Piece(PieceType.KING, Color.BLACK), game.getBoard().getPieceOn(Coord.of("c8")));
@@ -121,23 +121,39 @@ class ChessGameTest {
 
     @Test
     void testApplyAndUndoEnPassant() {
-        ChessGame game = new ChessGame("rnbqkbnr/ppppp1pp/8/4Pp2/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1");
-        Move move = new Move("e5f6", PieceType.PAWN, Color.WHITE, Coord.of("e5"), Coord.of("f6"),  null);
+        ChessGame game = new ChessGame("rnbqkbnr/ppppp1pp/8/4Pp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 2");
+        Move move = new Move(PieceType.PAWN, Color.WHITE, Coord.of("e5"), Coord.of("f6"),  null);
         MoveState state = game.applyMoveTemporarily(move);
         assertNull(game.getBoard().getPieceOn(Coord.of("e5")));
         assertNotNull(game.getBoard().getPieceOn(Coord.of("f6")));
         assertNull(game.getBoard().getPieceOn(Coord.of("f5")));
 
         game.undoMove(state);
-        assertNotNull(game.getBoard().getPieceOn(Coord.of("e4")));
-        assertNotNull(game.getBoard().getPieceOn(Coord.of("f6")));
+        assertNotNull(game.getBoard().getPieceOn(Coord.of("e5")));
+        assertNull(game.getBoard().getPieceOn(Coord.of("f6")));
+        assertNotNull(game.getBoard().getPieceOn(Coord.of("f5")));
     }
+
+    @Test
+    void testApplyAndUndoEnPassant_fromPerft() {
+        ChessGame game = new ChessGame("r3k2r/p1ppqpb1/bn2pnp1/3PN3/Pp2P3/2N2Q1p/1PPBBPPP/R3K2R b KQkq a3 0 1");
+        Move move = new Move(PieceType.PAWN, Color.BLACK, Coord.of("b4"), Coord.of("a3"),  null);
+        MoveState state = game.applyMoveTemporarily(move);
+        assertNull(game.getBoard().getPieceOn(Coord.of("b4")));
+        assertNotNull(game.getBoard().getPieceOn(Coord.of("a3")));
+        assertNull(game.getBoard().getPieceOn(Coord.of("a4")));
+
+        game.undoMove(state);
+        assertNotNull(game.getBoard().getPieceOn(Coord.of("b4")));
+        assertNull(game.getBoard().getPieceOn(Coord.of("a3")));
+        assertNotNull(game.getBoard().getPieceOn(Coord.of("a4")));
+    }
+
 
     @Test
     void testApplyAndUndoPromotion() {
         ChessGame game = new ChessGame("8/P7/8/8/8/8/8/k6K w - - 0 1");
-        MoveDraft moveDraft = new MoveDraft(PieceType.PAWN, Color.WHITE, Coord.of("a7"), Coord.of("a8"), Promotion.PROMOTION_QUEEN);
-        Move move = game.submitMove(moveDraft) ? game.getMoves().get(game.getMoves().size() - 1) : null;
+        Move move = new Move(PieceType.PAWN, Color.WHITE, Coord.of("a7"), Coord.of("a8"), Promotion.PROMOTION_QUEEN);
         assertNotNull(move);
 
         MoveState state = game.applyMoveTemporarily(move);
@@ -145,6 +161,7 @@ class ChessGameTest {
         assertNotNull(game.getBoard().getPieceOn(Coord.of("a8")));
         assertEquals(PieceType.QUEEN, game.getBoard().getPieceOn(Coord.of("a8")).pieceType());
 
+        System.out.println("The one I got: " + state);
         game.undoMove(state);
         assertNotNull(game.getBoard().getPieceOn(Coord.of("a7")));
         assertNull(game.getBoard().getPieceOn(Coord.of("a8")));

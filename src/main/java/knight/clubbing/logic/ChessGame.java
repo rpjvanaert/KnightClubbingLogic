@@ -115,7 +115,7 @@ public class ChessGame {
         return transformDraftToMove(moveDraft, threat);
     }
 
-    private ThreatType assessThreat(Color opponentColor) {
+    public ThreatType assessThreat(Color opponentColor) {
         boolean inCheck = RuleChecker.isKingInCheck(board, opponentColor);
 
         if (inCheck) {
@@ -143,11 +143,11 @@ public class ChessGame {
         Piece capturedPiece = this.board.getPieceOn(move.to());
 
         if (move.pieceType() == PieceType.PAWN &&
-                enPassantTarget != null &&
                 move.to().equals(enPassantTarget)) {
 
-            capturedPiece = this.board.getPieceOn(enPassantTarget.getAdjacent(0, move.color().other().direction));
-            this.board.emptySquare(enPassantTarget.getAdjacent(0, move.color().other().direction));
+            Coord capturedPawnSquare = enPassantTarget.getAdjacent(0, move.color().other().direction);
+            capturedPiece = this.board.getPieceOn(capturedPawnSquare);
+            this.board.emptySquare(capturedPawnSquare);
         }
 
         MoveState moveState = new MoveState(
@@ -176,9 +176,14 @@ public class ChessGame {
             if (moveState.movedPiece.pieceType() == PieceType.PAWN &&
                     moveState.to.equals(moveState.previousEnPassantTarget)) {
                 board.setPieceOn(moveState.capturedPiece, moveState.to.getAdjacent(0, moveState.movedPiece.color().other().direction));
+                board.emptySquare(moveState.to);
             } else {
                 board.setPieceOn(moveState.capturedPiece, moveState.to);
             }
+        }
+
+        if (moveState.promotion != null) {
+            board.setPieceOn(new Piece(PieceType.PAWN, moveState.movedPiece.color()), moveState.from);
         }
 
         board.setCastlingRights(moveState.previousCastlingRights);
@@ -198,7 +203,6 @@ public class ChessGame {
 
     private static Move transformDraftToMove(MoveDraft move, ThreatType threat) {
         return new Move(
-                getNotation(move, threat),
                 move.pieceType(),
                 move.color(),
                 move.from(),
@@ -311,6 +315,34 @@ public class ChessGame {
         }
     }
 
+    public int getMaterialBalance() {
+        int balance = 0;
+        for (Coord coord : this.board.searchPieces(null, null)) {
+            Piece piece = this.board.getPieceOn(coord);
+            switch (piece.pieceType()) {
+                case PAWN:
+                    balance += 1 * piece.color().direction;
+                    break;
+                case KNIGHT:
+                    balance += 3 * piece.color().direction;
+                    break;
+                case BISHOP:
+                    balance += 3 * piece.color().direction;
+                    break;
+                case ROOK:
+                    balance += 5 * piece.color().direction;
+                    break;
+                case QUEEN:
+                    balance += 9 * piece.color().direction;
+                    break;
+                case KING:
+                    break;
+            }
+        }
+
+        return balance;
+    }
+
     public String exportPgn() { //todo fully if possible
         StringBuilder pgn = new StringBuilder();
 
@@ -318,7 +350,7 @@ public class ChessGame {
         for (Move move : this.moves) {
             pgn
                 .append(Color.WHITE.equals(move.color()) ? fullMove + "." : "")
-                .append(move.notation())
+                .append(move.getUci())
                 .append(" ");
             if (move.color().equals(Color.BLACK))
                 fullMove++;
@@ -335,6 +367,9 @@ public class ChessGame {
             MoveState state = applyMoveTemporarily(move);
             nodes += perft(depth - 1);
             undoMove(state);
+
+
+
         }
         return nodes;
     }
@@ -347,7 +382,7 @@ public class ChessGame {
             long moveNodes = perft(depth - 1);
             undoMove(state);
 
-            System.out.println(move.notation() + ": " + moveNodes);
+            System.out.println(move.getUci() + ": " + moveNodes);
             totalNodes += moveNodes;
         }
 

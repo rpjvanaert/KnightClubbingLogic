@@ -218,7 +218,7 @@ public class MoveMaker {
             for (int dy = -1; dy <= 1; dy++) {
                 if (dx == 0 && dy == 0) continue;
                 Coord target = coord.getAdjacent(dx, dy);
-                if (target != null && board.isValid(target) && !board.isFriendly(coord, piece.color())) {
+                if (target != null && board.isValid(target) && !board.isFriendly(target, piece.color())) {
                     moves.add(new MoveDraft(piece.pieceType(), piece.color(), coord, target));
                 }
             }
