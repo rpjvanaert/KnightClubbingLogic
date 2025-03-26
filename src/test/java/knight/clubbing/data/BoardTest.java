@@ -156,6 +156,20 @@ class BoardTest {
     }
 
     @Test
+    void isFriendly() {
+        Board board = new Board();
+
+        assertTrue(board.isFriendly(Coord.of("e1"), Color.WHITE));
+        assertTrue(board.isFriendly(Coord.of("e8"), Color.BLACK));
+
+        assertFalse(board.isFriendly(Coord.of("e1"), Color.BLACK));
+        assertFalse(board.isFriendly(Coord.of("e8"), Color.WHITE));
+
+        assertFalse(board.isFriendly(Coord.of("e4"), Color.WHITE));
+        assertFalse(board.isFriendly(Coord.of("e4"), Color.BLACK));
+    }
+
+    @Test
     void searchPieces() {
         assertEquals(8, this.board.searchPieces(PieceType.PAWN, Color.WHITE).size());
         assertEquals(2, this.board.searchPieces(PieceType.ROOK, Color.WHITE).size());
