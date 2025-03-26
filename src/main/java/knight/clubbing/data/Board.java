@@ -138,12 +138,16 @@ public class Board {
     }
 
     public Piece getPieceOn(Coord coord) {
-        return this.board[coord.getY()][coord.getX()];
+        int x = coord.getX();
+        int y = coord.getY();
+        return isValid(coord) ? board[y][x] : null;
     }
 
     public void setPieceOn(Piece piece, Coord coord) {
         if (piece == null) return;
-        this.board[coord.getY()][coord.getX()] = piece;
+        int x = coord.getX();
+        int y = coord.getY();
+        if (isValid(coord)) board[y][x] = piece;
     }
 
     public int countPieces(Piece piece) {
@@ -180,13 +184,15 @@ public class Board {
     }
 
     public boolean isFriendly(Coord coord, Color color) {
-        return isValid(coord) && board[coord.getY()][coord.getX()] != null &&
-                board[coord.getY()][coord.getX()].color() == color;
+        Piece piece = getPieceOn(coord);
+        return piece != null &&
+                piece.color() == color;
     }
 
     public boolean isEnemy(Coord coord, Color color) {
-        return isValid(coord) && board[coord.getY()][coord.getX()] != null &&
-                board[coord.getY()][coord.getX()].color() != color;
+        Piece piece = getPieceOn(coord);
+        return piece != null &&
+                piece.color() != color;
     }
 
 
