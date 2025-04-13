@@ -81,7 +81,7 @@ public class PerftTest {
 
     @Test
     void testPerftDivideEnPassant() {
-        ChessGame game = new ChessGame("rnbqkbnr/pppppppp/8/8/4Pp2/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 2"); //todo fix e1e2
+        ChessGame game = new ChessGame("rnbqkbnr/pppppppp/8/8/4Pp2/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 2");
         long expectedNodes = 29;
 
         assertEquals(expectedNodes, game.perftDivide(1), "Incorrect Perft(1) result for en passant.");
