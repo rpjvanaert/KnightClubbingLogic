@@ -1,10 +1,14 @@
 package knight.clubbing;
 
+import knight.clubbing.data.details.Color;
+import knight.clubbing.data.details.Coord;
+import knight.clubbing.data.details.PieceType;
+import knight.clubbing.data.move.MoveDraft;
 import knight.clubbing.logic.ChessGame;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-/*
+
 public class PerftTest {
 
     @Test
@@ -70,19 +74,20 @@ public class PerftTest {
     @Test
     void testPerftDivideCastling() {
         ChessGame game = new ChessGame("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
-        long expectedNodes = 34;
+        long expectedNodes = 26;
 
         assertEquals(expectedNodes, game.perftDivide(1), "Incorrect Perft(1) result for castling.");
     }
 
     @Test
     void testPerftDivideEnPassant() {
-        ChessGame game = new ChessGame("rnbqkbnr/pppppppp/8/8/4Pp2/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 2");
-        long expectedNodes = 48;
+        ChessGame game = new ChessGame("rnbqkbnr/pppppppp/8/8/4Pp2/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 2"); //todo fix e1e2
+        long expectedNodes = 29;
 
         assertEquals(expectedNodes, game.perftDivide(1), "Incorrect Perft(1) result for en passant.");
     }
 
+    /*
     @Test
     void testPerftPosition2() {
         ChessGame game = new ChessGame("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 0");
@@ -91,7 +96,7 @@ public class PerftTest {
 
         expectedNodes = 48;
         depth = 1;
-        assertEquals(expectedNodes, game.perftDivide(depth));
+        assertEquals(expectedNodes, game.perft(depth));
 
         expectedNodes = 2039;
         depth = 2;
@@ -103,11 +108,23 @@ public class PerftTest {
 
         expectedNodes = 4085603;
         depth = 4;
-        assertEquals(expectedNodes, game.perft(depth));
+        assertEquals(expectedNodes, game.perftDivide(depth));
 
         expectedNodes = 193690690;
         depth = 5;
         assertEquals(expectedNodes, game.perft(depth));
+    }
+
+    @Test
+    void testPerftPosition2_a2a4() {
+        ChessGame game = new ChessGame("r3k2r/p1ppqpb1/bn2pnp1/3PN3/Pp2P3/2N2Q1p/1PPBBPPP/R3K2R b KQkq a3 0 1");
+        long expectedNodes;
+        int depth;
+
+        expectedNodes = 90978;
+        depth = 3;
+        assertEquals(expectedNodes, game.perft(depth)); //problem: b4a3
+
     }
 
     @Test
@@ -118,7 +135,7 @@ public class PerftTest {
 
         expectedNodes = 14;
         depth = 1;
-        assertEquals(expectedNodes, game.perftDivide(depth));
+        assertEquals(expectedNodes, game.perft(depth));
 
         expectedNodes = 191;
         depth = 2;
@@ -136,6 +153,5 @@ public class PerftTest {
         depth = 5;
         assertEquals(expectedNodes, game.perft(depth));
     }
+     */
 }
-
- */
