@@ -1,0 +1,68 @@
+package knight.clubbing.data.bitboard;
+
+public record BMove(short value) {
+
+    public static final int NoFlag = 0b0000;
+    public static final int EnPassantCaptureFlag = 0b0001;
+    public static final int CastleFlag = 0b0010;
+    public static final int PawnTwoUpFlag = 0b0011;
+
+    public static final int PromoteToQueenFlag = 0b0100;
+    public static final int PromoteToKnightFlag = 0b0101;
+    public static final int PromoteToRookFlag = 0b0110;
+    public static final int PromoteToBishopFlag = 0b0111;
+
+    private static final int startSquareMask = 0b0000000000111111;
+    private static final int targetSquareMask = 0b0000111111000000;
+    private static final int flagMask = 0b1111000000000000;
+
+    public BMove(int startSquare, int targetSquare) {
+        this((short) (startSquare | (targetSquare << 6)));
+    }
+
+    public BMove(int startSquare, int targetSquare, int flag) {
+        this((short) (startSquare | (targetSquare << 6) | (flag << 12)));
+    }
+
+    public boolean isNull() {
+        return value == 0;
+    }
+
+    public int startSquare() {
+        return value & startSquareMask;
+    }
+
+    public int targetSquare() {
+        return (value & targetSquareMask) >>> 6;
+    }
+
+    public int moveFlag() {
+        return value >>> 12;
+    }
+
+    public boolean isPromotion() {
+        return moveFlag() >= PromoteToQueenFlag;
+    }
+
+    public int promotionPieceType() {
+        return switch (moveFlag()) {
+            case PromoteToRookFlag -> BPiece.rook;
+            case PromoteToKnightFlag -> BPiece.knight;
+            case PromoteToBishopFlag -> BPiece.bishop;
+            case PromoteToQueenFlag -> BPiece.queen;
+            default -> BPiece.none;
+        };
+    }
+
+    public static BMove nullMove() {
+        return new BMove((short) 0);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BMove move = (BMove) o;
+        return value == move.value;
+    }
+}
