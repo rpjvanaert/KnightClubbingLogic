@@ -166,4 +166,11 @@ class ChessGameTest {
         assertNotNull(game.getBoard().getPieceOn(Coord.of("a7")));
         assertNull(game.getBoard().getPieceOn(Coord.of("a8")));
     }
+
+    @Test
+    void testAssessThreat() {
+        ChessGame game = new ChessGame("r1bq2r1/b4p2/p1pp1B1k/1p2pP2/1P2P1P1/3P4/1PP3P1/R3K2R b - - 0 2");
+
+        assertEquals(ThreatType.CHECKMATE, game.assessThreat(Color.BLACK));
+    }
 }
