@@ -32,23 +32,10 @@ public class BPiece {
     private static final int typeMask = 0b0111;
     private static final int colorMask = 0b1000;
 
-    public static int toBitboardIndex(int piece) {
-        return switch (piece) {
-            case whitePawn -> 0;
-            case whiteKnight -> 1;
-            case whiteBishop -> 2;
-            case whiteRook -> 3;
-            case whiteQueen -> 4;
-            case whiteKing -> 5;
-            case blackPawn -> 6;
-            case blackKnight -> 7;
-            case blackBishop -> 8;
-            case blackRook -> 9;
-            case blackQueen -> 10;
-            case blackKing -> 11;
-            default -> throw new IllegalArgumentException("Invalid piece: " + piece);
-        };
-    }
+    public static final int[] pieceIndices = {
+            whitePawn, whiteKnight, whiteBishop, whiteRook, whiteQueen, whiteKing,
+            blackPawn, blackKnight, blackBishop, blackRook, blackQueen, blackKing
+    };
 
     public static int makePiece(int pieceType, int pieceColor) {
         return pieceType | pieceColor;
