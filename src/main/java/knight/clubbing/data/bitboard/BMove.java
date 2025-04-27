@@ -2,15 +2,15 @@ package knight.clubbing.data.bitboard;
 
 public record BMove(short value) {
 
-    public static final int NoFlag = 0b0000;
-    public static final int EnPassantCaptureFlag = 0b0001;
-    public static final int CastleFlag = 0b0010;
-    public static final int PawnTwoUpFlag = 0b0011;
+    public static final int noFlag = 0b0000;
+    public static final int enPassantCaptureFlag = 0b0001;
+    public static final int castleFlag = 0b0010;
+    public static final int pawnTwoUpFlag = 0b0011;
 
-    public static final int PromoteToQueenFlag = 0b0100;
-    public static final int PromoteToKnightFlag = 0b0101;
-    public static final int PromoteToRookFlag = 0b0110;
-    public static final int PromoteToBishopFlag = 0b0111;
+    public static final int promoteToQueenFlag = 0b0100;
+    public static final int promoteToKnightFlag = 0b0101;
+    public static final int promoteToRookFlag = 0b0110;
+    public static final int promoteToBishopFlag = 0b0111;
 
     private static final int startSquareMask = 0b0000000000111111;
     private static final int targetSquareMask = 0b0000111111000000;
@@ -41,15 +41,15 @@ public record BMove(short value) {
     }
 
     public boolean isPromotion() {
-        return moveFlag() >= PromoteToQueenFlag;
+        return moveFlag() >= promoteToQueenFlag;
     }
 
     public int promotionPieceType() {
         return switch (moveFlag()) {
-            case PromoteToRookFlag -> BPiece.rook;
-            case PromoteToKnightFlag -> BPiece.knight;
-            case PromoteToBishopFlag -> BPiece.bishop;
-            case PromoteToQueenFlag -> BPiece.queen;
+            case promoteToRookFlag -> BPiece.rook;
+            case promoteToKnightFlag -> BPiece.knight;
+            case promoteToBishopFlag -> BPiece.bishop;
+            case promoteToQueenFlag -> BPiece.queen;
             default -> BPiece.none;
         };
     }
