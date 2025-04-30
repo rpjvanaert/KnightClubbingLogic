@@ -108,7 +108,7 @@ public class BBoard {
             }
 
             this.clear(capturedPiece, capturedPieceType);
-            // todo zobrist update?
+            zobristKey ^= BZobrist.getPiecesArray()[capturedPiece][captureSquare];
         }
 
         if (movedPieceType == BPiece.king) {
@@ -123,7 +123,8 @@ public class BBoard {
                 int castleRookTo = kingside ? targetSquare - 1 : targetSquare + 1;
 
                 this.move(rook, castleRookFrom, castleRookTo);
-                //todo zobrist update?
+                zobristKey ^= BZobrist.getPiecesArray()[rook][castleRookFrom];
+                zobristKey ^= BZobrist.getPiecesArray()[rook][castleRookTo];
             }
         }
 
@@ -133,13 +134,11 @@ public class BBoard {
 
             this.clear(movedPiece, targetSquare);
             this.set(promotionPiece, targetSquare);
-
-            //todo zobrist update?
         }
 
         if (moveFlag == BMove.pawnTwoUpFlag) {
-            int enPassantFile = BBoardHelper.fileIndex(targetSquare); // todo add 1? " + 1" after method call
-            //todo zobrist update?
+            int enPassantFile = BBoardHelper.fileIndex(targetSquare);
+            zobristKey ^= BZobrist.getEnPassantFile()[enPassantFile];
         }
 
         if (prevCastleRights != 0) {
@@ -157,10 +156,14 @@ public class BBoard {
             }
         }
 
-        //todo zobrist update?
+        zobristKey ^= BZobrist.getSideToMove();
+        zobristKey ^= BZobrist.getPiecesArray()[movedPiece][startSquare];
+        zobristKey ^= BZobrist.getPiecesArray()[pieceBoard[targetSquare]][targetSquare];
+        zobristKey ^= BZobrist.getEnPassantFile()[prevEnpassantFile];
 
         if (newCastleRights != prevCastleRights) {
-            //todo zobrist update?
+            zobristKey ^= BZobrist.getCastlingRights()[prevCastleRights];
+            zobristKey ^= BZobrist.getCastlingRights()[newCastleRights];
         }
 
         isWhiteToMove = !isWhiteToMove;
