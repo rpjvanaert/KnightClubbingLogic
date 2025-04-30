@@ -1,5 +1,9 @@
 package knight.clubbing.data.bitboard;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
 public class BBoard {
 
     public static int rowLength = 8;
@@ -27,7 +31,14 @@ public class BBoard {
 
     private int totalPieceCountWithoutPawnsAndKings;
 
+    private List<BMove> allGameMoves;
     public BGameState state;
+    private int plyCount;
+    private Stack<Long> repetitionPositionHistory;
+    private Stack<BGameState> gameStateHistory;
+
+    private boolean cachedInCheckValue;
+    private boolean hasCachedInCheckValue;
 
     public boolean isWhiteToMove;
     private int moveColor() {
@@ -78,7 +89,7 @@ public class BBoard {
 
         int prevCastleRights = state.getCastlingRights();
         int prevEnpassantFile = state.getEnPassantFile();
-        //long zobristKey = state.getZobristKey();
+        long zobristKey = state.getZobristKey();
         int newCastleRights = state.getCastlingRights();
         int newEnpassantFile = 0;
 
@@ -154,27 +165,27 @@ public class BBoard {
 
         isWhiteToMove = !isWhiteToMove;
 
-        // plyCount++;
-        // int newFiftyMoveCounter = currentGameState.fiftyMoveCounter + 1;
+        plyCount++;
+        int newFiftyMoveCounter = state.getFiftyMoveCounter() + 1;
 
         allPiecesBoard = colorBoards[whiteIndex] | colorBoards[blackIndex];
         //updateSliderBitboards();
 
         if (movedPieceType == BPiece.pawn || capturedPieceType != BPiece.none) {
             if (!inSearch) {
-                //RepetitionPositionHistory.Clear();
+                repetitionPositionHistory.clear();
             }
-            //newFiftyMoveCounter = 0;
+            newFiftyMoveCounter = 0;
         }
 
-        BGameState newState = new BGameState(capturedPieceType, newEnpassantFile, newCastleRights, 0); // todo last one should be newFiftyMoveCounter and newZobristKey should be added
-        //gameStateHistory.push(newState);
-        //currentGameState = newState;
-        //hasCachedInCheckValue = false;
+        BGameState newState = new BGameState(capturedPieceType, newEnpassantFile, newCastleRights, newFiftyMoveCounter, zobristKey);
+        gameStateHistory.push(newState);
+        state = newState;
+        hasCachedInCheckValue = false;
 
         if (!inSearch) {
-            //RepititionPositionHistory.push(newState.zobristKey);
-            //allGameMoves.add(move);
+            repetitionPositionHistory.push(newState.getZobristKey());
+            allGameMoves.add(move);
         }
     }
 
@@ -240,48 +251,47 @@ public class BBoard {
         allPiecesBoard = colorBoards[whiteIndex] | colorBoards[blackIndex];
         //updateSliderBitboards();
 
-        /*
-        if (!inSearch && RepetitionPositionHistory.size() > 0) {
-            RepititionPositionHistory.pop();
+
+        if (!inSearch && !repetitionPositionHistory.isEmpty()) {
+            repetitionPositionHistory.pop();
         }
-         */
         if (!inSearch) {
-            //allGameMoves.remove(allGameMoves.size() - 1);
+            allGameMoves.remove(allGameMoves.size() - 1);
+            allGameMoves.removeLast();
         }
 
-        //gameStateHistory.pop();
-        //state = gameStateHistory.peek();
-        //plyCount--;
-        //hasCachedInCheckValue = false;
+        gameStateHistory.pop();
+        state = gameStateHistory.peek();
+        plyCount--;
+        hasCachedInCheckValue = false;
     }
 
     public void makeNullMove() {
         isWhiteToMove = !isWhiteToMove;
 
-        //plyCount++;
+        plyCount++;
 
-        //long newZobristKey = state.getZobristKey();
-        //newZobristKey ^= Zobrist.sideToMove;
-        //newZobristKey ^= Zobrist.enPassantFile[state.enPassantFile];
+        long newZobristKey = state.getZobristKey();
+        newZobristKey ^= BZobrist.getSideToMove();
+        newZobristKey ^= BZobrist.getEnPassantFile()[state.getEnPassantFile()]; //todo hier naar kijken
 
-        BGameState newState = new BGameState(BPiece.none, 0, state.getCastlingRights(), state.getFiftyMoveCounter() + 1); //todo add newZobristKey to constructor
+        BGameState newState = new BGameState(BPiece.none, 0, state.getCastlingRights(), state.getFiftyMoveCounter() + 1, newZobristKey);
         state = newState;
-        //gameStateHistory.push(state);
+        gameStateHistory.push(state);
         //updateSliderBitboards();
-        //hasCachedInCheckValue = true;
-        //cachedInCheckValue = false;
+        hasCachedInCheckValue = true;
+        cachedInCheckValue = false;
     }
 
     public void undoNullMove() {
         isWhiteToMove = !isWhiteToMove;
-        //plyCount--;
-        //gameStateHistory.pop();
+        plyCount--;
+        gameStateHistory.pop();
         //updateSliderBitboards();
-        //hasCachedInCheckValue = true;
-        //cachedInCheckValue = false;
+        hasCachedInCheckValue = true;
+        cachedInCheckValue = false;
     }
 
-    /*
     public boolean isInCheck() {
         if (hasCachedInCheckValue) {
             return cachedInCheckValue;
@@ -291,7 +301,6 @@ public class BBoard {
 
         return cachedInCheckValue;
     }
-     */
 
     public boolean calculateInCheckState() {
         int kingSquare = kingSquares[moveColorIndex()];
@@ -305,7 +314,7 @@ public class BBoard {
 
         if (opponentDiagonalSliderBoard() != 0) {
             //long bishopAttacks = Magic.getBishopAttacks(kingSquare, blockers)
-            //if ((bishopAttacks & opponentDiagonalSliderBoard() != 0))
+            //if ((bishopAttacks & opponentDiagonal SliderBoard() != 0))
             //    return true;
         }
 
@@ -319,6 +328,37 @@ public class BBoard {
         //    return true;
 
         return false;
+    }
+
+    public void loadStartPosition() {
+        loadPosition(FenHelper.startFen);
+    }
+
+    public void loadPosition(String fen) {
+        FenHelper.PositionData positionData = FenHelper.loadPositionData(fen);
+        loadPosition(positionData);
+    }
+
+    public void loadPosition(FenHelper.PositionData positionData) {
+        //
+    }
+
+    public void initialize() {
+        allGameMoves = new ArrayList<>();
+        kingSquares = new int[2];
+        pieceBoard = new int[64];
+
+        repetitionPositionHistory = new Stack<>();
+        gameStateHistory = new Stack<>();
+
+        state = new BGameState();
+        plyCount = 0;
+
+        totalPieceCountWithoutPawnsAndKings = 0;
+
+        bitboards = new long[BPiece.maxPieceIndex + 1];
+        colorBoards = new long[2];
+        allPiecesBoard = 0;
     }
 
     public void set(int piece, int squareIndex) {
@@ -352,7 +392,7 @@ public class BBoard {
     }
 
     private static void checkPiece(int piece) {
-        if (piece <= 0 || piece >= 12 || true) // todo fix to new, see BPiece
+        if (piece <= 0 || piece >= BPiece.maxPieceIndex)
             throw new IllegalArgumentException("pieceIndex out of range: " + piece);
     }
 

@@ -2,6 +2,9 @@ package knight.clubbing.data.bitboard;
 
 public class BBoardHelper {
 
+    public static final String fileChars = "abcdefgh";
+    public static final String rankChars = "12345678";
+
     public static final int a1 = 0;
     public static final int b1 = 1;
     public static final int c1 = 2;
