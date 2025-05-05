@@ -5,6 +5,8 @@ public class BBoardHelper {
     public static final String fileChars = "abcdefgh";
     public static final String rankChars = "12345678";
 
+    public static int rowLength = 8;
+
     public static final int a1 = 0;
     public static final int b1 = 1;
     public static final int c1 = 2;
@@ -30,4 +32,34 @@ public class BBoardHelper {
     public static int fileIndex(int squareIndex) {
         return squareIndex & 0b000111;
     }
+
+    public static int coordToIndex(String coord) {
+        if (coord == null || coord.length() != 2) {
+            throw new IllegalArgumentException("Invalid coordinate: " + coord);
+        }
+
+        char fileChar = coord.charAt(0);
+        char rankChar = coord.charAt(1);
+
+        int file = fileChars.indexOf(fileChar);
+        int rank = rankChars.indexOf(rankChar);
+
+        if (file == -1 || rank == -1) {
+            throw new IllegalArgumentException("Invalid coordinate: " + coord);
+        }
+
+        return rank * 8 + file;
+    }
+
+    public static String indexToCoord(int index) {
+        if (index < 0 || index > 63) {
+            throw new IllegalArgumentException("Invalid square index: " + index);
+        }
+
+        int file = index % 8;
+        int rank = index / 8;
+
+        return "" + fileChars.charAt(file) + rankChars.charAt(rank);
+    }
+
 }
