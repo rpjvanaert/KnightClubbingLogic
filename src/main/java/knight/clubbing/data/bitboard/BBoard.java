@@ -73,10 +73,6 @@ public class BBoard {
         loadStartPosition();
     }
 
-    public void makeMove(BMove move) {
-        this.makeMove(move, false);
-    }
-
     public void makeMove(BMove move, boolean inSearch) {
         int startSquare = move.startSquare();
         int targetSquare = move.targetSquare();
@@ -95,7 +91,6 @@ public class BBoard {
         int newCastleRights = state.getCastlingRights();
         int newEnPassantFile = 0;
 
-        this.move(movedPiece, startSquare, targetSquare);
 
         if (capturedPieceType != BPiece.none) {
             int captureSquare = targetSquare;
@@ -113,6 +108,8 @@ public class BBoard {
             this.clear(capturedPiece, targetSquare);
             zobristKey ^= BZobrist.getPiecesArray()[capturedPiece][captureSquare];
         }
+
+        this.move(movedPiece, startSquare, targetSquare);
 
         if (movedPieceType == BPiece.king) {
             kingSquares[moveColorIndex()] = targetSquare;
@@ -177,8 +174,8 @@ public class BBoard {
         plyCount++;
         int newFiftyMoveCounter = state.getFiftyMoveCounter() + 1;
 
-        allPiecesBoard = colorBoards[whiteIndex] | colorBoards[blackIndex];
-        updateSliderBitboards();
+
+        updateOtherBoards();
 
         if (movedPieceType == BPiece.pawn || capturedPieceType != BPiece.none) {
             if (!inSearch) {
@@ -196,10 +193,6 @@ public class BBoard {
             repetitionPositionHistory.push(newState.getZobristKey());
             allGameMoves.add(move);
         }
-    }
-
-    public void undoMove(BMove move) {
-        undoMove(move, false);
     }
 
     public void undoMove(BMove move, boolean inSearch) {
@@ -257,7 +250,7 @@ public class BBoard {
         }
 
         allPiecesBoard = colorBoards[whiteIndex] | colorBoards[blackIndex];
-        updateSliderBitboards();
+        updateOtherBoards();
 
 
         if (!inSearch && !repetitionPositionHistory.isEmpty()) {
@@ -285,7 +278,7 @@ public class BBoard {
         BGameState newState = new BGameState(BPiece.none, 0, state.getCastlingRights(), state.getFiftyMoveCounter() + 1, newZobristKey);
         state = newState;
         gameStateHistory.push(state);
-        updateSliderBitboards();
+        updateOtherBoards();
         hasCachedInCheckValue = true;
         cachedInCheckValue = false;
     }
@@ -294,7 +287,7 @@ public class BBoard {
         isWhiteToMove = !isWhiteToMove;
         plyCount--;
         gameStateHistory.pop();
-        updateSliderBitboards();
+        updateOtherBoards();
         hasCachedInCheckValue = true;
         cachedInCheckValue = false;
     }
@@ -337,7 +330,17 @@ public class BBoard {
         return false;
     }
 
-    private void updateSliderBitboards() {
+    private void updateOtherBoards() {
+        for (int piece : BPiece.pieceIndices) {
+            if (BPiece.isWhite(piece)) {
+                colorBoards[whiteIndex] |= bitboards[piece];
+            } else {
+                colorBoards[blackIndex] |= bitboards[piece];
+            }
+        }
+
+        allPiecesBoard = colorBoards[whiteIndex] | colorBoards[blackIndex];
+
         whiteOrthogonalSliderBoard = bitboards[BPiece.whiteRook] | bitboards[BPiece.whiteQueen];
         whiteDiagonalSliderBoard = bitboards[BPiece.whiteBishop] | bitboards[BPiece.whiteQueen];
 
@@ -375,7 +378,7 @@ public class BBoard {
         isWhiteToMove = posData.isWhiteToMove();
 
         allPiecesBoard = colorBoards[whiteIndex] | colorBoards[blackIndex];
-        updateSliderBitboards();
+        updateOtherBoards();
 
         int whiteCastle = (posData.isWhiteCastlingKingside() ? 1 << 0 : 0) | (posData.isWhiteCastlingQueenside() ? 1 << 1 : 0);
         int blackCastle = (posData.isBlackCastlingKingside() ? 1 << 2 : 0) | (posData.isBlackCastlingQueenside() ? 1 << 3 : 0);
@@ -464,12 +467,15 @@ public class BBoard {
                 if (piece == BPiece.none) {
                     sb.append("-  ");
                 } else {
-                    sb.append(BPiece.getChar(piece)).append("  ");
+                    if (BPiece.isWhite(piece)) {
+                        sb.append(Character.toUpperCase(BPiece.getChar(piece))).append("  ");
+                    } else {
+                        sb.append(BPiece.getChar(piece)).append("  ");
+                    }
                 }
             }
             sb.append("\n");
         }
         return sb.toString();
     }
-
 }

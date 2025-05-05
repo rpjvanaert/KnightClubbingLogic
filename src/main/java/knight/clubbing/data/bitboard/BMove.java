@@ -65,4 +65,19 @@ public record BMove(short value) {
         BMove move = (BMove) o;
         return value == move.value;
     }
+
+
+    @Override
+    public String toString() {
+        return "BMove[" +
+                "start=" + startSquare() +
+                ", target=" + targetSquare() +
+                ", flag=" + moveFlag() +
+                ']';
+    }
+
+    @Override
+    public int hashCode() {
+        return Short.hashCode(value);
+    }
 }

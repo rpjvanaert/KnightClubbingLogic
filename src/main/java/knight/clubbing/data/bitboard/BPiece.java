@@ -46,7 +46,7 @@ public class BPiece {
     }
 
     public static boolean isWhite(int piece) {
-        return (piece & typeMask) == typeMask && piece != 0;
+        return getPieceColor(piece) == white && piece != none;
     }
 
     public static int getPieceColor(int piece) {
