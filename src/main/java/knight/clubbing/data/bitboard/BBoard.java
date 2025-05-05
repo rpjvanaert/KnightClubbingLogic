@@ -65,10 +65,14 @@ public class BBoard {
         return isWhiteToMove ? blackOrthogonalSliderBoard : whiteOrthogonalSliderBoard;
     }
 
+    public BBoard(String fen) {
+        initialize();
+        loadPosition(fen);
+    }
+
     public BBoard() {
-        bitboards = new long[12];
-        pieceBoard = new int[64];
-        colorBoards = new long[2];
+        initialize();
+        loadStartPosition();
     }
 
     public void makeMove(BMove move) {
@@ -108,7 +112,7 @@ public class BBoard {
                 totalPieceCountWithoutPawnsAndKings--;
             }
 
-            this.clear(capturedPiece, capturedPieceType);
+            this.clear(capturedPiece, targetSquare);
             zobristKey ^= BZobrist.getPiecesArray()[capturedPiece][captureSquare];
         }
 
@@ -323,11 +327,11 @@ public class BBoard {
             //    return true;
         }
 
-        long enemyKnights = pieceBoard[BPiece.makePiece(BPiece.knight, opponentColor())];
+        long enemyKnights = bitboards[BPiece.makePiece(BPiece.knight, opponentColor())];
         //if ((BBoardHelper.knightAttacks(kingSquare) & enemyKnights) != 0)
         //    return true;
 
-        long enemyPawns = pieceBoard[BPiece.makePiece(BPiece.pawn, opponentColor())];
+        long enemyPawns = bitboards[BPiece.makePiece(BPiece.pawn, opponentColor())];
         //long pawnAttackMask = isWhiteToMove ? BBoardHelper.whitePawnAttacks(kingSquare) : BBoardHelper.blackPawnAttacks(kingSquare);
         //if ((pawnAttackMask & enemyPawns) != 0)
         //    return true;
@@ -352,11 +356,48 @@ public class BBoard {
         loadPosition(positionData);
     }
 
-    public void loadPosition(FenHelper.PositionData positionData) {
-        //
+    public void loadPosition(FenHelper.PositionData posData) {
+        for (int index = 0; index < 64; index++) {
+            int piece = posData.getSquares().get(index);
+            int pieceType = BPiece.getPieceType(piece);
+            int colorIndex = BPiece.isWhite(piece) ? whiteIndex : blackIndex;
+            pieceBoard[index] = piece; //can I remove this?
+
+            if (piece != BPiece.none) {
+                this.set(piece, index);
+
+                if (pieceType == BPiece.king) {
+                    kingSquares[colorIndex] = index;
+                } else if (pieceType != BPiece.pawn) {
+                    totalPieceCountWithoutPawnsAndKings++;
+                }
+            }
+        }
+
+        isWhiteToMove = posData.isWhiteToMove();
+
+        allPiecesBoard = colorBoards[whiteIndex] | colorBoards[blackIndex];
+        updateSliderBitboards();
+
+        int whiteCastle = (posData.isWhiteCastlingKingside() ? 1 << 0 : 0) | (posData.isWhiteCastlingQueenside() ? 1 << 1 : 0);
+        int blackCastle = (posData.isBlackCastlingKingside() ? 1 << 2 : 0) | (posData.isBlackCastlingQueenside() ? 1 << 3 : 0);
+        int castlingRights = whiteCastle | blackCastle;
+
+        plyCount = (posData.getMoveCount() - 1) * 2 + (isWhiteToMove ? 0 : 1);
+
+        state = new BGameState(BPiece.none, posData.getEpFile(), castlingRights, posData.getFiftyMovePlyCount(), 0);
+        long zobristKey = BZobrist.CalculateZobristKey(this);
+        state = new BGameState(BPiece.none, posData.getEpFile(), castlingRights, posData.getFiftyMovePlyCount(), zobristKey);
+
+        repetitionPositionHistory.push(zobristKey);
+
+        gameStateHistory.push(state);
     }
 
-    public void initialize() {
+    private void initialize() {
+        bitboards = new long[12];
+        pieceBoard = new int[64];
+        colorBoards = new long[2];
         allGameMoves = new ArrayList<>();
         kingSquares = new int[2];
         pieceBoard = new int[64];
@@ -374,21 +415,21 @@ public class BBoard {
         allPiecesBoard = 0;
     }
 
-    public void set(int piece, int squareIndex) {
+    public void set(int piece, int squareIndex) { //add colorbitboards?
         checkPiece(piece);
         checkSquareIndex(squareIndex);
         bitboards[piece] |= 1L << squareIndex;
         pieceBoard[squareIndex] = piece;
     }
 
-    public void clear(int piece, int squareIndex) {
+    public void clear(int piece, int squareIndex) { //add colorbitboards?
         checkPiece(piece);
         checkSquareIndex(squareIndex);
         bitboards[piece] &= ~(1L << squareIndex);
         pieceBoard[squareIndex] = BPiece.none;
     }
 
-    public boolean get(int piece, int squareIndex) {
+    public boolean get(int piece, int squareIndex) { //add colorbitboards?
         checkPiece(piece);
         checkSquareIndex(squareIndex);
         return (bitboards[piece] & (1L << squareIndex)) != 0;
@@ -407,8 +448,8 @@ public class BBoard {
     }
 
     private static void checkPiece(int piece) {
-        if (piece <= 0 || piece >= BPiece.maxPieceIndex)
-            throw new IllegalArgumentException("pieceIndex out of range: " + piece);
+        if (piece <= 0 || piece > BPiece.maxPieceIndex)
+            throw new IllegalArgumentException("pieceIndex out of range (of " + BPiece.maxPieceIndex + "): " + piece);
     }
 
     private static void checkSquareIndex(int square) {

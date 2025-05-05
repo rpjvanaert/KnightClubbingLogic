@@ -32,7 +32,7 @@ public class FenHelper {
 
         public PositionData(String fen) {
             this.fen = fen;
-            List<Integer> tempSquares = new ArrayList<>(64);
+            List<Integer> tempSquares = new ArrayList<>(Collections.nCopies(64, BPiece.none));
 
             String[] sections = fen.split(" ");
 
@@ -97,6 +97,46 @@ public class FenHelper {
             epFile = tempEpFile;
             fiftyMovePlyCount = tempFiftyMovePlyCount;
             moveCount = tempMoveCount;
+        }
+
+        public List<Integer> getSquares() {
+            return squares;
+        }
+
+        public boolean isWhiteCastlingKingside() {
+            return whiteCastlingKingside;
+        }
+
+        public boolean isWhiteCastlingQueenside() {
+            return whiteCastlingQueenside;
+        }
+
+        public boolean isBlackCastlingKingside() {
+            return blackCastlingKingside;
+        }
+
+        public boolean isBlackCastlingQueenside() {
+            return blackCastlingQueenside;
+        }
+
+        public int getEpFile() {
+            return epFile;
+        }
+
+        public boolean isWhiteToMove() {
+            return whiteToMove;
+        }
+
+        public int getFiftyMovePlyCount() {
+            return fiftyMovePlyCount;
+        }
+
+        public int getMoveCount() {
+            return moveCount;
+        }
+
+        public String getFen() {
+            return fen;
         }
     }
 }

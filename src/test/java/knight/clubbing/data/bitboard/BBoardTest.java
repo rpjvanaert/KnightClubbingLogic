@@ -17,11 +17,11 @@ class BBoardTest {
     @Test
     void setAndGet() {
 
-        b.set(0, 0);
-        assertTrue(b.get(0, 0));
-        assertFalse(b.get(0, 1));
-        assertFalse(b.get(0, 63));
-        assertFalse(b.get(0, 32));
+        b.set(BPiece.whitePawn, 0);
+        assertTrue(b.get(BPiece.whitePawn, 0));
+        assertFalse(b.get(BPiece.whitePawn, 1));
+        assertFalse(b.get(BPiece.whitePawn, 63));
+        assertFalse(b.get(BPiece.whitePawn, 32));
     }
 
     @Test
