@@ -6,8 +6,6 @@ import java.util.Stack;
 
 public class BBoard {
 
-    public static int rowLength = 8;
-
     // Using BPiece for index, contains 64 bit bitboards for each piecetype+color
     private long[] bitboards;
 
@@ -103,7 +101,7 @@ public class BBoard {
             int captureSquare = targetSquare;
 
             if (isEnPassant) {
-                captureSquare = targetSquare + (isWhiteToMove ? -rowLength : rowLength);
+                captureSquare = targetSquare + (isWhiteToMove ? -BBoardHelper.rowLength : BBoardHelper.rowLength);
                 this.clear(BPiece.blackPawn, captureSquare);
                 pieceBoard[captureSquare] = BPiece.none;
             }
@@ -236,7 +234,7 @@ public class BBoard {
             int capturedPiece = BPiece.makePiece(capturedPieceType, opponentColor());
 
             if (undoingEnpassant) {
-                captureSquare = movedTo + ((undoingWhiteMove) ? -rowLength : rowLength);
+                captureSquare = movedTo + ((undoingWhiteMove) ? -BBoardHelper.rowLength : BBoardHelper.rowLength);
             }
             if (capturedPiece != BPiece.pawn) {
                 totalPieceCountWithoutPawnsAndKings++;
@@ -456,4 +454,22 @@ public class BBoard {
         if (square < 0 || square >= 64)
             throw new IllegalArgumentException("squareIndex out of range: " + square);
     }
+
+    public String getDisplay() {
+        StringBuilder sb = new StringBuilder();
+        for (int rank = 7; rank >= 0; rank--) {
+            for (int file = 0; file < 8; file++) {
+                int index = rank * 8 + file;
+                int piece = pieceBoard[index];
+                if (piece == BPiece.none) {
+                    sb.append("-  ");
+                } else {
+                    sb.append(BPiece.getChar(piece)).append("  ");
+                }
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
 }
