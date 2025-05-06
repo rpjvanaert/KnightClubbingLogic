@@ -219,7 +219,7 @@ public class ChessGame {
         return (move.getPiece().pieceType().fen() + move.to().getNotation() + threat.getSign()).trim();
     }
 
-    private void executeMove(Move move) {
+    public void executeMove(Move move) {
         if (move.promotion() != null) {
             executePromotion(move);
             return;
