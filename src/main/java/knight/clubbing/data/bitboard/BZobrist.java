@@ -40,7 +40,7 @@ public class BZobrist {
         long zobristKey = 0;
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++) {
-            int piece = board.pieceBoard[squareIndex];
+            int piece = board.pieceBoards[squareIndex];
 
             if (BPiece.getPieceType(piece) != BPiece.none) {
                 zobristKey ^= piecesArray[piece][squareIndex];

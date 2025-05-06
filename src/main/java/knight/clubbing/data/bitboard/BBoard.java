@@ -1,6 +1,7 @@
 package knight.clubbing.data.bitboard;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
@@ -10,7 +11,7 @@ public class BBoard {
     private long[] bitboards;
 
     // 64-size int array. Representation for board using BPiece int-structure for pieces
-    public int[] pieceBoard;
+    public int[] pieceBoards;
 
     // 64 bit bitboards for white/blackpieces
     private long[] colorBoards;
@@ -80,9 +81,9 @@ public class BBoard {
         boolean isPromotion = move.isPromotion();
         boolean isEnPassant = moveFlag == BMove.enPassantCaptureFlag;
 
-        int movedPiece = pieceBoard[startSquare];
+        int movedPiece = pieceBoards[startSquare];
         int movedPieceType = BPiece.getPieceType(movedPiece);
-        int capturedPiece = isEnPassant ? BPiece.makePiece(BPiece.pawn, isWhiteToMove? BPiece.white : BPiece.black) : pieceBoard[targetSquare];
+        int capturedPiece = isEnPassant ? BPiece.makePiece(BPiece.pawn, isWhiteToMove? BPiece.white : BPiece.black) : pieceBoards[targetSquare];
         int capturedPieceType = BPiece.getPieceType(capturedPiece);
 
         int prevCastleRights = state.getCastlingRights();
@@ -98,7 +99,7 @@ public class BBoard {
             if (isEnPassant) {
                 captureSquare = targetSquare + (isWhiteToMove ? -BBoardHelper.rowLength : BBoardHelper.rowLength);
                 this.clear(BPiece.blackPawn, captureSquare);
-                pieceBoard[captureSquare] = BPiece.none;
+                pieceBoards[captureSquare] = BPiece.none;
             }
 
             if (capturedPieceType != BPiece.pawn) {
@@ -161,7 +162,7 @@ public class BBoard {
 
         zobristKey ^= BZobrist.getSideToMove();
         zobristKey ^= BZobrist.getPiecesArray()[movedPiece][startSquare];
-        zobristKey ^= BZobrist.getPiecesArray()[pieceBoard[targetSquare]][targetSquare];
+        zobristKey ^= BZobrist.getPiecesArray()[pieceBoards[targetSquare]][targetSquare];
         zobristKey ^= BZobrist.getEnPassantFile()[prevEnPassantFile];
 
         if (newCastleRights != prevCastleRights) {
@@ -208,12 +209,12 @@ public class BBoard {
         boolean undoingPromotion = move.isPromotion();
         boolean undoingCapture = state.getCapturedPiece() != BPiece.none;
 
-        int movedPiece = undoingPromotion ? BPiece.makePiece(BPiece.pawn, moveColor()) : pieceBoard[movedTo];
+        int movedPiece = undoingPromotion ? BPiece.makePiece(BPiece.pawn, moveColor()) : pieceBoards[movedTo];
         int movedPieceType = BPiece.getPieceType(movedPiece);
         int capturedPieceType = BPiece.getPieceType(state.getCapturedPiece());
 
         if (undoingPromotion) {
-            int promotionPiece = pieceBoard[movedTo];
+            int promotionPiece = pieceBoards[movedTo];
             totalPieceCountWithoutPawnsAndKings--;
 
             this.clear(promotionPiece, movedTo);
@@ -362,7 +363,7 @@ public class BBoard {
             int piece = posData.getSquares().get(index);
             int pieceType = BPiece.getPieceType(piece);
             int colorIndex = BPiece.isWhite(piece) ? whiteIndex : blackIndex;
-            pieceBoard[index] = piece; //can I remove this?
+            pieceBoards[index] = piece;
 
             if (piece != BPiece.none) {
                 this.set(piece, index);
@@ -395,13 +396,17 @@ public class BBoard {
         gameStateHistory.push(state);
     }
 
+    public String exportFen() {
+        return FenHelper.exportFen(this);
+    }
+
     private void initialize() {
         bitboards = new long[12];
-        pieceBoard = new int[64];
+        pieceBoards = new int[64];
         colorBoards = new long[2];
         allGameMoves = new ArrayList<>();
         kingSquares = new int[2];
-        pieceBoard = new int[64];
+        pieceBoards = new int[64];
 
         repetitionPositionHistory = new Stack<>();
         gameStateHistory = new Stack<>();
@@ -420,14 +425,14 @@ public class BBoard {
         checkPiece(piece);
         checkSquareIndex(squareIndex);
         bitboards[piece] |= 1L << squareIndex;
-        pieceBoard[squareIndex] = piece;
+        pieceBoards[squareIndex] = piece;
     }
 
     public void clear(int piece, int squareIndex) { //add colorbitboards?
         checkPiece(piece);
         checkSquareIndex(squareIndex);
         bitboards[piece] &= ~(1L << squareIndex);
-        pieceBoard[squareIndex] = BPiece.none;
+        pieceBoards[squareIndex] = BPiece.none;
     }
 
     public boolean get(int piece, int squareIndex) { //add colorbitboards?
@@ -438,6 +443,26 @@ public class BBoard {
 
     public long getBitboard(int piece) {
         return bitboards[piece];
+    }
+
+    public long[] getBitboards() {
+        return bitboards;
+    }
+
+    public long[] getCopyBitboards() {
+        return Arrays.copyOf(bitboards, bitboards.length);
+    }
+
+    public int[] getPieceBoards() {
+        return pieceBoards;
+    }
+
+    public int[] getCopyPieceBoards() {
+        return Arrays.copyOf(pieceBoards, pieceBoards.length);
+    }
+
+    public int getPlyCount() {
+        return plyCount;
     }
 
     public void move(int piece, int fromSquare, int toSquare) {
@@ -463,7 +488,7 @@ public class BBoard {
         for (int rank = 7; rank >= 0; rank--) {
             for (int file = 0; file < 8; file++) {
                 int index = rank * 8 + file;
-                int piece = pieceBoard[index];
+                int piece = pieceBoards[index];
                 if (piece == BPiece.none) {
                     sb.append("-  ");
                 } else {
