@@ -28,14 +28,14 @@ public class BGameState {
         this.fiftyMoveCounter = 0;
     }
 
-    public boolean hasKingsideCastleRight(boolean white) {
+    public boolean hasKingSideCastleRight(boolean white) {
         int mask = white ? 1 : 4;
-        return (capturedPiece & mask) != 0;
+        return (castlingRights & mask) != 0;
     }
 
     public boolean hasQueenSideCastleRight(boolean white) {
         int mask = white ? 2 : 8;
-        return (capturedPiece & mask) != 0;
+        return (castlingRights & mask) != 0;
     }
 
     public int getCapturedPiece() {
