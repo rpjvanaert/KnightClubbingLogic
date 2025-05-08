@@ -1,4 +1,4 @@
-package knight.clubbing.data.bitboard;
+package knight.clubbing.data.bitboard.core;
 
 public record BMove(short value) {
 
