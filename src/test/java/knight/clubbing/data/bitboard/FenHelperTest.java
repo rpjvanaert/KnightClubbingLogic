@@ -1,9 +1,10 @@
 package knight.clubbing.data.bitboard;
 
-import knight.clubbing.data.Board;
+import knight.clubbing.data.bitboard.core.BBoard;
+import knight.clubbing.data.bitboard.core.BBoardHelper;
+import knight.clubbing.data.bitboard.core.BPiece;
+import knight.clubbing.data.bitboard.core.FenHelper;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 

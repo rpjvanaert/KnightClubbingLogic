@@ -1,5 +1,6 @@
 package knight.clubbing.data.bitboard;
 
+import knight.clubbing.data.bitboard.core.BGameState;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

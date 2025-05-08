@@ -1,5 +1,9 @@
 package knight.clubbing.data.bitboard;
 
+import knight.clubbing.data.bitboard.core.BBoard;
+import knight.clubbing.data.bitboard.core.BBoardHelper;
+import knight.clubbing.data.bitboard.core.BMove;
+import knight.clubbing.data.bitboard.core.BPiece;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

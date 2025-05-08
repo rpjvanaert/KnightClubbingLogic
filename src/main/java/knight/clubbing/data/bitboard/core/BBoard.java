@@ -1,4 +1,4 @@
-package knight.clubbing.data.bitboard;
+package knight.clubbing.data.bitboard.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +17,7 @@ public class BBoard {
     private long[] colorBoards;
     private int[] kingSquares;
     private int whiteIndex = 0;
-    private int blackIndex = 0;
+    private int blackIndex = 1;
 
     // 64 bit bitboard for every piece
     private long allPiecesBoard;
@@ -40,19 +40,19 @@ public class BBoard {
     private boolean hasCachedInCheckValue;
 
     public boolean isWhiteToMove;
-    private int moveColor() {
+    public int moveColor() {
         return isWhiteToMove ? BPiece.white : BPiece.black;
     }
 
-    private int opponentColor() {
+    public int opponentColor() {
         return isWhiteToMove ? BPiece.black : BPiece.white;
     }
 
-    private int moveColorIndex() {
+    public int moveColorIndex() {
         return isWhiteToMove ? whiteIndex : blackIndex;
     }
 
-    private int opponentColorIndex() {
+    public int opponentColorIndex() {
         return isWhiteToMove ? blackIndex : whiteIndex;
     }
 
@@ -463,6 +463,42 @@ public class BBoard {
 
     public int getPlyCount() {
         return plyCount;
+    }
+
+    public int getKingSquare(int colorIndex) {
+        if (colorIndex != whiteIndex && colorIndex != blackIndex)
+            throw new IndexOutOfBoundsException();
+        return kingSquares[colorIndex];
+    }
+
+    public long getColorBitboard(int colorIndex) {
+        if (colorIndex != whiteIndex && colorIndex != blackIndex)
+            throw new IndexOutOfBoundsException();
+        return colorBoards[colorIndex];
+    }
+
+    public long getAllPiecesBoard() {
+        return allPiecesBoard;
+    }
+
+    public long getDiagonalSliders(int colorIndex) {
+        if (colorIndex == whiteIndex)
+            return whiteDiagonalSliderBoard;
+
+        if (colorIndex == blackIndex)
+            return blackDiagonalSliderBoard;
+
+        throw new IndexOutOfBoundsException();
+    }
+
+    public long getOrthogonalSliders(int colorIndex) {
+        if (colorIndex == whiteIndex)
+            return whiteOrthogonalSliderBoard;
+
+        if (colorIndex == blackIndex)
+            return blackOrthogonalSliderBoard;
+
+        throw new IndexOutOfBoundsException();
     }
 
     public void move(int piece, int fromSquare, int toSquare) {

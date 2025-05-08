@@ -1,4 +1,4 @@
-package knight.clubbing.data.bitboard;
+package knight.clubbing.data.bitboard.core;
 
 import java.nio.ByteBuffer;
 import java.util.Random;

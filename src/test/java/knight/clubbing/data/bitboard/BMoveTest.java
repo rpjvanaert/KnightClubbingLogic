@@ -1,5 +1,7 @@
 package knight.clubbing.data.bitboard;
 
+import knight.clubbing.data.bitboard.core.BMove;
+import knight.clubbing.data.bitboard.core.BPiece;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
