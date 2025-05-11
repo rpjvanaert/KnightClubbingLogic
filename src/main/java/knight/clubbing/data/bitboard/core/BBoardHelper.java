@@ -33,25 +33,25 @@ public class BBoardHelper {
         return squareIndex & 0b000111;
     }
 
-    public static int coordToIndex(String coord) {
-        if (coord == null || coord.length() != 2) {
-            throw new IllegalArgumentException("Invalid coordinate: " + coord);
+    public static int stringCoordToIndex(String stringCoord) {
+        if (stringCoord == null || stringCoord.length() != 2) {
+            throw new IllegalArgumentException("Invalid coordinate: " + stringCoord);
         }
 
-        char fileChar = coord.charAt(0);
-        char rankChar = coord.charAt(1);
+        char fileChar = stringCoord.charAt(0);
+        char rankChar = stringCoord.charAt(1);
 
         int file = fileChars.indexOf(fileChar);
         int rank = rankChars.indexOf(rankChar);
 
         if (file == -1 || rank == -1) {
-            throw new IllegalArgumentException("Invalid coordinate: " + coord);
+            throw new IllegalArgumentException("Invalid coordinate: " + stringCoord);
         }
 
         return rank * 8 + file;
     }
 
-    public static String indexToCoord(int index) {
+    public static String indexToStringCoord(int index) {
         if (index < 0 || index > 63) {
             throw new IllegalArgumentException("Invalid square index: " + index);
         }
@@ -62,4 +62,15 @@ public class BBoardHelper {
         return "" + fileChars.charAt(file) + rankChars.charAt(rank);
     }
 
+    public static int indexFromCoord(int fileIndex, int rankIndex) {
+        return rankIndex * 8 + fileIndex;
+    }
+
+    public static int indexFromCoord(BCoord coord) {
+        return indexFromCoord(coord.getFileIndex(), coord.getRankIndex());
+    }
+
+    public static BCoord coordFromIndex(int squareIndex) {
+        return new BCoord(fileIndex(squareIndex), rankIndex(squareIndex));
+    }
 }

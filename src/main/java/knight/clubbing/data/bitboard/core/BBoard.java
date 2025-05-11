@@ -16,8 +16,8 @@ public class BBoard {
     // 64 bit bitboards for white/blackpieces
     private long[] colorBoards;
     private int[] kingSquares;
-    private int whiteIndex = 0;
-    private int blackIndex = 1;
+    public static final int whiteIndex = 0;
+    public static final int blackIndex = 1;
 
     // 64 bit bitboard for every piece
     private long allPiecesBoard;

@@ -86,49 +86,49 @@ class BBoardTest {
     @Test
     void testBasicMove() {
         BBoard board = new BBoard();
-        BMove move = new BMove(BBoardHelper.coordToIndex("e2"), BBoardHelper.coordToIndex("e4"), BMove.pawnTwoUpFlag);
+        BMove move = new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4"), BMove.pawnTwoUpFlag);
         long keyBefore = board.state.getZobristKey();
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.coordToIndex("e4")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.coordToIndex("e2")]);
+        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("e4")]);
+        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("e2")]);
         assertNotEquals(keyBefore, board.state.getZobristKey());
     }
 
     @Test
     void testCapture() {
         BBoard board = new BBoard("rnbqkbnr/ppp1pppp/3p4/4P3/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2");
-        BMove move = new BMove(BBoardHelper.coordToIndex("e5"), BBoardHelper.coordToIndex("d6"));
+        BMove move = new BMove(BBoardHelper.stringCoordToIndex("e5"), BBoardHelper.stringCoordToIndex("d6"));
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.coordToIndex("d6")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.coordToIndex("e5")]);
+        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("d6")]);
+        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("e5")]);
         assertEquals(0, board.state.getFiftyMoveCounter());
     }
 
     @Test
     void testPromotion() {
         BBoard board = new BBoard("8/P7/8/8/8/8/8/k6K w - - 0 1");
-        BMove move = new BMove(BBoardHelper.coordToIndex("a7"), BBoardHelper.coordToIndex("a8"), BMove.promoteToQueenFlag);
+        BMove move = new BMove(BBoardHelper.stringCoordToIndex("a7"), BBoardHelper.stringCoordToIndex("a8"), BMove.promoteToQueenFlag);
 
         board.makeMove(move, false);
 
         assertEquals(BPiece.whiteQueen, board.pieceBoards[BBoardHelper.a8]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.coordToIndex("a7")]);
+        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("a7")]);
     }
 
     @Test
     void testEnPassant() {
         BBoard board = new BBoard("8/8/8/4pP2/8/8/8/8 w - e6 0 1");
-        BMove move = new BMove(BBoardHelper.coordToIndex("f5"), BBoardHelper.coordToIndex("e6"), BMove.enPassantCaptureFlag);
+        BMove move = new BMove(BBoardHelper.stringCoordToIndex("f5"), BBoardHelper.stringCoordToIndex("e6"), BMove.enPassantCaptureFlag);
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.coordToIndex("e6")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.coordToIndex("f5")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.coordToIndex("e5")]);
+        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("e6")]);
+        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("f5")]);
+        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("e5")]);
     }
 
     @Test
@@ -160,15 +160,15 @@ class BBoardTest {
     @Test
     void testBasicUndoMove() {
         BBoard board = new BBoard();
-        BMove move = new BMove(BBoardHelper.coordToIndex("e2"), BBoardHelper.coordToIndex("e4"), BMove.pawnTwoUpFlag);
+        BMove move = new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4"), BMove.pawnTwoUpFlag);
         long keyBefore = board.state.getZobristKey();
         long[] bitboardsBefore = board.getCopyBitboards();
         int[] pieceBoardsBefore = board.getCopyPieceBoards();
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.coordToIndex("e4")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.coordToIndex("e2")]);
+        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("e4")]);
+        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("e2")]);
         assertNotEquals(keyBefore, board.state.getZobristKey());
 
         board.undoMove(move, false);
@@ -181,15 +181,15 @@ class BBoardTest {
     @Test
     void testUndoCapture() {
         BBoard board = new BBoard("rnbqkbnr/ppp1pppp/3p4/4P3/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2");
-        BMove move = new BMove(BBoardHelper.coordToIndex("e5"), BBoardHelper.coordToIndex("d6"));
+        BMove move = new BMove(BBoardHelper.stringCoordToIndex("e5"), BBoardHelper.stringCoordToIndex("d6"));
         long keyBefore = board.state.getZobristKey();
         long[] bitboardsBefore = board.getCopyBitboards();
         int[] pieceBoardsBefore = board.getCopyPieceBoards();
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.coordToIndex("d6")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.coordToIndex("e5")]);
+        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("d6")]);
+        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("e5")]);
         assertEquals(0, board.state.getFiftyMoveCounter());
 
         board.undoMove(move, false);
@@ -202,7 +202,7 @@ class BBoardTest {
     @Test
     void testUndoPromotion() {
         BBoard board = new BBoard("8/P7/8/8/8/8/8/k6K w - - 0 1");
-        BMove move = new BMove(BBoardHelper.coordToIndex("a7"), BBoardHelper.coordToIndex("a8"), BMove.promoteToQueenFlag);
+        BMove move = new BMove(BBoardHelper.stringCoordToIndex("a7"), BBoardHelper.stringCoordToIndex("a8"), BMove.promoteToQueenFlag);
         long keyBefore = board.state.getZobristKey();
         long[] bitboardsBefore = board.getCopyBitboards();
         int[] pieceBoardsBefore = board.getCopyPieceBoards();
@@ -210,7 +210,7 @@ class BBoardTest {
         board.makeMove(move, false);
 
         assertEquals(BPiece.whiteQueen, board.pieceBoards[BBoardHelper.a8]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.coordToIndex("a7")]);
+        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("a7")]);
 
         board.undoMove(move, false);
 
@@ -222,16 +222,16 @@ class BBoardTest {
     @Test
     void testUndoEnPassant() {
         BBoard board = new BBoard("8/8/8/4pP2/8/8/8/8 w - e6 0 1");
-        BMove move = new BMove(BBoardHelper.coordToIndex("f5"), BBoardHelper.coordToIndex("e6"), BMove.enPassantCaptureFlag);
+        BMove move = new BMove(BBoardHelper.stringCoordToIndex("f5"), BBoardHelper.stringCoordToIndex("e6"), BMove.enPassantCaptureFlag);
         long keyBefore = board.state.getZobristKey();
         long[] bitboardsBefore = board.getCopyBitboards();
         int[] pieceBoardsBefore = board.getCopyPieceBoards();
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.coordToIndex("e6")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.coordToIndex("f5")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.coordToIndex("e5")]);
+        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("e6")]);
+        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("f5")]);
+        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("e5")]);
 
         board.undoMove(move, false);
 
