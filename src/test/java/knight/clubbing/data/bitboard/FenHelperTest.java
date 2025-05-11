@@ -41,8 +41,8 @@ class FenHelperTest {
         BBoard board = new BBoard();
         board.loadPosition(customFen);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.coordToIndex("d4")]);
-        assertEquals(BPiece.blackPawn, board.pieceBoards[BBoardHelper.coordToIndex("e4")]);
+        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("d4")]);
+        assertEquals(BPiece.blackPawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("e4")]);
 
 
         System.out.println(board.state.getCastlingRights());
