@@ -61,4 +61,8 @@ public class BCoord implements Comparable<BCoord>, Serializable {
     public int hashCode() {
         return 8 * rankIndex + fileIndex;
     }
+
+    public int getSquareIndex() {
+        return BBoardHelper.indexFromCoord(fileIndex, rankIndex);
+    }
 }
