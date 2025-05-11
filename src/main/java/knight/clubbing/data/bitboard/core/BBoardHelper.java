@@ -5,6 +5,9 @@ public class BBoardHelper {
     public static final String fileChars = "abcdefgh";
     public static final String rankChars = "12345678";
 
+    public static final BCoord[] ROOK_DIRECTIONS = { new BCoord(-1, 0), new BCoord(1, 0), new BCoord(0, 1), new BCoord(0, -1) };
+    public static final BCoord[] BISHOP_DIRECTIONS = { new BCoord(-1, 1), new BCoord(1, 1), new BCoord(1, -1), new BCoord(-1, -1) };
+
     public static int rowLength = 8;
 
     public static final int a1 = 0;
@@ -72,5 +75,13 @@ public class BBoardHelper {
 
     public static BCoord coordFromIndex(int squareIndex) {
         return new BCoord(fileIndex(squareIndex), rankIndex(squareIndex));
+    }
+
+    public static boolean containsSquare(long bitboard, int squareIndex) {
+        return ((bitboard >> squareIndex) & 1) != 0;
+    }
+
+    public static long setSquare(long bitboard, int squareIndex) {
+        return bitboard | 1L << squareIndex;
     }
 }
