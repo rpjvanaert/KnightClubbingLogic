@@ -1,14 +1,18 @@
 package knight.clubbing.data.bitboard.moveGeneration.magic;
 
+import knight.clubbing.data.bitboard.FileUtil;
+
 import java.io.*;
+import java.nio.file.Path;
 
 public class MagicBuild {
 
+    private static final String fileName = "magicData.bin";
+    private static final Path PATH = Path.of(fileName);
+
     public static void main(String[] args) {
-        // Trigger static generation
         MagicNumberFinder.start();
 
-        // Pack data
         MagicData data = new MagicData();
         data.rookMasks = MagicNumberFinder.ROOK_MASKS;
         data.rookShifts = MagicNumberFinder.ROOK_SHIFTS;
@@ -20,15 +24,6 @@ public class MagicBuild {
         data.bishopMagics = MagicNumberFinder.BISHOP_MAGICS;
         data.bishopAttacks = MagicNumberFinder.BISHOP_ATTACKS;
 
-        try {
-            FileOutputStream fos = new FileOutputStream("magicData.bin");
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(data);
-            oos.close();
-            System.out.println("Magic data saved to magicData.bin");
-        } catch (IOException e) {
-            System.err.println("Failed to save magic data: " + e.getMessage());
-            e.printStackTrace();
-        }
+        FileUtil.save(data, PATH);
     }
 }

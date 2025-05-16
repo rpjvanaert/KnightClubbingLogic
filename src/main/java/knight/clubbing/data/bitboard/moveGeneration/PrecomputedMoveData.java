@@ -1,10 +1,12 @@
 package knight.clubbing.data.bitboard.moveGeneration;
 
+import knight.clubbing.data.bitboard.FileUtil;
 import knight.clubbing.data.bitboard.core.BBoard;
 import knight.clubbing.data.bitboard.core.BBoardHelper;
 import knight.clubbing.data.bitboard.core.BCoord;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,9 +14,17 @@ import java.util.List;
 
 public class PrecomputedMoveData implements Serializable{
 
+    public static void main(String[] args) {
+        PrecomputedMoveData.getInstance();
+        System.out.println(Arrays.toString(PrecomputedMoveData.getInstance().directionLookup));
+        System.out.println(Arrays.deepToString(PrecomputedMoveData.getInstance().dirRayMask));
+        System.out.println(Arrays.deepToString(PrecomputedMoveData.getInstance().alignMask));
+    }
+
     @Serial
     private static final long serialVersionUID = 1L;
-    private static final String DATA_FILE = "precomputed_data.bin";
+    private static final String FILE_NAME = "precomputed_data.bin";
+    private static final Path PATH = Path.of(FILE_NAME);
 
     private long[][] alignMask;
     private long[][] dirRayMask;
@@ -70,32 +80,13 @@ public class PrecomputedMoveData implements Serializable{
 
     public static PrecomputedMoveData loadOrGenerate() {
         PrecomputedMoveData data;
-        if ((data = loadFromFile()) == null) {
+        if ((data = FileUtil.load(PrecomputedMoveData.class, PATH)) == null) {
             data = new PrecomputedMoveData();
             data.computeAll();
-            saveToFile(data);
+            FileUtil.save(data, PATH);
         }
 
         return data;
-    }
-
-    private static PrecomputedMoveData loadFromFile() {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(DATA_FILE))) {
-            System.out.println("Loaded precomputed data from file.");
-            return (PrecomputedMoveData) in.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Precomputed data not found, computing...");
-            return null;
-        }
-    }
-
-    private static void saveToFile(PrecomputedMoveData data) {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(DATA_FILE))) {
-            out.writeObject(data);
-            System.out.println("Saved precomputed data to file.");
-        } catch (IOException e) {
-            System.err.println("Failed to save precomputed data: " + e.getMessage());
-        }
     }
 
     private void computeAll() {
@@ -381,12 +372,5 @@ public class PrecomputedMoveData implements Serializable{
 
     public int[] getDirectionOffsets() {
         return directionOffsets;
-    }
-
-    public static void main(String[] args) {
-        PrecomputedMoveData.getInstance();
-        System.out.println(Arrays.toString(PrecomputedMoveData.getInstance().directionLookup));
-        System.out.println(Arrays.deepToString(PrecomputedMoveData.getInstance().dirRayMask));
-        System.out.println(Arrays.deepToString(PrecomputedMoveData.getInstance().alignMask));
     }
 }
