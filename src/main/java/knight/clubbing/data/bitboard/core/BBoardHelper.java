@@ -84,4 +84,22 @@ public class BBoardHelper {
     public static long setSquare(long bitboard, int squareIndex) {
         return bitboard | 1L << squareIndex;
     }
+
+    public static String bitboardToString(long bitboard) {
+        return String.format("%64s", Long.toBinaryString(bitboard)).replace(' ', '0');
+    }
+
+    public static String bitboardToDisplay(long bitboard) {
+        StringBuilder sb = new StringBuilder();
+
+        String binary = String.format("%64s", Long.toBinaryString(bitboard)).replace(' ', '0');
+        for (int rank = 0; rank < 8; rank++) {
+            for (int file = 0; file < 8; file++) {
+                int index = rank * 8 + file;
+                sb.append(binary.charAt(index)).append(" ");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
 }
