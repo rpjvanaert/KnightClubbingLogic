@@ -1,10 +1,17 @@
 package knight.clubbing.data.bitboard.moveGeneration.magic;
 
+import knight.clubbing.data.bitboard.FileUtil;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public final class PrecomputedMagics {
+
+    private static final String fileName = "magicData.bin";
+    private static final Path path = Paths.get(fileName);
 
     private PrecomputedMagics() {
         // Prevent instantiation
@@ -22,10 +29,10 @@ public final class PrecomputedMagics {
 
     static {
         MagicData data;
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("magicData.bin"))) {
-            data = (MagicData) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Failed to load magicData.bin", e);
+        data = FileUtil.load(MagicData.class, path);
+
+        if (data == null) {
+            throw new RuntimeException("MagicData not found");
         }
 
         ROOK_MAGICS = data.rookMagics;
