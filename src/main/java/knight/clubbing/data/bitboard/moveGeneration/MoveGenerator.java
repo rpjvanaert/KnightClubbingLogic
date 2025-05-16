@@ -1,10 +1,9 @@
 package knight.clubbing.data.bitboard.moveGeneration;
 
 import knight.clubbing.data.bitboard.core.*;
+import knight.clubbing.data.bitboard.moveGeneration.magic.Magic;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public class MoveGenerator {
