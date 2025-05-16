@@ -1,7 +1,8 @@
-package knight.clubbing.data.bitboard.moveGeneration;
+package knight.clubbing.data.bitboard.moveGeneration.magic;
 
 import knight.clubbing.data.bitboard.core.BBoardHelper;
 import knight.clubbing.data.bitboard.core.BCoord;
+import knight.clubbing.data.bitboard.moveGeneration.MoveUtility;
 
 import java.util.ArrayList;
 import java.util.List;

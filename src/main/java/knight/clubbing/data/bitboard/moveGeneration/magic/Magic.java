@@ -1,6 +1,6 @@
-package knight.clubbing.data.bitboard.moveGeneration;
+package knight.clubbing.data.bitboard.moveGeneration.magic;
 
-import static knight.clubbing.data.bitboard.moveGeneration.PrecomputedMagics.*;
+import static knight.clubbing.data.bitboard.moveGeneration.magic.PrecomputedMagics.*;
 
 public final class Magic {
 
