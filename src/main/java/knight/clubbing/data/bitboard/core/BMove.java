@@ -58,6 +58,21 @@ public record BMove(short value) {
         return new BMove((short) 0);
     }
 
+    private String moveFlagName() {
+        return switch (moveFlag()) {
+            case noFlag -> "-";
+            case enPassantCaptureFlag -> "en passant";
+            case castleFlag -> "castle";
+            case pawnTwoUpFlag -> "pawn two up";
+            case promoteToQueenFlag -> "promote to queen";
+            case promoteToKnightFlag -> "promote to knight";
+            case promoteToRookFlag -> "promote to rook";
+            case promoteToBishopFlag -> "promote to bishop";
+            default -> "unknown";
+        };
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -70,9 +85,9 @@ public record BMove(short value) {
     @Override
     public String toString() {
         return "BMove[" +
-                "start=" + startSquare() +
-                ", target=" + targetSquare() +
-                ", flag=" + moveFlag() +
+                "start=" + BBoardHelper.indexToStringCoord(startSquare()) +
+                ", target=" + BBoardHelper.indexToStringCoord(targetSquare()) +
+                ", flag=" + moveFlagName() +
                 ']';
     }
 
