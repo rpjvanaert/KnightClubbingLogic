@@ -66,7 +66,14 @@ public class MoveGenerator {
             pawnMoves = generatePawnMoves();
         }
 
-        BMove[] combined = new BMove[kingMoves.length + slidingMoves.length + knightMoves.length + pawnMoves.length];
+        int total = kingMoves.length + slidingMoves.length + knightMoves.length + pawnMoves.length;
+        BMove[] combined = new BMove[total];
+        int index = 0;
+
+        System.arraycopy(kingMoves, 0, combined, index, kingMoves.length); index += kingMoves.length;
+        System.arraycopy(slidingMoves, 0, combined, index, slidingMoves.length); index += slidingMoves.length;
+        System.arraycopy(knightMoves, 0, combined, index, knightMoves.length); index += knightMoves.length;
+        System.arraycopy(pawnMoves, 0, combined, index, pawnMoves.length);
 
         return combined;
     }
@@ -204,8 +211,8 @@ public class MoveGenerator {
 
         opponentSlidingAttackMap = 0;
 
-        updateSlideAttack(board.getOrthogonalSliders(opponentColor), true);
-        updateSlideAttack(board.getDiagonalSliders(opponentColor), false);
+        updateSlideAttack(board.getOrthogonalSliders(enemyIndex), true);
+        updateSlideAttack(board.getDiagonalSliders(enemyIndex), false);
 
     }
 
@@ -327,7 +334,7 @@ public class MoveGenerator {
             knights = startResult.remaining;
             long moveSquares = MoveUtility.KnightAttacks[knightSquare] & moveMask;
 
-            while (knights != 0) {
+            while (moveSquares != 0) {
                 PopLsbResult targetResult = PopLsbResult.popLsb(moveSquares);
                 int targetSquare = targetResult.index;
                 moveSquares = targetResult.remaining;
