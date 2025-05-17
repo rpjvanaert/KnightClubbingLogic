@@ -47,6 +47,8 @@ class BBoardTest {
         assertTrue(b.get(5,33));
     }
 
+    //todo more robust debugging of loadPosition tests
+
     @Test
     void loadStartPosition() {
         BBoard board = new BBoard();
@@ -64,6 +66,10 @@ class BBoardTest {
         for (int i = 16; i < 48; i++) {
             assertEquals(BPiece.none, board.pieceBoards[i], "Expected none at " + i);
         }
+
+        assertEquals(BPiece.makePiece(BPiece.rook, BPiece.white), board.pieceBoards[0]);
+        assertEquals(129L, board.getBitboard(BPiece.whiteRook));
+        assertEquals(66L, board.getBitboard(BPiece.whiteKnight));
 
         assertEquals(0b1111, board.state.getCastlingRights(), "Expected full castling rights");
         assertTrue(board.isWhiteToMove, "Expected white to move");
