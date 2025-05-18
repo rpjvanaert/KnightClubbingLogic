@@ -58,7 +58,7 @@ public record BMove(short value) {
         return new BMove((short) 0);
     }
 
-    private String moveFlagName() {
+    public String moveFlagName() {
         return switch (moveFlag()) {
             case noFlag -> "-";
             case enPassantCaptureFlag -> "en passant";
