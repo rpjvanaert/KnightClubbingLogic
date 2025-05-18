@@ -3,6 +3,8 @@ package knight.clubbing.data.bitboard.moveGeneration;
 import knight.clubbing.data.bitboard.core.BBoard;
 import knight.clubbing.data.bitboard.core.BBoardHelper;
 import knight.clubbing.data.bitboard.core.BMove;
+import knight.clubbing.data.bitboard.moveGeneration.magic.PrecomputedMagics;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -13,13 +15,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MoveGeneratorTest {
 
+    @BeforeAll
+    static void callPrecomputed() {
+        long[] test = PrecomputedMagics.BISHOP_MAGICS;
+        PrecomputedMoveData.getInstance();
+    }
+
     @Test
     void testInitialPositionLegalMoves() {
         BBoard board = new BBoard();
         MoveGenerator moveGenerator = new MoveGenerator(board);
         BMove[] moves = moveGenerator.generateMoves(false);
         System.out.println(Arrays.toString(moves));
-        assertEquals(20, moves.length); //todo fix a lot
+        assertEquals(20, moves.length);
     }
 
     @Test

@@ -324,7 +324,7 @@ public class MoveGenerator {
         List<BMove> moves = new ArrayList<>();
 
         int friendlyKnightPiece = BPiece.makePiece(BPiece.knight, friendlyColor);
-        long knights = board.getPieceBoards()[friendlyKnightPiece] & notPinRays;
+        long knights = board.getBitboard(friendlyKnightPiece) & notPinRays;
         long moveMask = emptyOrEnemySquares & checkRayBitmask & moveTypeMask;
 
         while (knights != 0) {
@@ -353,7 +353,7 @@ public class MoveGenerator {
         int pushOffset = pushDir * 8;
 
         int friendlyPawnPiece = BPiece.makePiece(BPiece.pawn, friendlyColor);
-        long pawns = board.getPieceBoards()[friendlyPawnPiece];
+        long pawns = board.getBitboard(friendlyPawnPiece);
 
         long promotionRankMask = board.isWhiteToMove ? MoveUtility.Rank8 : MoveUtility.Rank1;
         long singlePush = (MoveUtility.shift(pawns, pushOffset)) & emptySquares;
@@ -375,9 +375,9 @@ public class MoveGenerator {
 
             while (singlePushNoPromotions != 0) {
 
-                PopLsbResult targetResult = PopLsbResult.popLsb(singlePush);
+                PopLsbResult targetResult = PopLsbResult.popLsb(singlePushNoPromotions);
                 int targetSquare = targetResult.index;
-                singlePush = targetResult.remaining;
+                singlePushNoPromotions = targetResult.remaining;
                 int startSquare = targetSquare - pushOffset;
 
                 if (!isPinned(startSquare) || PrecomputedMoveData.getInstance().getAlignMask()[startSquare][friendlyKingSquare] == PrecomputedMoveData.getInstance().getAlignMask()[targetSquare][friendlyKingSquare]) {
