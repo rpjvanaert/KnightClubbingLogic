@@ -62,9 +62,10 @@ class BMoveTest {
     void testToStringFormat() {
         BMove move = new BMove(1, 2, BMove.pawnTwoUpFlag);
         String str = move.toString();
-        assertTrue(str.contains("start=1"));
-        assertTrue(str.contains("target=2"));
-        assertTrue(str.contains("flag=" + BMove.pawnTwoUpFlag));
+        System.out.println(str);
+        assertTrue(str.contains("start=b1"));
+        assertTrue(str.contains("target=c1"));
+        assertTrue(str.contains("flag=" + move.moveFlagName()));
     }
 
     @Test
