@@ -51,7 +51,7 @@ class FenHelperTest {
         assertFalse(board.state.hasKingSideCastleRight(false));
         assertTrue(board.state.hasQueenSideCastleRight(false));
 
-        assertEquals(3, board.state.getEnPassantFile());
+        assertEquals(4, board.state.getEnPassantFile());
         assertFalse(board.isWhiteToMove);
         assertEquals(4, board.state.getFiftyMoveCounter());
         assertEquals(13, board.getPlyCount());

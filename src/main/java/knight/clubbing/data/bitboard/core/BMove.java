@@ -95,4 +95,19 @@ public record BMove(short value) {
     public int hashCode() {
         return Short.hashCode(value);
     }
+
+    public String getUci() {
+        return
+                BBoardHelper.indexToStringCoord(startSquare()) +
+                BBoardHelper.indexToStringCoord(targetSquare()) +
+                (!isPromotion() ? "" :
+                        switch (promotionPieceType()) {
+                            case BPiece.queen -> "q";
+                            case BPiece.bishop -> "b";
+                            case BPiece.rook -> "r";
+                            case BPiece.knight -> "n";
+                            default -> "";
+                        }
+                );
+    }
 }

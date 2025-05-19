@@ -33,6 +33,11 @@ public class MoveGenerator {
     private long opponentSlidingAttackMap;
 
     private boolean generateQuietMoves;
+
+    public BBoard getBoard() {
+        return board;
+    }
+
     private BBoard board;
     private int currentMoveIndex;
 
@@ -406,7 +411,7 @@ public class MoveGenerator {
             PopLsbResult targetResult = PopLsbResult.popLsb(captureA);
             int targetSquare = targetResult.index;
             captureA = targetResult.remaining;
-            int startSquare = targetSquare - pushOffset * 7;
+            int startSquare = targetSquare - pushDir * 7;
 
             if (!isPinned(startSquare) || PrecomputedMoveData.getInstance().getAlignMask()[startSquare][friendlyKingSquare] == PrecomputedMoveData.getInstance().getAlignMask()[targetSquare][friendlyKingSquare]) {
                 moves.add(new BMove(startSquare, targetSquare));
@@ -418,7 +423,7 @@ public class MoveGenerator {
             PopLsbResult targetResult = PopLsbResult.popLsb(captureB);
             int targetSquare = targetResult.index;
             captureB = targetResult.remaining;
-            int startSquare = targetSquare - pushOffset * 9;
+            int startSquare = targetSquare - pushDir * 9;
 
             if (!isPinned(startSquare) || PrecomputedMoveData.getInstance().getAlignMask()[startSquare][friendlyKingSquare] == PrecomputedMoveData.getInstance().getAlignMask()[targetSquare][friendlyKingSquare]) {
                 moves.add(new BMove(startSquare, targetSquare));
@@ -444,7 +449,7 @@ public class MoveGenerator {
             int startSquare = targetSquare - pushDir * 7;
 
             if (!isPinned(startSquare) || PrecomputedMoveData.getInstance().getAlignMask()[startSquare][friendlyKingSquare] == PrecomputedMoveData.getInstance().getAlignMask()[targetSquare][friendlyKingSquare]) {
-                generatePromotions(startSquare, targetSquare);
+                moves.addAll(generatePromotions(startSquare, targetSquare));
             }
         }
 
@@ -453,10 +458,10 @@ public class MoveGenerator {
             PopLsbResult targetResult = PopLsbResult.popLsb(capturePromotionsB);
             int targetSquare = targetResult.index;
             capturePromotionsB = targetResult.remaining;
-            int startSquare = targetSquare - pushDir * 7;
+            int startSquare = targetSquare - pushDir * 9;
 
             if (!isPinned(startSquare) || PrecomputedMoveData.getInstance().getAlignMask()[startSquare][friendlyKingSquare] == PrecomputedMoveData.getInstance().getAlignMask()[targetSquare][friendlyKingSquare]) {
-                generatePromotions(startSquare, targetSquare);
+                moves.addAll(generatePromotions(startSquare, targetSquare));
             }
         }
 
@@ -464,7 +469,7 @@ public class MoveGenerator {
             int epFileIndex = board.state.getEnPassantFile() - 1;
             int epRankIndex = board.isWhiteToMove ? 5 : 2;
             int targetSquare = epRankIndex * 8 + epFileIndex;
-            int capturedPawnSquare = targetSquare - pushOffset;
+            int capturedPawnSquare = targetSquare + (board.isWhiteToMove ? -8 : 8);
 
             if (MoveUtility.containsSquare(checkRayBitmask, capturedPawnSquare)) {
 
