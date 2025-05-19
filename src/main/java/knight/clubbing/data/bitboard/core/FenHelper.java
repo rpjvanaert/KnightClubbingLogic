@@ -73,7 +73,7 @@ public class FenHelper {
         int epFile = board.state.getEnPassantFile();
         if (epFile > 0 && epFile <= 8) {
             int rankOffset = board.isWhiteToMove ? 5 : 2;
-            ep = BBoardHelper.fileChars.charAt(epFile) + Integer.toString(rankOffset + 1);
+            ep = BBoardHelper.fileChars.charAt(epFile - 1) + Integer.toString(rankOffset + 1);
         }
 
         int halfMoveClock = board.state.getFiftyMoveCounter();
@@ -157,7 +157,7 @@ public class FenHelper {
             if (sections.length > 3) {
                 String enPassantFileName = sections[3].charAt(0) + "";
                 if (BBoardHelper.fileChars.contains(enPassantFileName)) {
-                    tempEpFile = BBoardHelper.fileChars.indexOf(enPassantFileName);
+                    tempEpFile = BBoardHelper.fileChars.indexOf(enPassantFileName) + 1;
                 }
             }
 

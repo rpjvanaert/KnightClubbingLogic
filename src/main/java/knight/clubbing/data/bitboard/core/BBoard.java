@@ -140,7 +140,7 @@ public class BBoard {
         }
 
         if (moveFlag == BMove.pawnTwoUpFlag) {
-            int enPassantFile = BBoardHelper.fileIndex(targetSquare);
+            int enPassantFile = BBoardHelper.fileIndex(targetSquare) + 1;
             newEnPassantFile = enPassantFile;
             zobristKey ^= BZobrist.getEnPassantFile()[enPassantFile];
         }
@@ -332,6 +332,8 @@ public class BBoard {
     }
 
     private void updateOtherBoards() {
+        colorBoards[whiteIndex] = 0L;
+        colorBoards[blackIndex] = 0L;
         for (int piece : BPiece.pieceIndices) {
             if (BPiece.isWhite(piece)) {
                 colorBoards[whiteIndex] |= bitboards[piece];
