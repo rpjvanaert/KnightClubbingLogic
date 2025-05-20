@@ -14,7 +14,7 @@ import java.util.List;
 
 public class PrecomputedMoveData implements Serializable{
 
-    public static void main(String[] args) {
+    public static void main() {
         PrecomputedMoveData.getInstance();
         System.out.println(Arrays.toString(PrecomputedMoveData.getInstance().directionLookup));
         System.out.println(Arrays.deepToString(PrecomputedMoveData.getInstance().dirRayMask));
@@ -173,7 +173,7 @@ public class PrecomputedMoveData implements Serializable{
                 }
                 if (y > 0) {
                     pawnCapturesBlack.add(squareIndex - 9);
-                    pawnAttackBitboards[squareIndex][BBoard.whiteIndex] |= 1L << (squareIndex - 9);
+                    pawnAttackBitboards[squareIndex][BBoard.blackIndex] |= 1L << (squareIndex - 9);
                 }
             }
 
@@ -184,7 +184,7 @@ public class PrecomputedMoveData implements Serializable{
                 }
                 if (y > 0) {
                     pawnCapturesBlack.add(squareIndex - 7);
-                    pawnAttackBitboards[squareIndex][BBoard.whiteIndex] |= 1L << (squareIndex - 7);
+                    pawnAttackBitboards[squareIndex][BBoard.blackIndex] |= 1L << (squareIndex - 7);
                 }
             }
 
@@ -250,23 +250,7 @@ public class PrecomputedMoveData implements Serializable{
             }
         }
 
-        alignMask = new long[64][64];
-        for (int squareA = 0; squareA < 64; squareA++) {
-
-            for (int squareB = 0; squareB < 64; squareB++) {
-                BCoord coordA = BBoardHelper.coordFromIndex(squareA);
-                BCoord coordB = BBoardHelper.coordFromIndex(squareB);
-                BCoord delta = coordB.subtract(coordA);
-                BCoord dir = new BCoord(Integer.signum(delta.getFileIndex()), Integer.signum(delta.getRankIndex()));
-
-                for (int i = -8; i < 8; i++) {
-                    BCoord coord = BBoardHelper.coordFromIndex(squareA).add(dir).multiply(i);
-                    if (coord.isValidSquare()) {
-                        alignMask[squareA][squareB] |= 1L << BBoardHelper.indexFromCoord(coord);
-                    }
-                }
-            }
-        }
+        calculateAlignMask();
 
         dirRayMask = new long[8][64];
         for (int dirIndex = 0; dirIndex < dirOffsets2D.length; dirIndex++) {
@@ -275,13 +259,55 @@ public class PrecomputedMoveData implements Serializable{
                 BCoord square = BBoardHelper.coordFromIndex(squareIndex);
 
                 for (int i = 0; i < 8; i++) {
-                    BCoord coord = square.add(dirOffsets2D[dirIndex]).multiply(i);
+                    BCoord coord = square.add(dirOffsets2D[dirIndex].multiply(i));
                     if (coord.isValidSquare()) {
                         dirRayMask[dirIndex][squareIndex] |= 1L << BBoardHelper.indexFromCoord(coord);
                     } else {
                         break;
                     }
                 }
+            }
+        }
+    }
+
+    private void calculateAlignMask() {
+        alignMask = new long[64][64];
+        for (int squareA = 0; squareA < 64; squareA++) {
+            for (int squareB = 0; squareB < 64; squareB++) {
+
+                if (squareA == squareB) {
+                    alignMask[squareA][squareB] = 1L << squareA;
+                    continue;
+                }
+
+                BCoord coordA = BBoardHelper.coordFromIndex(squareA);
+                BCoord coordB = BBoardHelper.coordFromIndex(squareB);
+                BCoord delta = coordB.subtract(coordA);
+
+                if (
+                        delta.getFileIndex() != 0 &&
+                        delta.getRankIndex() != 0 &&
+                        Math.abs(delta.getRankIndex()) != Math.abs(delta.getFileIndex())
+                ) {
+                    alignMask[squareA][squareB] = 0;
+                    continue;
+                }
+
+                BCoord dir = new BCoord(Integer.signum(delta.getFileIndex()), Integer.signum(delta.getRankIndex()));
+
+
+                for (int i = -8; i < 8; i++) {
+
+                    if (i == 0)
+                        continue;
+
+                    BCoord coord = BBoardHelper.coordFromIndex(squareA).add(dir.multiply(i));
+                    if (coord.isValidSquare()) {
+                        alignMask[squareA][squareB] |= 1L << BBoardHelper.indexFromCoord(coord);
+                    }
+                }
+
+                alignMask[squareA][squareB] |= (1L << squareA) | (1L << squareB);
             }
         }
     }
