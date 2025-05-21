@@ -21,11 +21,16 @@
             <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>1.10.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -38,6 +43,15 @@
                 <configuration>
                     <source>23</source>
                     <target>23</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <excludedGroups>perft</excludedGroups>
                 </configuration>
             </plugin>
         </plugins>
