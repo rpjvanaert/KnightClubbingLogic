@@ -40,6 +40,17 @@ public final class Magic {
         return BishopAttacks[square][(int) key];
     }
 
+    public static long getRookIndex(int square, long blockers) {
+        long masked = blockers & Magic.RookMask[square];
+        return (masked * PrecomputedMagics.ROOK_MAGICS[square]) >>> PrecomputedMagics.ROOK_SHIFTS[square];
+    }
+
+    public static long getBishopIndex(int square, long blockers) {
+        long masked = blockers & Magic.BishopMask[square];
+        return (masked * PrecomputedMagics.BISHOP_MAGICS[square]) >>> PrecomputedMagics.BISHOP_SHIFTS[square];
+    }
+
+
     private static long[] createTable(int square, boolean isRook, long magic, int shift) {
         int numBits = 64 - shift;
         int size = 1 << numBits;
