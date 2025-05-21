@@ -1,157 +1,139 @@
 package knight.clubbing;
 
-import knight.clubbing.data.details.Color;
-import knight.clubbing.data.details.Coord;
-import knight.clubbing.data.details.PieceType;
-import knight.clubbing.data.move.MoveDraft;
-import knight.clubbing.logic.ChessGame;
+import knight.clubbing.core.BBoard;
+import knight.clubbing.core.BMove;
+import knight.clubbing.moveGeneration.MoveGenerator;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PerftTest {
 
-    @Test
-    void testBasicPerft() {
-        int depth;
-        long expected;
-        long possibilities;
-        ChessGame chessGame;
+    @Test @Tag("perft")
+    void perftBasic() {
+        BBoard board = new BBoard();
+        MoveGenerator moveGenerator = new MoveGenerator(board);
 
-        depth = 0;
-        expected = 1;
-        chessGame = new ChessGame();
-        possibilities = chessGame.perft(depth);
-        assertEquals(expected, possibilities);
+        assertEquals(20, perft(moveGenerator, 1));
 
-        depth = 1;
-        expected = 20;
-        chessGame = new ChessGame();
-        possibilities = chessGame.perft(depth);
-        assertEquals(expected, possibilities);
+        board = new BBoard();
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(400, perft(moveGenerator, 2));
 
-        depth = 2;
-        expected = 400;
-        chessGame = new ChessGame();
-        possibilities = chessGame.perft(depth);
-        assertEquals(expected, possibilities);
+        board = new BBoard();
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(8902, perft(moveGenerator, 3));
 
-        depth = 3;
-        expected = 8902;
-        chessGame = new ChessGame();
-        possibilities = chessGame.perft(depth);
-        assertEquals(expected, possibilities);
+        board = new BBoard();
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(197281, perft(moveGenerator, 4));
 
-        depth = 4;
-        expected = 197281;
-        chessGame = new ChessGame();
-        possibilities = chessGame.perft(depth);
-        assertEquals(expected, possibilities);
+        board = new BBoard();
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(4865609, perft(moveGenerator, 5));
     }
 
-    @Test
-    void testPerftDivideStartPositionDepth1() {
-        ChessGame game = new ChessGame();
-        long expectedNodes = 20;
+    @Test @Tag("perft")
+    void perftKiwipete() {
+        String fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
+        BBoard board = new BBoard(fen);
+        MoveGenerator moveGenerator = new MoveGenerator(board);
 
-        assertEquals(expectedNodes, game.perftDivide(1), "Incorrect Perft(1) result.");
+        assertEquals(48, perft(moveGenerator, 1));
+
+        board = new BBoard(fen);
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(2039, perft(moveGenerator, 2));
+
+        board = new BBoard(fen);
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(97862, perft(moveGenerator, 3));
+
+        board = new BBoard(fen);
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(4085603, perft(moveGenerator, 4));
+
+        board = new BBoard(fen);
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(193690690, perft(moveGenerator, 5));
+
+        board = new BBoard(fen);
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(8031647685L, perft(moveGenerator, 6));
     }
 
-    @Test
-    void testPerftDivideStartPositionDepth2() {
-        ChessGame game = new ChessGame();
-        long expectedNodes = 400;
-        assertEquals(expectedNodes, game.perftDivide(2), "Incorrect Perft(2) result.");
+    @Test @Tag("perft")
+    void perftPosition3() {
+        String fen = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1 ";
+        BBoard board = new BBoard(fen);
+        MoveGenerator moveGenerator = new MoveGenerator(board);
+
+        assertEquals(14, perft(moveGenerator, 1));
+
+        board = new BBoard(fen);
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(191, perft(moveGenerator, 2));
+
+        board = new BBoard(fen);
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(2812, perft(moveGenerator, 3));
+
+        board = new BBoard(fen);
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(43238, perft(moveGenerator, 4));
+
+        board = new BBoard(fen);
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(674624, perft(moveGenerator, 5));
+
+        board = new BBoard(fen);
+        moveGenerator = new MoveGenerator(board);
+        assertEquals(11030083, perft(moveGenerator, 6));
     }
 
-    @Test
-    void testPerftDivideStartPositionDepth3() {
-        ChessGame game = new ChessGame();
-        long expectedNodes = 8902;
-        assertEquals(expectedNodes, game.perftDivide(3), "Incorrect Perft(3) result.");
+    long perft(MoveGenerator moveGenerator, int depth) {
+        if (depth == 0) return 1;
+
+        long nodes = 0;
+
+        BMove[] moves = moveGenerator.generateMoves(false);
+
+        for (BMove move : moves) {
+            assertNotNull(move);
+            assertNotEquals(0, moveGenerator.getBoard().getPieceBoards()[move.startSquare()], "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
+            assertNotEquals("unknown", move.moveFlagName(), "unknown moveFlagName: " + move.moveFlagName());
+
+            moveGenerator.getBoard().makeMove(move, true);
+            nodes += perft(moveGenerator, depth - 1);
+            moveGenerator.getBoard().undoMove(move, true);
+        }
+
+        return nodes;
     }
 
-    @Test
-    void testPerftDivideCastling() {
-        ChessGame game = new ChessGame("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
-        long expectedNodes = 26;
+    long perftDivide(MoveGenerator moveGenerator, int depth) {
+        if (depth == 0) return 1;
 
-        assertEquals(expectedNodes, game.perftDivide(1), "Incorrect Perft(1) result for castling.");
+        long nodes = 0;
+
+        BMove[] moves = moveGenerator.generateMoves(false);
+
+        for (BMove move : moves) {
+            assertNotNull(move);
+            assertNotEquals(0, moveGenerator.getBoard().getPieceBoards()[move.startSquare()], "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
+            assertNotEquals("unknown", move.moveFlagName(), "unknown moveFlagName: " + move.moveFlagName());
+
+            moveGenerator.getBoard().makeMove(move, true);
+            long moveNodes = perft(moveGenerator, depth - 1);
+
+            System.out.println(move.getUci() + ": " + moveNodes);
+
+            nodes += moveNodes;
+            moveGenerator.getBoard().undoMove(move, true);
+        }
+
+        return nodes;
     }
 
-    @Test
-    void testPerftDivideEnPassant() {
-        ChessGame game = new ChessGame("rnbqkbnr/pppppppp/8/8/4Pp2/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 2");
-        long expectedNodes = 29;
-
-        assertEquals(expectedNodes, game.perftDivide(1), "Incorrect Perft(1) result for en passant.");
-    }
-
-    /*
-    @Test
-    void testPerftPosition2() {
-        ChessGame game = new ChessGame("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 0");
-        long expectedNodes;
-        int depth;
-
-        expectedNodes = 48;
-        depth = 1;
-        assertEquals(expectedNodes, game.perft(depth));
-
-        expectedNodes = 2039;
-        depth = 2;
-        assertEquals(expectedNodes, game.perft(depth));
-
-        expectedNodes = 97862;
-        depth = 3;
-        assertEquals(expectedNodes, game.perft(depth));
-
-        expectedNodes = 4085603;
-        depth = 4;
-        assertEquals(expectedNodes, game.perftDivide(depth));
-
-        expectedNodes = 193690690;
-        depth = 5;
-        assertEquals(expectedNodes, game.perft(depth));
-    }
-
-    @Test
-    void testPerftPosition2_a2a4() {
-        ChessGame game = new ChessGame("r3k2r/p1ppqpb1/bn2pnp1/3PN3/Pp2P3/2N2Q1p/1PPBBPPP/R3K2R b KQkq a3 0 1");
-        long expectedNodes;
-        int depth;
-
-        expectedNodes = 90978;
-        depth = 3;
-        assertEquals(expectedNodes, game.perft(depth)); //problem: b4a3
-
-    }
-
-    @Test
-    void testPerftPosition3() {
-        ChessGame game = new ChessGame("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 0");
-        long expectedNodes;
-        int depth;
-
-        expectedNodes = 14;
-        depth = 1;
-        assertEquals(expectedNodes, game.perft(depth));
-
-        expectedNodes = 191;
-        depth = 2;
-        assertEquals(expectedNodes, game.perft(depth));
-
-        expectedNodes = 2812;
-        depth = 3;
-        assertEquals(expectedNodes, game.perft(depth));
-
-        expectedNodes = 43238;
-        depth = 4;
-        assertEquals(expectedNodes, game.perft(depth));
-
-        expectedNodes = 674624;
-        depth = 5;
-        assertEquals(expectedNodes, game.perft(depth));
-    }
-     */
 }
