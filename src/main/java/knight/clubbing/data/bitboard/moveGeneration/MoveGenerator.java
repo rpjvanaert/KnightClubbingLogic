@@ -205,7 +205,7 @@ public class MoveGenerator {
         int enemyKingSquare = board.getKingSquare(enemyIndex);
 
         opponentAttackMapNoPawns = opponentSlidingAttackMap | opponentKnightAttacks | MoveUtility.KingMoves[enemyKingSquare];
-        opponentAttackMap = opponentAttackMapNoPawns | opponentKnightAttacks;
+        opponentAttackMap = opponentAttackMapNoPawns | opponentPawnAttackMap;
 
         if (!inCheck) {
             checkRayBitmask = Long.MAX_VALUE;

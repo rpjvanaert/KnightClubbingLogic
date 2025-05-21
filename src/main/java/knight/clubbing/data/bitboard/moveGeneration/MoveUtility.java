@@ -70,7 +70,6 @@ public class MoveUtility {
     private static void processSquare(int x, int y, int[][] orthoDir, int[][] diagDir, int[][] knightJumps) {
         int squareIndex = y * 8 + x;
 
-        // King moves: orthogonal and diagonal directions
         for (int[] dir : orthoDir) {
             int dx = dir[0], dy = dir[1];
             int nx = x + dx, ny = y + dy;
@@ -87,7 +86,6 @@ public class MoveUtility {
             }
         }
 
-        // Knight attacks
         for (int[] jump : knightJumps) {
             int nx = x + jump[0], ny = y + jump[1];
             if (validSquareIndex(nx, ny)) {
@@ -95,7 +93,6 @@ public class MoveUtility {
             }
         }
 
-        // White pawn attacks
         if (validSquareIndex(x + 1, y + 1)) {
             WhitePawnAttacks[squareIndex] |= 1L << ((y + 1) * 8 + (x + 1));
         }
@@ -103,7 +100,6 @@ public class MoveUtility {
             WhitePawnAttacks[squareIndex] |= 1L << ((y + 1) * 8 + (x - 1));
         }
 
-        // Black pawn attacks
         if (validSquareIndex(x + 1, y - 1)) {
             BlackPawnAttacks[squareIndex] |= 1L << ((y - 1) * 8 + (x + 1));
         }
