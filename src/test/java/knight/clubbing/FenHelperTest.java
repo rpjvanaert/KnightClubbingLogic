@@ -45,7 +45,6 @@ class FenHelperTest {
         assertEquals(BPiece.blackPawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("e4")]);
 
 
-        System.out.println(board.state.getCastlingRights());
         assertTrue(board.state.hasKingSideCastleRight(true));
         assertFalse(board.state.hasQueenSideCastleRight(true));
         assertFalse(board.state.hasKingSideCastleRight(false));
