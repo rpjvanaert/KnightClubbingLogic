@@ -195,6 +195,7 @@ public class MoveGenerator {
 
         if (MoveUtility.containsSquare(opponentPawnAttackMap, friendlyKingSquare)) {
             inDoubleCheck = inCheck;
+            inCheck = true;
 
             long possiblePawnAttackOrigins = board.isWhiteToMove ? MoveUtility.WhitePawnAttacks[friendlyKingSquare] : MoveUtility.BlackPawnAttacks[friendlyKingSquare];
             long pawnCheckMap = opponentPawns & possiblePawnAttackOrigins;
