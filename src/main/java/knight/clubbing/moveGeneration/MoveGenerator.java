@@ -101,7 +101,7 @@ public class MoveGenerator {
         allPieces = board.getAllPiecesBoard();
         emptySquares = ~allPieces;
         emptyOrEnemySquares = emptySquares | enemyPieces;
-        moveTypeMask = generateQuietMoves ? Long.MAX_VALUE : enemyPieces;
+        moveTypeMask = generateQuietMoves ? BBoardHelper.allBitsSet : enemyPieces;
 
         calculateAttackData();
     }
@@ -207,7 +207,7 @@ public class MoveGenerator {
         opponentAttackMap = opponentAttackMapNoPawns | opponentPawnAttackMap;
 
         if (!inCheck) {
-            checkRayBitmask = Long.MAX_VALUE;
+            checkRayBitmask = BBoardHelper.allBitsSet;
         }
     }
 
