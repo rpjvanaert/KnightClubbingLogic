@@ -2,6 +2,7 @@ package knight.clubbing;
 
 import knight.clubbing.core.BBoard;
 import knight.clubbing.core.BMove;
+import knight.clubbing.core.BPiece;
 import knight.clubbing.moveGeneration.MoveGenerator;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -101,7 +102,9 @@ public class PerftTest {
 
         for (BMove move : moves) {
             assertNotNull(move);
-            assertNotEquals(0, moveGenerator.getBoard().getPieceBoards()[move.startSquare()], "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
+            int piece = moveGenerator.getBoard().getPieceBoards()[move.startSquare()];
+            assertNotEquals(0, piece, "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
+            assertEquals(moveGenerator.getBoard().isWhiteToMove, BPiece.isWhite(piece));
             assertNotEquals("unknown", move.moveFlagName(), "unknown moveFlagName: " + move.moveFlagName());
 
             moveGenerator.getBoard().makeMove(move, true);
@@ -121,7 +124,9 @@ public class PerftTest {
 
         for (BMove move : moves) {
             assertNotNull(move);
-            assertNotEquals(0, moveGenerator.getBoard().getPieceBoards()[move.startSquare()], "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
+            int piece = moveGenerator.getBoard().getPieceBoards()[move.startSquare()];
+            assertNotEquals(0, piece, "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
+            assertEquals(moveGenerator.getBoard().isWhiteToMove, BPiece.isWhite(piece));
             assertNotEquals("unknown", move.moveFlagName(), "unknown moveFlagName: " + move.moveFlagName());
 
             moveGenerator.getBoard().makeMove(move, true);
