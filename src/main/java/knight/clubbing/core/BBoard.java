@@ -83,7 +83,7 @@ public class BBoard {
 
         int movedPiece = pieceBoards[startSquare];
         int movedPieceType = BPiece.getPieceType(movedPiece);
-        int capturedPiece = isEnPassant ? BPiece.makePiece(BPiece.pawn, isWhiteToMove? BPiece.white : BPiece.black) : pieceBoards[targetSquare];
+        int capturedPiece = isEnPassant ? BPiece.makePiece(BPiece.pawn, opponentColor()) : pieceBoards[targetSquare];
         int capturedPieceType = BPiece.getPieceType(capturedPiece);
 
         int prevCastleRights = state.getCastlingRights();
@@ -98,7 +98,7 @@ public class BBoard {
 
             if (isEnPassant) {
                 captureSquare = targetSquare + (isWhiteToMove ? -BBoardHelper.rowLength : BBoardHelper.rowLength);
-                this.clear(BPiece.blackPawn, captureSquare);
+                this.clear(capturedPiece, captureSquare);
                 pieceBoards[captureSquare] = BPiece.none;
             }
 
@@ -481,6 +481,10 @@ public class BBoard {
 
     public long getAllPiecesBoard() {
         return allPiecesBoard;
+    }
+
+    public List<BMove> getAllGameMoves() {
+        return allGameMoves;
     }
 
     public long getDiagonalSliders(int colorIndex) {
