@@ -1,9 +1,5 @@
-package knight.clubbing;
+package knight.clubbing.core;
 
-import knight.clubbing.core.BBoard;
-import knight.clubbing.core.BBoardHelper;
-import knight.clubbing.core.BMove;
-import knight.clubbing.core.BPiece;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

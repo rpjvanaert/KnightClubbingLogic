@@ -28,6 +28,15 @@ public class BGameState {
         this.fiftyMoveCounter = 0;
     }
 
+    public BGameState(BGameState other) {
+        this.capturedPiece = other.capturedPiece;
+        this.enPassantFile = other.enPassantFile;
+        this.castlingRights = other.castlingRights;
+        this.fiftyMoveCounter = other.fiftyMoveCounter;
+        this.zobristKey = other.zobristKey;
+    }
+
+
     public boolean hasKingSideCastleRight(boolean white) {
         int mask = white ? 1 : 4;
         return (castlingRights & mask) != 0;

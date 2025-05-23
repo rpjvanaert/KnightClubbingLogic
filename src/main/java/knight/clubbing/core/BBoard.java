@@ -545,4 +545,33 @@ public class BBoard {
         }
         return sb.toString();
     }
+
+    public BBoard(BBoard other) {
+        this.bitboards = Arrays.copyOf(other.bitboards, other.bitboards.length);
+        this.pieceBoards = Arrays.copyOf(other.pieceBoards, other.pieceBoards.length);
+        this.colorBoards = Arrays.copyOf(other.colorBoards, other.colorBoards.length);
+        this.kingSquares = Arrays.copyOf(other.kingSquares, other.kingSquares.length);
+
+        this.allPiecesBoard = other.allPiecesBoard;
+        this.whiteOrthogonalSliderBoard = other.whiteOrthogonalSliderBoard;
+        this.blackOrthogonalSliderBoard = other.blackOrthogonalSliderBoard;
+        this.whiteDiagonalSliderBoard = other.whiteDiagonalSliderBoard;
+        this.blackDiagonalSliderBoard = other.blackDiagonalSliderBoard;
+        this.totalPieceCountWithoutPawnsAndKings = other.totalPieceCountWithoutPawnsAndKings;
+
+        this.allGameMoves = new ArrayList<>(other.allGameMoves); // Shallow copy is okay if BMove is immutable
+
+        this.state = new BGameState(other.state); // Ensure BGameState has a deep copy constructor
+        this.plyCount = other.plyCount;
+
+        this.repetitionPositionHistory = (Stack<Long>) other.repetitionPositionHistory.clone();
+        this.gameStateHistory = new Stack<>();
+        for (BGameState s : other.gameStateHistory) {
+            this.gameStateHistory.push(new BGameState(s));
+        }
+
+        this.cachedInCheckValue = other.cachedInCheckValue;
+        this.hasCachedInCheckValue = other.hasCachedInCheckValue;
+        this.isWhiteToMove = other.isWhiteToMove;
+    }
 }
