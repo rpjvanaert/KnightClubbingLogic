@@ -496,4 +496,17 @@ class MoveGeneratorTest {
 
         assertEquals(8, pawnMoves.size(), "Pawn moves should be 8, but is " + pawnMoves);
     }
+
+    @Test
+    void testBishopCheck1() {
+        BBoard board = new BBoard("5nn1/1k3nn1/8/8/8/6K1/6B1/8 b - - 0 1");
+        MoveGenerator moveGenerator = new MoveGenerator(board);
+
+        BMove[] moves = moveGenerator.generateMoves(false);
+
+        Arrays.stream(moves)
+                .forEach(move -> assertEquals(BBoardHelper.stringCoordToIndex("b7"), move.startSquare()));
+
+        assertEquals(6, moves.length, "Moves should be 6, but is " + moves.length);
+    }
 }

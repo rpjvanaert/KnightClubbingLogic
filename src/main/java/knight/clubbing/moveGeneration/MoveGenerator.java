@@ -115,8 +115,8 @@ public class MoveGenerator {
         int endDirIndex = 8;
 
         if (board.getBitboard(BPiece.makePiece(BPiece.queen, opponentColor)) == 0) {
-            startDirIndex = board.getBitboard(BPiece.makePiece(BPiece.rook, opponentColor)) > 0 ? 0 : 4;
-            endDirIndex = board.getBitboard(BPiece.makePiece(BPiece.bishop, opponentColor)) > 0 ? 8 : 4;
+            startDirIndex = board.getBitboard(BPiece.makePiece(BPiece.rook, opponentColor)) != 0L ? 0 : 4;
+            endDirIndex = board.getBitboard(BPiece.makePiece(BPiece.bishop, opponentColor)) != 0L ? 8 : 4;
         }
 
         for (int dir = startDirIndex; dir < endDirIndex; dir++) {
