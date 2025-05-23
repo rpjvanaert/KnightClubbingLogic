@@ -1,9 +1,5 @@
-package knight.clubbing;
+package knight.clubbing.core;
 
-import knight.clubbing.core.BBoard;
-import knight.clubbing.core.BBoardHelper;
-import knight.clubbing.core.BPiece;
-import knight.clubbing.core.FenHelper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,7 +41,6 @@ class FenHelperTest {
         assertEquals(BPiece.blackPawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("e4")]);
 
 
-        System.out.println(board.state.getCastlingRights());
         assertTrue(board.state.hasKingSideCastleRight(true));
         assertFalse(board.state.hasQueenSideCastleRight(true));
         assertFalse(board.state.hasKingSideCastleRight(false));

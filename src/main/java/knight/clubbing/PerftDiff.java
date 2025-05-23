@@ -6,38 +6,103 @@ public class PerftDiff {
 
     public static void main(String[] args) {
         String yourOutput = """
-            a5a4: 1
-             a5a6: 1
-             a5b6: 1
-             b4b1: 1
-             b4b2: 1
-             b4b3: 1
-             b4a4: 1
-             b4c4: 1
-             b4d4: 1
-             b4e4: 1
-             b4f4: 1
-             e2e3: 1
-             g2g3: 1
-             e2e4: 1
-             g2g4: 1
+            e8e7: 40
+                    e8d8: 45
+                    e8f8: 45
+                    a8b8: 45
+                    a8c8: 45
+                    a8d8: 45
+                    h8h2: 44
+                    h8h3: 43
+                    h8h4: 44
+                    h8h5: 45
+                    h8h6: 45
+                    h8h7: 45
+                    h8f8: 45
+                    h8g8: 45
+                    a6e2: 40
+                    a6d3: 43
+                    a6c4: 43
+                    a6b5: 44
+                    a6b7: 45
+                    a6c8: 45
+                    g7h6: 45
+                    g7f8: 45
+                    b6a4: 44
+                    b6c4: 43
+                    b6d5: 46
+                    b6c8: 45
+                    f6e4: 47
+                    f6g4: 45
+                    f6d5: 47
+                    f6h5: 46
+                    f6h7: 46
+                    f6g8: 46
+                    b4b3: 46
+                    e6e5: 43
+                    c7c6: 46
+                    d7d6: 44
+                    c7c5: 46
+                    b4c3: 45
+                    e6d5: 46
+                    g2g1q: 2
+                    g2g1n: 45
+                    g2g1r: 42
+                    g2g1b: 45
+                    g2h1q: 2
+                    g2h1n: 45
+                    g2h1r: 42
+                    g2h1b: 45
         """;
 
         String stockfishOutput = """
-            e2e3: 1
-                    g2g3: 1
-                    a5a6: 1
-                    e2e4: 1
-                    g2g4: 1
-                    b4b1: 1
-                    b4b2: 1
-                    b4b3: 1
-                    b4a4: 1
-                    b4c4: 1
-                    b4d4: 1
-                    b4e4: 1
-                    b4f4: 1
-                    a5a4: 1
+            b4b3: 46
+                               e6e5: 43
+                               c7c6: 46
+                               d7d6: 44
+                               c7c5: 46
+                               g2h1q: 2
+                               g2h1r: 2
+                               g2h1b: 45
+                               g2h1n: 45
+                               g2g1q: 2
+                               g2g1r: 2
+                               g2g1b: 45
+                               g2g1n: 45
+                               e6d5: 46
+                               b4c3: 45
+                               b6a4: 44
+                               b6c4: 43
+                               b6d5: 46
+                               b6c8: 45
+                               f6e4: 47
+                               f6g4: 45
+                               f6d5: 47
+                               f6h5: 46
+                               f6h7: 46
+                               f6g8: 46
+                               a6e2: 40
+                               a6d3: 43
+                               a6c4: 43
+                               a6b5: 44
+                               a6b7: 45
+                               a6c8: 45
+                               g7h6: 45
+                               g7f8: 45
+                               a8b8: 45
+                               a8c8: 45
+                               a8d8: 45
+                               h8h2: 44
+                               h8h3: 43
+                               h8h4: 44
+                               h8h5: 45
+                               h8h6: 45
+                               h8h7: 45
+                               h8f8: 45
+                               h8g8: 45
+                               e8e7: 40
+                               e8d8: 45
+                               e8f8: 45
         """;
 
         Map<String, Integer> yours = parsePerftOutput(yourOutput);
@@ -53,7 +118,7 @@ public class PerftDiff {
             Integer y = yours.get(move);
             Integer s = stockfish.get(move);
 
-            if (s != null && !Objects.equals(y, s)) {
+            if (s != null && y != null && !Objects.equals(y, s)) {
                 int diff = y - s;
 
                 if (diff > 0) {
@@ -67,6 +132,9 @@ public class PerftDiff {
                 totalTooMuch += y;
 
                 System.out.printf("%s => Yours: %s, Stockfish: %s -- Diff: %s%n", move, y, 0, y);
+            } else if (y == null && s != null) {
+                totalMissing += s;
+                System.out.printf("%s => Yours: %s, Stockfish: %s -- Diff: -%s%n", move, 0, s, s);
             }
         }
 

@@ -2,94 +2,140 @@ package knight.clubbing;
 
 import knight.clubbing.core.BBoard;
 import knight.clubbing.core.BMove;
+import knight.clubbing.core.BPiece;
 import knight.clubbing.moveGeneration.MoveGenerator;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PerftTest {
 
+    /**
+     * Perft position 1 - initial
+     * rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+     * -------------------
+     * depth    |   nodes
+     * 1            20
+     * 2            400
+     * 3            8902
+     * 4            197281
+     * 5            4865609
+     * 6            119060324
+     */
+
     @Test @Tag("perft")
-    void perftBasic() {
+    void perftPosition1() {
         BBoard board = new BBoard();
         MoveGenerator moveGenerator = new MoveGenerator(board);
-
-        assertEquals(20, perft(moveGenerator, 1));
-
-        board = new BBoard();
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(400, perft(moveGenerator, 2));
-
-        board = new BBoard();
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(8902, perft(moveGenerator, 3));
-
-        board = new BBoard();
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(197281, perft(moveGenerator, 4));
-
-        board = new BBoard();
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(4865609, perft(moveGenerator, 5));
+        assertEquals(4865609, perftParallel(moveGenerator, 5));
     }
+
+    /**
+     * Perft position 2 - Kiwipete
+     * r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -
+     * -------------------
+     * depth    |   nodes
+     * 1            48
+     * 2            2039
+     * 3            97862
+     * 4            4085603
+     * 5            193690690
+     * 6            8031647685
+     */
 
     @Test @Tag("perft")
-    void perftKiwipete() {
-        String fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
+    void perftPosition2() { //a.k.a. Kiwipete
+        String fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+
         BBoard board = new BBoard(fen);
         MoveGenerator moveGenerator = new MoveGenerator(board);
-
-        assertEquals(48, perft(moveGenerator, 1));
-
-        board = new BBoard(fen);
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(2039, perft(moveGenerator, 2));
-
-        board = new BBoard(fen);
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(97862, perft(moveGenerator, 3));
-
-        board = new BBoard(fen);
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(4085603, perft(moveGenerator, 4));
-
-        board = new BBoard(fen);
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(193690690, perft(moveGenerator, 5));
-
-        board = new BBoard(fen);
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(8031647685L, perft(moveGenerator, 6));
+        assertEquals(193690690, perftParallel(moveGenerator, 5));
     }
+
+    /**
+     * Perft position 3
+     * 8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1
+     * -------------------
+     * depth    |   nodes
+     * 1            14
+     * 2            191
+     * 3            2812
+     * 4            43238
+     * 5            674624
+     * 6            11030083
+     */
 
     @Test @Tag("perft")
     void perftPosition3() {
         String fen = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1 ";
         BBoard board = new BBoard(fen);
         MoveGenerator moveGenerator = new MoveGenerator(board);
+        assertEquals(11030083, perftParallel(moveGenerator, 6));
+    }
 
-        assertEquals(14, perft(moveGenerator, 1));
+    /**
+     * Perft position 4
+     * r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1
+     * -------------------
+     * depth    |   nodes
+     * 1            6
+     * 2            264
+     * 3            9467
+     * 4            422333
+     * 5            15833292
+     * 6            706045033
+     */
 
-        board = new BBoard(fen);
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(191, perft(moveGenerator, 2));
+    @Test @Tag("perft")
+    void perftPosition4() {
+        String fen = "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1";
+        BBoard board = new BBoard(fen);
+        MoveGenerator moveGenerator = new MoveGenerator(board);
+        assertEquals(15833292, perft(moveGenerator, 5));
+    }
 
-        board = new BBoard(fen);
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(2812, perft(moveGenerator, 3));
+    /**
+     * Perft position 5
+     * rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8
+     * -------------------
+     * depth    |   nodes
+     * 1            44
+     * 2            1486
+     * 3            62379
+     * 4            2103487
+     * 5            89941194
+     */
 
-        board = new BBoard(fen);
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(43238, perft(moveGenerator, 4));
+    @Test @Tag("perft")
+    void perftPosition5() {
+        String fen = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8";
+        BBoard board = new BBoard(fen);
+        MoveGenerator moveGenerator = new MoveGenerator(board);
+        assertEquals(89941194, perftParallel(moveGenerator, 5));
+    }
 
-        board = new BBoard(fen);
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(674624, perft(moveGenerator, 5));
+    /**
+     * Perft position 6
+     * r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10
+     * -------------------
+     * depth    |   nodes
+     * 1            46
+     * 2            2079
+     * 3            89890
+     * 4            3894594
+     * 5            164075551
+     * 6            6923051137
+     */
 
-        board = new BBoard(fen);
-        moveGenerator = new MoveGenerator(board);
-        assertEquals(11030083, perft(moveGenerator, 6));
+    @Test @Tag("perft")
+    void perftPosition6() {
+        String fen = "r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10";
+        BBoard board = new BBoard(fen);
+        MoveGenerator moveGenerator = new MoveGenerator(board);
+        assertEquals(164075551, perftParallel(moveGenerator, 5));
     }
 
     long perft(MoveGenerator moveGenerator, int depth) {
@@ -101,15 +147,42 @@ public class PerftTest {
 
         for (BMove move : moves) {
             assertNotNull(move);
-            assertNotEquals(0, moveGenerator.getBoard().getPieceBoards()[move.startSquare()], "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
+            int piece = moveGenerator.getBoard().getPieceBoards()[move.startSquare()];
+            assertNotEquals(0, piece, "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
+            assertEquals(moveGenerator.getBoard().isWhiteToMove, BPiece.isWhite(piece));
             assertNotEquals("unknown", move.moveFlagName(), "unknown moveFlagName: " + move.moveFlagName());
 
-            moveGenerator.getBoard().makeMove(move, true);
+            moveGenerator.getBoard().makeMove(move, false);
             nodes += perft(moveGenerator, depth - 1);
-            moveGenerator.getBoard().undoMove(move, true);
+            moveGenerator.getBoard().undoMove(move, false);
         }
 
         return nodes;
+    }
+
+    long perftParallel(MoveGenerator moveGenerator, int depth) {
+        if (depth == 0) return 1;
+
+        BMove[] moves = moveGenerator.generateMoves(false);
+
+        return Arrays.stream(moves).parallel().mapToLong(move -> {
+
+            int piece = moveGenerator.getBoard().getPieceBoards()[move.startSquare()];
+            assertNotEquals(0, piece, "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
+            assertEquals(moveGenerator.getBoard().isWhiteToMove, BPiece.isWhite(piece));
+            assertNotEquals("unknown", move.moveFlagName(), "unknown moveFlagName: " + move.moveFlagName());
+
+            BBoard childBoard = new BBoard(moveGenerator.getBoard());
+            MoveGenerator childMoveGenerator = new MoveGenerator(childBoard);
+
+            childBoard.makeMove(move, true);
+
+            long result = perft(childMoveGenerator, depth - 1);
+
+            childBoard.undoMove(move, true);
+
+            return result;
+        }).sum();
     }
 
     long perftDivide(MoveGenerator moveGenerator, int depth) {
@@ -121,16 +194,18 @@ public class PerftTest {
 
         for (BMove move : moves) {
             assertNotNull(move);
-            assertNotEquals(0, moveGenerator.getBoard().getPieceBoards()[move.startSquare()], "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
+            int piece = moveGenerator.getBoard().getPieceBoards()[move.startSquare()];
+            assertNotEquals(0, piece, "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
+            assertEquals(moveGenerator.getBoard().isWhiteToMove, BPiece.isWhite(piece));
             assertNotEquals("unknown", move.moveFlagName(), "unknown moveFlagName: " + move.moveFlagName());
 
-            moveGenerator.getBoard().makeMove(move, true);
+            moveGenerator.getBoard().makeMove(move, false);
             long moveNodes = perft(moveGenerator, depth - 1);
 
             System.out.println(move.getUci() + ": " + moveNodes);
 
             nodes += moveNodes;
-            moveGenerator.getBoard().undoMove(move, true);
+            moveGenerator.getBoard().undoMove(move, false);
         }
 
         return nodes;

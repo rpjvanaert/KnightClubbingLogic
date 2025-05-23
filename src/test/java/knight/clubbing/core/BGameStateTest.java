@@ -1,6 +1,5 @@
-package knight.clubbing;
+package knight.clubbing.core;
 
-import knight.clubbing.core.BGameState;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

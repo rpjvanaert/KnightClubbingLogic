@@ -1,6 +1,5 @@
-package knight.clubbing;
+package knight.clubbing.core;
 
-import knight.clubbing.core.BBoardHelper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -28,6 +28,8 @@ public class BBoardHelper {
     public static final int g8 = 62;
     public static final int h8 = 63;
 
+    public static final long allBitsSet = 0xFFFFFFFFFFFFFFFFL;
+
     public static int rankIndex(int squareIndex) {
         return squareIndex >> 3;
     }
