@@ -4,6 +4,7 @@ import knight.clubbing.core.*;
 import knight.clubbing.moveGeneration.magic.Magic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MoveGenerator {
@@ -11,6 +12,10 @@ public class MoveGenerator {
     public enum PromotionMode { All, Queen, QueenAndKnight }
 
     public PromotionMode promotionMode = PromotionMode.All;
+
+    private static final int MAX_MOVES = 219;
+    private final BMove[] moveBuffer = new BMove[MAX_MOVES];
+    private int moveCount = 0;
 
     private boolean isWhiteToMove;
     private int friendlyColor;
@@ -57,32 +62,20 @@ public class MoveGenerator {
 
         init();
 
-        BMove[] kingMoves;
-        BMove[] slidingMoves = new BMove[0];
-        BMove[] knightMoves = new BMove[0];
-        BMove[] pawnMoves = new BMove[0];
-
-        kingMoves = generateKingMoves();
+        generateKingMoves();
 
         if (!inDoubleCheck) {
-            slidingMoves = generateSlidingMoves();
-            knightMoves = generateKnightMoves();
-            pawnMoves = generatePawnMoves();
+            generateSlidingMoves();
+            generateKnightMoves();
+            generatePawnMoves();
         }
 
-        int total = kingMoves.length + slidingMoves.length + knightMoves.length + pawnMoves.length;
-        BMove[] combined = new BMove[total];
-        int index = 0;
-
-        System.arraycopy(kingMoves, 0, combined, index, kingMoves.length); index += kingMoves.length;
-        System.arraycopy(slidingMoves, 0, combined, index, slidingMoves.length); index += slidingMoves.length;
-        System.arraycopy(knightMoves, 0, combined, index, knightMoves.length); index += knightMoves.length;
-        System.arraycopy(pawnMoves, 0, combined, index, pawnMoves.length);
-
-        return combined;
+        return Arrays.copyOf(moveBuffer, moveCount);
     }
 
     private void init() {
+        moveCount = 0;
+
         currentMoveIndex = 0;
         inCheck = false;
         inDoubleCheck = false;
@@ -235,8 +228,7 @@ public class MoveGenerator {
         }
     }
 
-    private BMove[] generateKingMoves() {
-        List<BMove> moves = new ArrayList<>();
+    private void generateKingMoves() {
 
         long legalMask = ~(opponentAttackMap | friendlyPieces);
         long kingMoves = MoveUtility.KingMoves[friendlyKingSquare] & legalMask & moveTypeMask;
@@ -245,7 +237,7 @@ public class MoveGenerator {
             PopLsbResult popLsbResult = PopLsbResult.popLsb(kingMoves);
             int targetSquare = popLsbResult.index;
             kingMoves = popLsbResult.remaining;
-            moves.add(new BMove(friendlyKingSquare, targetSquare));
+            moveBuffer[moveCount++] = new BMove(friendlyKingSquare, targetSquare);
             currentMoveIndex++;
         }
 
@@ -256,7 +248,7 @@ public class MoveGenerator {
                 long castleMask = board.isWhiteToMove ? MoveUtility.WHITE_KINGSIDE_MASK : MoveUtility.BLACK_KINGSIDE_MASK;
                 if ((castleMask & castleBlockers) == 0) {
                     int targetSquare = board.isWhiteToMove ? BBoardHelper.g1 : BBoardHelper.g8;
-                    moves.add(new BMove(friendlyKingSquare, targetSquare, BMove.castleFlag));
+                    moveBuffer[moveCount++] = new BMove(friendlyKingSquare, targetSquare, BMove.castleFlag);
                 }
             }
 
@@ -265,16 +257,13 @@ public class MoveGenerator {
                 long castleBlockMask = board.isWhiteToMove ? MoveUtility.WHITE_QUEENSIDE_MASK : MoveUtility.BLACK_QUEENSIDE_MASK;
                 if ((castleMask & castleBlockers) == 0 && (castleBlockMask & board.getAllPiecesBoard()) == 0) {
                     int targetSquare = board.isWhiteToMove ? BBoardHelper.c1 : BBoardHelper.c8;
-                    moves.add(new BMove(friendlyKingSquare, targetSquare, BMove.castleFlag));
+                    moveBuffer[moveCount++] = new BMove(friendlyKingSquare, targetSquare, BMove.castleFlag);
                 }
             }
         }
-
-        return moves.toArray(new BMove[0]);
     }
 
-    private BMove[] generateSlidingMoves() {
-        List<BMove> moves = new ArrayList<>();
+    private void generateSlidingMoves() {
 
         long moveMask = emptyOrEnemySquares & checkRayBitmask & moveTypeMask;
 
@@ -300,7 +289,7 @@ public class MoveGenerator {
                 PopLsbResult moveResult = PopLsbResult.popLsb(moveSquares);
                 int targetSquare = moveResult.index;
                 moveSquares = moveResult.remaining;
-                moves.add(new BMove(startSquare, targetSquare));
+                moveBuffer[moveCount++] = new BMove(startSquare, targetSquare);
             }
         }
 
@@ -318,15 +307,12 @@ public class MoveGenerator {
                 PopLsbResult targetResult = PopLsbResult.popLsb(moveSquares);
                 int targetSquare = targetResult.index;
                 moveSquares = targetResult.remaining;
-                moves.add(new BMove(startSquare, targetSquare));
+                moveBuffer[moveCount++] = new BMove(startSquare, targetSquare);
             }
         }
-
-        return moves.toArray(new BMove[0]);
     }
 
-    private BMove[] generateKnightMoves() {
-        List<BMove> moves = new ArrayList<>();
+    private void generateKnightMoves() {
 
         int friendlyKnightPiece = BPiece.makePiece(BPiece.knight, friendlyColor);
         long knights = board.getBitboard(friendlyKnightPiece) & notPinRays;
@@ -344,16 +330,12 @@ public class MoveGenerator {
                 int targetSquare = targetResult.index;
                 moveSquares = targetResult.remaining;
 
-                moves.add(new BMove(knightSquare, targetSquare));
+                moveBuffer[moveCount++] = new BMove(knightSquare, targetSquare);
             }
         }
-
-        return moves.toArray(new BMove[0]);
     }
 
-    private BMove[] generatePawnMoves() {
-        List<BMove> moves = new ArrayList<>();
-
+    private void generatePawnMoves() {
         int pushDir = board.isWhiteToMove ? 1 : -1;
         int pushOffset = pushDir * 8;
 
@@ -386,7 +368,7 @@ public class MoveGenerator {
                 int startSquare = targetSquare - pushOffset;
 
                 if (!isPinned(startSquare) || PrecomputedMoveData.getInstance().getAlignMask()[startSquare][friendlyKingSquare] == PrecomputedMoveData.getInstance().getAlignMask()[targetSquare][friendlyKingSquare]) {
-                    moves.add(new BMove(startSquare, targetSquare));
+                    moveBuffer[moveCount++] = new BMove(startSquare, targetSquare);
                 }
             }
 
@@ -401,7 +383,7 @@ public class MoveGenerator {
                 int startSquare = targetSquare - pushOffset * 2;
 
                 if (!isPinned(startSquare) || PrecomputedMoveData.getInstance().getAlignMask()[startSquare][friendlyKingSquare] == PrecomputedMoveData.getInstance().getAlignMask()[targetSquare][friendlyKingSquare]) {
-                    moves.add(new BMove(startSquare, targetSquare, BMove.pawnTwoUpFlag));
+                    moveBuffer[moveCount++] = new BMove(startSquare, targetSquare, BMove.pawnTwoUpFlag);
                 }
             }
         }
@@ -414,7 +396,7 @@ public class MoveGenerator {
             int startSquare = targetSquare - pushDir * 7;
 
             if (!isPinned(startSquare) || PrecomputedMoveData.getInstance().getAlignMask()[startSquare][friendlyKingSquare] == PrecomputedMoveData.getInstance().getAlignMask()[targetSquare][friendlyKingSquare]) {
-                moves.add(new BMove(startSquare, targetSquare));
+                moveBuffer[moveCount++] = new BMove(startSquare, targetSquare);
             }
         }
 
@@ -426,7 +408,7 @@ public class MoveGenerator {
             int startSquare = targetSquare - pushDir * 9;
 
             if (!isPinned(startSquare) || PrecomputedMoveData.getInstance().getAlignMask()[startSquare][friendlyKingSquare] == PrecomputedMoveData.getInstance().getAlignMask()[targetSquare][friendlyKingSquare]) {
-                moves.add(new BMove(startSquare, targetSquare));
+                moveBuffer[moveCount++] = new BMove(startSquare, targetSquare);
             }
         }
 
@@ -437,7 +419,7 @@ public class MoveGenerator {
             pushPromotions = targetResult.remaining;
             int startSquare = targetSquare - pushOffset;
             if (!isPinned(startSquare)) {
-                moves.addAll(generatePromotions(startSquare, targetSquare));
+                moveCount = generatePromotions(startSquare, targetSquare, moveBuffer, moveCount);
             }
         }
 
@@ -449,7 +431,7 @@ public class MoveGenerator {
             int startSquare = targetSquare - pushDir * 7;
 
             if (!isPinned(startSquare) || PrecomputedMoveData.getInstance().getAlignMask()[startSquare][friendlyKingSquare] == PrecomputedMoveData.getInstance().getAlignMask()[targetSquare][friendlyKingSquare]) {
-                moves.addAll(generatePromotions(startSquare, targetSquare));
+                moveCount = generatePromotions(startSquare, targetSquare, moveBuffer, moveCount);
             }
         }
 
@@ -461,7 +443,7 @@ public class MoveGenerator {
             int startSquare = targetSquare - pushDir * 9;
 
             if (!isPinned(startSquare) || PrecomputedMoveData.getInstance().getAlignMask()[startSquare][friendlyKingSquare] == PrecomputedMoveData.getInstance().getAlignMask()[targetSquare][friendlyKingSquare]) {
-                moves.addAll(generatePromotions(startSquare, targetSquare));
+                moveCount = generatePromotions(startSquare, targetSquare, moveBuffer, moveCount);
             }
         }
 
@@ -484,14 +466,12 @@ public class MoveGenerator {
                     if (!isPinned(startSquare) || PrecomputedMoveData.getInstance().getAlignMask()[startSquare][friendlyKingSquare] == PrecomputedMoveData.getInstance().getAlignMask()[targetSquare][friendlyKingSquare]) {
 
                         if (!inCheckAfterEnPassant(startSquare, targetSquare, capturedPawnSquare)) {
-                            moves.add(new BMove(startSquare, targetSquare, BMove.enPassantCaptureFlag));
+                            moveBuffer[moveCount++] = new BMove(startSquare, targetSquare, BMove.enPassantCaptureFlag);
                         }
                     }
                 }
             }
         }
-
-        return moves.toArray(new BMove[0]);
     }
 
     private boolean inCheckAfterEnPassant(int startSquare, int targetSquare, int capturedPawnSquare) {
@@ -506,23 +486,22 @@ public class MoveGenerator {
         return false;
     }
 
-    private List<BMove> generatePromotions(int startSquare, int targetSquare) {
-        List<BMove> moves = new ArrayList<>();
+    private int generatePromotions(int startSquare, int targetSquare, BMove[] buffer, int index) {
 
-        moves.add(new BMove(startSquare, targetSquare, BMove.promoteToQueenFlag));
+        buffer[index++] = new BMove(startSquare, targetSquare, BMove.promoteToQueenFlag);
 
         if (generateQuietMoves) {
             if (promotionMode == PromotionMode.All) {
-                moves.add(new BMove(startSquare, targetSquare, BMove.promoteToKnightFlag));
-                moves.add(new BMove(startSquare, targetSquare, BMove.promoteToRookFlag));
-                moves.add(new BMove(startSquare, targetSquare, BMove.promoteToBishopFlag));
+                buffer[index++] = new BMove(startSquare, targetSquare, BMove.promoteToKnightFlag);
+                buffer[index++] = new BMove(startSquare, targetSquare, BMove.promoteToRookFlag);
+                buffer[index++] = new BMove(startSquare, targetSquare, BMove.promoteToBishopFlag);
 
             } else if (promotionMode == PromotionMode.QueenAndKnight) {
-                moves.add(new BMove(startSquare, targetSquare, BMove.promoteToKnightFlag));
+                buffer[index++] = new BMove(startSquare, targetSquare, BMove.promoteToKnightFlag);
             }
         }
 
-        return moves;
+        return index;
     }
 
     private boolean isPinned(int square) {
