@@ -1,9 +1,9 @@
 package knight.clubbing.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import knight.clubbing.moveGeneration.MoveUtility;
+import knight.clubbing.moveGeneration.magic.Magic;
+
+import java.util.*;
 
 public class BBoard {
 
@@ -33,8 +33,8 @@ public class BBoard {
     private List<BMove> allGameMoves;
     public BGameState state;
     private int plyCount;
-    private Stack<Long> repetitionPositionHistory;
-    private Stack<BGameState> gameStateHistory;
+    private Deque<Long> repetitionPositionHistory;
+    private Deque<BGameState> gameStateHistory;
 
     private boolean cachedInCheckValue;
     private boolean hasCachedInCheckValue;
@@ -308,25 +308,25 @@ public class BBoard {
         long blockers = allPiecesBoard;
 
         if (opponentOrthogonalSliderBoard() != 0) {
-            //long rookAttacks = Magic.getRookAttacks(kingSquare, blockers)
-            //if ((rookAttacks & opponentOrthogonalSliderBoard() != 0))
-            //    return true;
+            long rookAttacks = Magic.getRookAttacks(kingSquare, blockers);
+            if ((rookAttacks & opponentOrthogonalSliderBoard()) != 0L)
+                return true;
         }
 
         if (opponentDiagonalSliderBoard() != 0) {
-            //long bishopAttacks = Magic.getBishopAttacks(kingSquare, blockers)
-            //if ((bishopAttacks & opponentDiagonal SliderBoard() != 0))
-            //    return true;
+            long bishopAttacks = Magic.getBishopAttacks(kingSquare, blockers);
+            if ((bishopAttacks & opponentDiagonalSliderBoard()) != 0L)
+                return true;
         }
 
         long enemyKnights = bitboards[BPiece.makePiece(BPiece.knight, opponentColor())];
-        //if ((BBoardHelper.knightAttacks(kingSquare) & enemyKnights) != 0)
-        //    return true;
+        if ((MoveUtility.KnightAttacks[kingSquare] & enemyKnights) != 0)
+            return true;
 
         long enemyPawns = bitboards[BPiece.makePiece(BPiece.pawn, opponentColor())];
-        //long pawnAttackMask = isWhiteToMove ? BBoardHelper.whitePawnAttacks(kingSquare) : BBoardHelper.blackPawnAttacks(kingSquare);
-        //if ((pawnAttackMask & enemyPawns) != 0)
-        //    return true;
+        long pawnAttackMask = MoveUtility.pawnAttacks(kingSquare, isWhiteToMove);
+        if ((pawnAttackMask & enemyPawns) != 0)
+            return true;
 
         return false;
     }
@@ -410,8 +410,8 @@ public class BBoard {
         kingSquares = new int[2];
         pieceBoards = new int[64];
 
-        repetitionPositionHistory = new Stack<>();
-        gameStateHistory = new Stack<>();
+        repetitionPositionHistory = new ArrayDeque<>();
+        gameStateHistory = new ArrayDeque<>();
 
         state = new BGameState();
         plyCount = 0;
@@ -564,8 +564,8 @@ public class BBoard {
         this.state = new BGameState(other.state); // Ensure BGameState has a deep copy constructor
         this.plyCount = other.plyCount;
 
-        this.repetitionPositionHistory = (Stack<Long>) other.repetitionPositionHistory.clone();
-        this.gameStateHistory = new Stack<>();
+        this.repetitionPositionHistory = new ArrayDeque<>(other.repetitionPositionHistory);
+        this.gameStateHistory = new ArrayDeque<>();
         for (BGameState s : other.gameStateHistory) {
             this.gameStateHistory.push(new BGameState(s));
         }
