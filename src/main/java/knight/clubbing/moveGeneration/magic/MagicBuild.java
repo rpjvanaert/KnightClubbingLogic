@@ -10,6 +10,18 @@ public class MagicBuild {
     private static final Path PATH = Path.of(fileName);
 
     public static void main(String[] args) {
+        generateAndSave();
+    }
+
+    public static MagicData generateAndSave() {
+        MagicData data = generateMagicData();
+
+        FileUtil.save(data, PATH);
+
+        return data;
+    }
+
+    private static MagicData generateMagicData() {
         MagicNumberFinder.start();
 
         MagicData data = new MagicData();
@@ -22,7 +34,6 @@ public class MagicBuild {
         data.bishopShifts = MagicNumberFinder.BISHOP_SHIFTS;
         data.bishopMagics = MagicNumberFinder.BISHOP_MAGICS;
         data.bishopAttacks = MagicNumberFinder.BISHOP_ATTACKS;
-
-        FileUtil.save(data, PATH);
+        return data;
     }
 }
