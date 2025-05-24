@@ -324,7 +324,7 @@ public class BBoard {
             return true;
 
         long enemyPawns = bitboards[BPiece.makePiece(BPiece.pawn, opponentColor())];
-        long pawnAttackMask = MoveUtility.pawnAttacks(kingSquare, isWhiteToMove);
+        long pawnAttackMask = isWhiteToMove ? MoveUtility.WhitePawnAttacks[kingSquare] : MoveUtility.BlackPawnAttacks[kingSquare];
         if ((pawnAttackMask & enemyPawns) != 0)
             return true;
 
