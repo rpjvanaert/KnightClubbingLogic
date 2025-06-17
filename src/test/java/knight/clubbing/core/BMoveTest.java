@@ -74,4 +74,14 @@ class BMoveTest {
         assertEquals(0, nullMove.targetSquare());
         assertEquals(0, nullMove.moveFlag());
     }
+
+    @Test
+    void testFromUci() {
+        BBoard board = new BBoard("r1b1k2r/p3bppp/5n2/8/3N4/P6P/1PPPPPP1/R1BQKB1R b KQkq - 0 15");
+        String uciMove = "e8g8";
+
+        BMove move = BMove.fromUci(uciMove, board);
+
+        assertTrue(move.isCastle());
+    }
 }
