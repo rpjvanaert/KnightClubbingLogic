@@ -106,8 +106,8 @@ public class BBoard {
                 totalPieceCountWithoutPawnsAndKings--;
             }
 
-            this.clear(capturedPiece, targetSquare);
             zobristKey ^= BZobrist.getPiecesArray()[capturedPiece][captureSquare];
+            this.clear(capturedPiece, targetSquare);
         }
 
         this.move(movedPiece, startSquare, targetSquare);
@@ -403,9 +403,6 @@ public class BBoard {
     }
 
     private void initialize() {
-        bitboards = new long[12];
-        pieceBoards = new int[64];
-        colorBoards = new long[2];
         allGameMoves = new ArrayList<>();
         kingSquares = new int[2];
         pieceBoards = new int[64];
@@ -559,9 +556,9 @@ public class BBoard {
         this.blackDiagonalSliderBoard = other.blackDiagonalSliderBoard;
         this.totalPieceCountWithoutPawnsAndKings = other.totalPieceCountWithoutPawnsAndKings;
 
-        this.allGameMoves = new ArrayList<>(other.allGameMoves); // Shallow copy is okay if BMove is immutable
+        this.allGameMoves = new ArrayList<>(other.allGameMoves);
 
-        this.state = new BGameState(other.state); // Ensure BGameState has a deep copy constructor
+        this.state = new BGameState(other.state);
         this.plyCount = other.plyCount;
 
         this.repetitionPositionHistory = new ArrayDeque<>(other.repetitionPositionHistory);
@@ -573,5 +570,9 @@ public class BBoard {
         this.cachedInCheckValue = other.cachedInCheckValue;
         this.hasCachedInCheckValue = other.hasCachedInCheckValue;
         this.isWhiteToMove = other.isWhiteToMove;
+    }
+
+    public BBoard copy() {
+        return new BBoard(this);
     }
 }
