@@ -83,7 +83,8 @@ public class BBoard {
 
         int movedPiece = pieceBoards[startSquare];
         int movedPieceType = BPiece.getPieceType(movedPiece);
-        int capturedPiece = isEnPassant ? BPiece.makePiece(BPiece.pawn, opponentColor()) : pieceBoards[targetSquare];
+        int targetPiece = pieceBoards[targetSquare];
+        int capturedPiece = isEnPassant ? BPiece.makePiece(BPiece.pawn, opponentColor()) : targetPiece;
         int capturedPieceType = BPiece.getPieceType(capturedPiece);
 
         int prevCastleRights = state.getCastlingRights();
@@ -162,7 +163,7 @@ public class BBoard {
 
         zobristKey ^= BZobrist.getSideToMove();
         zobristKey ^= BZobrist.getPiecesArray()[movedPiece][startSquare];
-        zobristKey ^= BZobrist.getPiecesArray()[pieceBoards[targetSquare]][targetSquare];
+        zobristKey ^= BZobrist.getPiecesArray()[targetPiece][targetSquare];
         zobristKey ^= BZobrist.getEnPassantFile()[prevEnPassantFile];
 
         if (newCastleRights != prevCastleRights) {

@@ -389,4 +389,58 @@ class BBoardTest {
         assertTrue(new BBoard("6rK/8/5n2/1k6/8/8/8/8 w - - 0 1").isInCheck());
         assertTrue(new BBoard("8/8/8/1k6/8/8/5PPP/3r2K1 w - - 0 1").isInCheck());
     }
+
+    @Test
+    void testZobrist_basicRestore() {
+        BBoard board = new BBoard();
+        long originalKey = board.state.getZobristKey();
+        BMove move = new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4"));
+
+        board.makeMove(move, false);
+        long newKey = board.state.getZobristKey();
+
+        assertNotEquals(originalKey, newKey);
+
+        board.undoMove(move, false);
+        long undoKey = board.state.getZobristKey();
+
+        assertEquals(originalKey, undoKey);
+    }
+
+    @Test
+    void testZobrist_replicate() {
+        String fen = "3k4/3Q4/4K3/4p3/8/8/8/8 b - - 0 1";
+
+        BBoard board1 = new BBoard(fen);
+        BBoard board2 = new BBoard(fen);
+
+        assertEquals(board1.state.getZobristKey(), board2.state.getZobristKey());
+    }
+
+    @Test
+    public void testZobrist_differentFen() {
+        BBoard board1 = new BBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        BBoard board2 = new BBoard("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
+
+        assertNotEquals(board1.state.getZobristKey(), board2.state.getZobristKey());
+    }
+
+    @Test
+    public void testZobrist_differentFen_castling() {
+        BBoard board1 = new BBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        BBoard board2 = new BBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w Qkq - 0 1");
+
+        assertNotEquals(board1.state.getZobristKey(), board2.state.getZobristKey());
+    }
+
+    @Test
+    public void testZobrist_move() {
+        BBoard boardFromFen = new BBoard("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w Qkq - 0 1");
+        BBoard boardFromMove = new BBoard();
+        boardFromMove.makeMove(new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4")), false);
+
+        assertEquals(boardFromFen.state.getZobristKey(), boardFromMove.state.getZobristKey());
+    }
+
+
 }
