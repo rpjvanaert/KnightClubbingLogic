@@ -41,7 +41,7 @@ public record BMove(short value) {
     }
 
     public boolean isPromotion() {
-        return moveFlag() == promoteToQueenFlag;
+        return moveFlag() >= promoteToQueenFlag;
     }
 
     public boolean isCastle() {
