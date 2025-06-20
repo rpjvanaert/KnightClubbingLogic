@@ -435,12 +435,10 @@ class BBoardTest {
 
     @Test
     public void testZobrist_move() {
-        BBoard boardFromFen = new BBoard("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w Qkq - 0 1");
+        BBoard boardFromFen = new BBoard("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
         BBoard boardFromMove = new BBoard();
         boardFromMove.makeMove(new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4")), false);
 
         assertEquals(boardFromFen.state.getZobristKey(), boardFromMove.state.getZobristKey());
     }
-
-
 }
