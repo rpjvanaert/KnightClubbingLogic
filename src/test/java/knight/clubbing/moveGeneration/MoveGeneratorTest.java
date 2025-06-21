@@ -509,4 +509,24 @@ class MoveGeneratorTest {
 
         assertEquals(6, moves.length, "Moves should be 6, but is " + moves.length);
     }
+
+    @Test
+    void testMate1() {
+        BBoard board = new BBoard("4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1n1/1P6/4R1Pq/B1Q2RK1 w - - 5 33");
+        MoveGenerator moveGenerator = new MoveGenerator(board);
+
+        BMove[] moves = moveGenerator.generateMoves(false);
+
+        assertEquals(0, moves.length);
+    }
+
+    @Test
+    void testMate2() {
+        BBoard board = new BBoard("4rb2/3qrk2/1p1p1nQ1/7p/P2P4/4R2P/1B1N1P2/1K4R1 b - - 4 39");
+        MoveGenerator moveGenerator = new MoveGenerator(board);
+
+        BMove[] moves = moveGenerator.generateMoves(false);
+
+        assertEquals(0, moves.length);
+    }
 }

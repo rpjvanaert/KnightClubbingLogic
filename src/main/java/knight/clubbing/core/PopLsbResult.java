@@ -5,7 +5,7 @@ public class PopLsbResult {
     public final int index;
     public final long remaining;
 
-    public PopLsbResult(final int index, final long remaining) {
+    private PopLsbResult(final int index, final long remaining) {
         this.index = index;
         this.remaining = remaining;
     }

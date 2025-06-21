@@ -29,7 +29,7 @@ public final class PrecomputedMagics {
         data = FileUtil.load(MagicData.class, path);
 
         if (data == null) {
-            throw new RuntimeException("MagicData not found");
+            data = MagicBuild.generateAndSave();
         }
 
         ROOK_MAGICS = data.rookMagics;

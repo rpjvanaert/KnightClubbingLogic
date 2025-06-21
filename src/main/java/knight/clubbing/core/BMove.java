@@ -44,6 +44,14 @@ public record BMove(short value) {
         return moveFlag() >= promoteToQueenFlag;
     }
 
+    public boolean isCastle() {
+        return moveFlag() == castleFlag;
+    }
+
+    public boolean isPawnTwoUp() {
+        return moveFlag() == pawnTwoUpFlag;
+    }
+
     public int promotionPieceType() {
         return switch (moveFlag()) {
             case promoteToRookFlag -> BPiece.rook;
@@ -70,6 +78,43 @@ public record BMove(short value) {
             case promoteToBishopFlag -> "promote to bishop";
             default -> "unknown";
         };
+    }
+
+    public static BMove fromUci(String uci, BBoard board) {
+        if (uci == null || uci.length() < 4) return BMove.nullMove();
+
+        int from = BBoardHelper.stringCoordToIndex(uci.substring(0, 2));
+        int to = BBoardHelper.stringCoordToIndex(uci.substring(2, 4));
+
+        int flag = BMove.noFlag;
+
+        int movePiece = board.pieceBoards[from];
+        int targetPiece = board.pieceBoards[to];
+
+        int movePieceType = BPiece.getPieceType(movePiece);
+        boolean isPawn = movePieceType == BPiece.pawn;
+
+        if (isPawn && uci.length() == 5) {
+            char promo = uci.charAt(4);
+            flag = switch (promo) {
+                case 'q' -> BMove.promoteToQueenFlag;
+                case 'r' -> BMove.promoteToRookFlag;
+                case 'b' -> BMove.promoteToBishopFlag;
+                case 'k' -> BMove.promoteToKnightFlag;
+                default -> BMove.noFlag;
+            };
+        }
+
+        if (isPawn && targetPiece == BPiece.none && BBoardHelper.fileIndex(from) != BBoardHelper.fileIndex(to))
+            flag = BMove.enPassantCaptureFlag;
+
+        if (isPawn && Math.abs(BBoardHelper.rankIndex(from) - BBoardHelper.rankIndex(to)) == 16)
+            flag = BMove.pawnTwoUpFlag;
+
+        if (movePieceType == BPiece.king && Math.abs(BBoardHelper.fileIndex(from) - BBoardHelper.fileIndex(to)) == 2)
+            flag = BMove.castleFlag;
+
+        return new BMove(from, to, flag);
     }
 
 
