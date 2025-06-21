@@ -140,7 +140,7 @@ public class BBoard {
             zobristKey ^= BZobrist.getPiecesArray()[promotionPiece][targetSquare];
         }
 
-        if (moveFlag == BMove.pawnTwoUpFlag && isEnPassantPossible(targetSquare)) {
+        if (moveFlag == BMove.pawnTwoUpFlag /*&& todo isEnPassantPossible(targetSquare)*/) {
             int enPassantFile = BBoardHelper.fileIndex(targetSquare) + 1;
             newEnPassantFile = enPassantFile;
             zobristKey ^= BZobrist.getEnPassantFile()[enPassantFile];
