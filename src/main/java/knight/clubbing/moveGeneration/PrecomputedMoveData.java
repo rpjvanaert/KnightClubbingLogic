@@ -8,7 +8,6 @@ import knight.clubbing.core.BCoord;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -16,9 +15,6 @@ public class PrecomputedMoveData implements Serializable{
 
     public static void main(String[] args) {
         PrecomputedMoveData.getInstance();
-        System.out.println(Arrays.toString(PrecomputedMoveData.getInstance().directionLookup));
-        System.out.println(Arrays.deepToString(PrecomputedMoveData.getInstance().dirRayMask));
-        System.out.println(Arrays.deepToString(PrecomputedMoveData.getInstance().alignMask));
     }
 
     @Serial

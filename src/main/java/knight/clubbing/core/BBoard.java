@@ -1,9 +1,9 @@
 package knight.clubbing.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import knight.clubbing.moveGeneration.MoveUtility;
+import knight.clubbing.moveGeneration.magic.Magic;
+
+import java.util.*;
 
 public class BBoard {
 
@@ -33,8 +33,8 @@ public class BBoard {
     private List<BMove> allGameMoves;
     public BGameState state;
     private int plyCount;
-    private Stack<Long> repetitionPositionHistory;
-    private Stack<BGameState> gameStateHistory;
+    private Deque<Long> repetitionPositionHistory;
+    private Deque<BGameState> gameStateHistory;
 
     private boolean cachedInCheckValue;
     private boolean hasCachedInCheckValue;
@@ -83,7 +83,8 @@ public class BBoard {
 
         int movedPiece = pieceBoards[startSquare];
         int movedPieceType = BPiece.getPieceType(movedPiece);
-        int capturedPiece = isEnPassant ? BPiece.makePiece(BPiece.pawn, opponentColor()) : pieceBoards[targetSquare];
+        int targetPiece = pieceBoards[targetSquare];
+        int capturedPiece = isEnPassant ? BPiece.makePiece(BPiece.pawn, opponentColor()) : targetPiece;
         int capturedPieceType = BPiece.getPieceType(capturedPiece);
 
         int prevCastleRights = state.getCastlingRights();
@@ -106,8 +107,8 @@ public class BBoard {
                 totalPieceCountWithoutPawnsAndKings--;
             }
 
-            this.clear(capturedPiece, targetSquare);
             zobristKey ^= BZobrist.getPiecesArray()[capturedPiece][captureSquare];
+            this.clear(capturedPiece, targetSquare);
         }
 
         this.move(movedPiece, startSquare, targetSquare);
@@ -139,7 +140,7 @@ public class BBoard {
             zobristKey ^= BZobrist.getPiecesArray()[promotionPiece][targetSquare];
         }
 
-        if (moveFlag == BMove.pawnTwoUpFlag) {
+        if (moveFlag == BMove.pawnTwoUpFlag && isEnPassantPossible(targetSquare)) {
             int enPassantFile = BBoardHelper.fileIndex(targetSquare) + 1;
             newEnPassantFile = enPassantFile;
             zobristKey ^= BZobrist.getEnPassantFile()[enPassantFile];
@@ -162,7 +163,7 @@ public class BBoard {
 
         zobristKey ^= BZobrist.getSideToMove();
         zobristKey ^= BZobrist.getPiecesArray()[movedPiece][startSquare];
-        zobristKey ^= BZobrist.getPiecesArray()[pieceBoards[targetSquare]][targetSquare];
+        zobristKey ^= BZobrist.getPiecesArray()[targetPiece][targetSquare];
         zobristKey ^= BZobrist.getEnPassantFile()[prevEnPassantFile];
 
         if (newCastleRights != prevCastleRights) {
@@ -185,7 +186,8 @@ public class BBoard {
             newFiftyMoveCounter = 0;
         }
 
-        BGameState newState = new BGameState(capturedPieceType, newEnPassantFile, newCastleRights, newFiftyMoveCounter, zobristKey);
+        long newZobristKey = BZobrist.CalculateZobristKey(this);
+        BGameState newState = new BGameState(capturedPieceType, newEnPassantFile, newCastleRights, newFiftyMoveCounter, newZobristKey);
         gameStateHistory.push(newState);
         state = newState;
         hasCachedInCheckValue = false;
@@ -308,25 +310,25 @@ public class BBoard {
         long blockers = allPiecesBoard;
 
         if (opponentOrthogonalSliderBoard() != 0) {
-            //long rookAttacks = Magic.getRookAttacks(kingSquare, blockers)
-            //if ((rookAttacks & opponentOrthogonalSliderBoard() != 0))
-            //    return true;
+            long rookAttacks = Magic.getRookAttacks(kingSquare, blockers);
+            if ((rookAttacks & opponentOrthogonalSliderBoard()) != 0L)
+                return true;
         }
 
         if (opponentDiagonalSliderBoard() != 0) {
-            //long bishopAttacks = Magic.getBishopAttacks(kingSquare, blockers)
-            //if ((bishopAttacks & opponentDiagonal SliderBoard() != 0))
-            //    return true;
+            long bishopAttacks = Magic.getBishopAttacks(kingSquare, blockers);
+            if ((bishopAttacks & opponentDiagonalSliderBoard()) != 0L)
+                return true;
         }
 
         long enemyKnights = bitboards[BPiece.makePiece(BPiece.knight, opponentColor())];
-        //if ((BBoardHelper.knightAttacks(kingSquare) & enemyKnights) != 0)
-        //    return true;
+        if ((MoveUtility.KnightAttacks[kingSquare] & enemyKnights) != 0)
+            return true;
 
         long enemyPawns = bitboards[BPiece.makePiece(BPiece.pawn, opponentColor())];
-        //long pawnAttackMask = isWhiteToMove ? BBoardHelper.whitePawnAttacks(kingSquare) : BBoardHelper.blackPawnAttacks(kingSquare);
-        //if ((pawnAttackMask & enemyPawns) != 0)
-        //    return true;
+        long pawnAttackMask = isWhiteToMove ? MoveUtility.WhitePawnAttacks[kingSquare] : MoveUtility.BlackPawnAttacks[kingSquare];
+        if ((pawnAttackMask & enemyPawns) != 0)
+            return true;
 
         return false;
     }
@@ -403,15 +405,12 @@ public class BBoard {
     }
 
     private void initialize() {
-        bitboards = new long[12];
-        pieceBoards = new int[64];
-        colorBoards = new long[2];
         allGameMoves = new ArrayList<>();
         kingSquares = new int[2];
         pieceBoards = new int[64];
 
-        repetitionPositionHistory = new Stack<>();
-        gameStateHistory = new Stack<>();
+        repetitionPositionHistory = new ArrayDeque<>();
+        gameStateHistory = new ArrayDeque<>();
 
         state = new BGameState();
         plyCount = 0;
@@ -422,6 +421,24 @@ public class BBoard {
         colorBoards = new long[2];
         allPiecesBoard = 0;
     }
+
+    private boolean isEnPassantPossible(int targetSquare) {
+        int file = BBoardHelper.fileIndex(targetSquare);
+        int epCaptureRank = isWhiteToMove ? 4 : 3; // because white e2→e4 puts ep target at e3 (rank 3)
+
+        for (int df = -1; df <= 1; df += 2) {
+            int adjFile = file + df;
+            if (adjFile < 0 || adjFile > 7) continue;
+
+            int adjSquare = BBoardHelper.indexFromCoord(adjFile, epCaptureRank);
+            int adjPiece = pieceBoards[adjSquare];
+            if (BPiece.getPieceType(adjPiece) == BPiece.pawn && BPiece.getPieceColor(adjPiece) == opponentColor()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public void set(int piece, int squareIndex) { //add colorbitboards?
         checkPiece(piece);
@@ -559,13 +576,13 @@ public class BBoard {
         this.blackDiagonalSliderBoard = other.blackDiagonalSliderBoard;
         this.totalPieceCountWithoutPawnsAndKings = other.totalPieceCountWithoutPawnsAndKings;
 
-        this.allGameMoves = new ArrayList<>(other.allGameMoves); // Shallow copy is okay if BMove is immutable
+        this.allGameMoves = new ArrayList<>(other.allGameMoves);
 
-        this.state = new BGameState(other.state); // Ensure BGameState has a deep copy constructor
+        this.state = new BGameState(other.state);
         this.plyCount = other.plyCount;
 
-        this.repetitionPositionHistory = (Stack<Long>) other.repetitionPositionHistory.clone();
-        this.gameStateHistory = new Stack<>();
+        this.repetitionPositionHistory = new ArrayDeque<>(other.repetitionPositionHistory);
+        this.gameStateHistory = new ArrayDeque<>();
         for (BGameState s : other.gameStateHistory) {
             this.gameStateHistory.push(new BGameState(s));
         }
@@ -573,5 +590,9 @@ public class BBoard {
         this.cachedInCheckValue = other.cachedInCheckValue;
         this.hasCachedInCheckValue = other.hasCachedInCheckValue;
         this.isWhiteToMove = other.isWhiteToMove;
+    }
+
+    public BBoard copy() {
+        return new BBoard(this);
     }
 }
