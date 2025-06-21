@@ -140,7 +140,7 @@ public class BBoard {
             zobristKey ^= BZobrist.getPiecesArray()[promotionPiece][targetSquare];
         }
 
-        if (moveFlag == BMove.pawnTwoUpFlag) {
+        if (moveFlag == BMove.pawnTwoUpFlag && isEnPassantPossible(targetSquare)) {
             int enPassantFile = BBoardHelper.fileIndex(targetSquare) + 1;
             newEnPassantFile = enPassantFile;
             zobristKey ^= BZobrist.getEnPassantFile()[enPassantFile];
@@ -186,7 +186,8 @@ public class BBoard {
             newFiftyMoveCounter = 0;
         }
 
-        BGameState newState = new BGameState(capturedPieceType, newEnPassantFile, newCastleRights, newFiftyMoveCounter, zobristKey);
+        long newZobristKey = BZobrist.CalculateZobristKey(this);
+        BGameState newState = new BGameState(capturedPieceType, newEnPassantFile, newCastleRights, newFiftyMoveCounter, newZobristKey);
         gameStateHistory.push(newState);
         state = newState;
         hasCachedInCheckValue = false;
@@ -420,6 +421,24 @@ public class BBoard {
         colorBoards = new long[2];
         allPiecesBoard = 0;
     }
+
+    private boolean isEnPassantPossible(int targetSquare) {
+        int file = BBoardHelper.fileIndex(targetSquare);
+        int epCaptureRank = isWhiteToMove ? 4 : 3; // because white e2→e4 puts ep target at e3 (rank 3)
+
+        for (int df = -1; df <= 1; df += 2) {
+            int adjFile = file + df;
+            if (adjFile < 0 || adjFile > 7) continue;
+
+            int adjSquare = BBoardHelper.indexFromCoord(adjFile, epCaptureRank);
+            int adjPiece = pieceBoards[adjSquare];
+            if (BPiece.getPieceType(adjPiece) == BPiece.pawn && BPiece.getPieceColor(adjPiece) == opponentColor()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public void set(int piece, int squareIndex) { //add colorbitboards?
         checkPiece(piece);
