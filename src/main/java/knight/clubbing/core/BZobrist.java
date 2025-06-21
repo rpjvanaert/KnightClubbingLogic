@@ -30,7 +30,7 @@ public class BZobrist {
         }
 
         for (int i = 0; i < enPassantFile.length; i++) {
-            enPassantFile[i] = Random64BitNumber(random);
+            enPassantFile[i] = (i == 0) ? 0 : Random64BitNumber(random);
         }
 
         sideToMove = Random64BitNumber(random);
@@ -54,6 +54,12 @@ public class BZobrist {
         }
 
         zobristKey ^= castlingRights[board.state.getCastlingRights()];
+
+        int epFile = board.state.getEnPassantFile();
+        if (epFile >= 0 && epFile < enPassantFile.length) {
+            zobristKey ^= enPassantFile[epFile];
+        }
+
 
         return zobristKey;
     }
