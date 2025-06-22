@@ -1,15 +1,15 @@
 package knight.clubbing.moveGeneration;
 
 
-import knight.clubbing.moveGeneration.magic.Magic;
-import knight.clubbing.moveGeneration.magic.PrecomputedMagics;
+import knight.clubbing.movegen.magic.Magic;
+import knight.clubbing.movegen.magic.PrecomputedMagics;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import static knight.clubbing.moveGeneration.magic.Magic.getBishopIndex;
+import static knight.clubbing.movegen.magic.Magic.getBishopIndex;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MagicBitboardTest {
