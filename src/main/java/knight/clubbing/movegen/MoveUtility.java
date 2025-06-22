@@ -1,4 +1,4 @@
-package knight.clubbing.moveGeneration;
+package knight.clubbing.movegen;
 
 import knight.clubbing.core.BBoardHelper;
 

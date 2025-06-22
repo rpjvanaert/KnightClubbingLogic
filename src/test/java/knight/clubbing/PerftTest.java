@@ -3,7 +3,7 @@ package knight.clubbing;
 import knight.clubbing.core.BBoard;
 import knight.clubbing.core.BMove;
 import knight.clubbing.core.BPiece;
-import knight.clubbing.moveGeneration.MoveGenerator;
+import knight.clubbing.movegen.MoveGenerator;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
