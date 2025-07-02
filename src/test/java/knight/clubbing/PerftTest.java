@@ -31,8 +31,8 @@ public class PerftTest {
 
     @Test @Tag("perft")
     void perftPosition1() {
-        int nodes = 4865609;
-        int depth = 5;
+        int nodes = 119060324;
+        int depth = 6;
 
         BBoard board = new BBoard();
         MoveGenerator moveGenerator = new MoveGenerator(board);
