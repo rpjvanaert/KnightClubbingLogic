@@ -13,24 +13,22 @@ import java.util.List;
 public interface OpeningBookDao {
     @SqlUpdate("""
         CREATE TABLE IF NOT EXISTS opening_book (
-            zobrist_key BIGINT NOT NULL,
-            move TEXT NOT NULL,
-            weight INTEGER DEFAULT 0,
-            depth INTEGER DEFAULT 1,
-            wdl TEXT,
-            PRIMARY KEY (zobrist_key, move)
+        zobrist_key BIGINT NOT NULL,
+        move TEXT NOT NULL,
+        score INTEGER DEFAULT 0,
+        depth INTEGER DEFAULT 1,
+        PRIMARY KEY (zobrist_key, move)
         );
     """)
     void createTable();
 
     @SqlUpdate("""
-            INSERT INTO opening_book (zobrist_key, move, weight, depth, wdl)
-            VALUES (:zobristKey, :move, :weight, :depth, :wdl)
-            ON CONFLICT (zobrist_key, move) DO UPDATE SET
-                weight = excluded.weight,
-                depth = excluded.depth,
-                wdl = excluded.wdl
-            """)
+        INSERT INTO opening_book (zobrist_key, move, score, depth)
+        VALUES (:zobristKey, :move, :score, :depth)
+        ON CONFLICT (zobrist_key, move) DO UPDATE SET
+            score = excluded.score,
+            depth = excluded.depth
+    """)
     @GetGeneratedKeys
     int upsert(@BindBean OpeningBookEntry entry);
 
@@ -39,14 +37,13 @@ public interface OpeningBookDao {
     List<OpeningBookEntry> list();
 
     @SqlQuery("""
-    SELECT * FROM opening_book
-    WHERE zobrist_key = :zobristKey
-    ORDER BY weight DESC
-    LIMIT 1
-""")
+        SELECT * FROM opening_book
+        WHERE zobrist_key = :zobristKey
+        ORDER BY score DESC
+        LIMIT 1
+    """)
     @RegisterBeanMapper(OpeningBookEntry.class)
     OpeningBookEntry selectBestByZobristKey(@Bind("zobristKey") long zobristKey);
-
 
     @SqlUpdate("""
         DELETE FROM opening_book WHERE zobrist_key = :zobristKey AND move = :move
