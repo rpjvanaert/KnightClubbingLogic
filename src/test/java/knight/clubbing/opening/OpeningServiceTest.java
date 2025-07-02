@@ -19,14 +19,14 @@ class OpeningServiceTest {
 
     @Test
     void getAll() {
-        openingService.insert(new OpeningBookEntry(1L, "d2d4", 13, 5, "33-33-33"));
-        openingService.insert(new OpeningBookEntry(1L, "e2e4", 11, 5, "33-33-33"));
+        openingService.insert(new OpeningBookEntry(1L, "d2d4", 13, 5));
+        openingService.insert(new OpeningBookEntry(1L, "e2e4", 11, 5));
         assertEquals(2, openingService.getAll().size());
     }
 
     @Test
     void AddAndGet() {
-        OpeningBookEntry entry = new OpeningBookEntry(1L, "e2e4", 13, 5, "33-33-33");
+        OpeningBookEntry entry = new OpeningBookEntry(1L, "e2e4", 13, 5);
         openingService.insert(entry);
 
         assertEquals(1, openingService.getAll().size());
@@ -37,16 +37,16 @@ class OpeningServiceTest {
     @Test
     void getBest() {
         String expected = "d2d4";
-        openingService.insert(new OpeningBookEntry(1L, expected, 13, 5, "33-33-33"));
-        openingService.insert(new OpeningBookEntry(1L, "e2e4", 11, 5, "33-33-33"));
+        openingService.insert(new OpeningBookEntry(1L, expected, 13, 5));
+        openingService.insert(new OpeningBookEntry(1L, "e2e4", 11, 5));
         assertEquals(2, openingService.getAll().size());
         assertEquals(expected, openingService.getBest(1L).getMove());
     }
 
     @Test
     void updateShouldReplaceExistingEntry() {
-        OpeningBookEntry original = new OpeningBookEntry(1L, "e2e4", 10, 3, "00-00-00");
-        OpeningBookEntry updated = new OpeningBookEntry(1L, "e2e4", 25, 7, "11-11-11");
+        OpeningBookEntry original = new OpeningBookEntry(1L, "e2e4", 10, 3);
+        OpeningBookEntry updated = new OpeningBookEntry(1L, "e2e4", 25, 7);
 
         openingService.insert(original);
         openingService.update(updated);
@@ -58,8 +58,8 @@ class OpeningServiceTest {
 
     @Test
     void removeShouldDeleteEntry() {
-        OpeningBookEntry entry1 = new OpeningBookEntry(1L, "e2e4", 10, 3, "00-00-00");
-        OpeningBookEntry entry2 = new OpeningBookEntry(1L, "d2d4", 12, 4, "11-11-11");
+        OpeningBookEntry entry1 = new OpeningBookEntry(1L, "e2e4", 10, 3);
+        OpeningBookEntry entry2 = new OpeningBookEntry(1L, "d2d4", 12, 4);
 
         openingService.insert(entry1);
         openingService.insert(entry2);
