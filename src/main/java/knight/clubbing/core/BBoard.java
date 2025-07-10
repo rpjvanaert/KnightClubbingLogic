@@ -186,8 +186,7 @@ public class BBoard {
             newFiftyMoveCounter = 0;
         }
 
-        long newZobristKey = BZobrist.CalculateZobristKey(this);
-        BGameState newState = new BGameState(capturedPieceType, newEnPassantFile, newCastleRights, newFiftyMoveCounter, newZobristKey);
+        BGameState newState = new BGameState(capturedPieceType, newEnPassantFile, newCastleRights, newFiftyMoveCounter, zobristKey);
         gameStateHistory.push(newState);
         state = newState;
         hasCachedInCheckValue = false;
@@ -278,8 +277,7 @@ public class BBoard {
         newZobristKey ^= BZobrist.getSideToMove();
         newZobristKey ^= BZobrist.getEnPassantFile()[state.getEnPassantFile()]; //todo hier naar kijken
 
-        BGameState newState = new BGameState(BPiece.none, 0, state.getCastlingRights(), state.getFiftyMoveCounter() + 1, newZobristKey);
-        state = newState;
+        state = new BGameState(BPiece.none, 0, state.getCastlingRights(), state.getFiftyMoveCounter() + 1, newZobristKey);
         gameStateHistory.push(state);
         updateOtherBoards();
         hasCachedInCheckValue = true;
@@ -424,15 +422,20 @@ public class BBoard {
 
     private boolean isEnPassantPossible(int targetSquare) {
         int file = BBoardHelper.fileIndex(targetSquare);
-        int epCaptureRank = isWhiteToMove ? 4 : 3; // because white e2→e4 puts ep target at e3 (rank 3)
+        int epCaptureRank = isWhiteToMove ? 3 : 4;
 
-        for (int df = -1; df <= 1; df += 2) {
-            int adjFile = file + df;
-            if (adjFile < 0 || adjFile > 7) continue;
+        int fileLeft = file - 1;
+        int fileRight = file + 1;
+        if (fileLeft >= 0) {
+            int opponentSquare = BBoardHelper.indexFromCoord(fileLeft, epCaptureRank);
+            if (get(BPiece.makePiece(BPiece.pawn, opponentColor()), opponentSquare)) {
+                return true;
+            }
+        }
 
-            int adjSquare = BBoardHelper.indexFromCoord(adjFile, epCaptureRank);
-            int adjPiece = pieceBoards[adjSquare];
-            if (BPiece.getPieceType(adjPiece) == BPiece.pawn && BPiece.getPieceColor(adjPiece) == opponentColor()) {
+        if (fileRight <= 7) {
+            int opponentSquare = BBoardHelper.indexFromCoord(fileRight, epCaptureRank);
+            if (get(BPiece.makePiece(BPiece.pawn, opponentColor()), opponentSquare)) {
                 return true;
             }
         }
