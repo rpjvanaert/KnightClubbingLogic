@@ -7,16 +7,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BBoardTest {
 
-    private BBoard b = new BBoard();
 
-    @BeforeEach
-    void setUp() {
-        b = new BBoard();
-    }
 
     @Test
     void setAndGet() {
-
+        BBoard b = new BBoard();
         b.set(BPiece.whitePawn, 0);
         assertTrue(b.get(BPiece.whitePawn, 0));
         assertFalse(b.get(BPiece.whitePawn, 1));
@@ -26,6 +21,7 @@ class BBoardTest {
 
     @Test
     void clear() {
+        BBoard b = new BBoard();
         b.set(11,63);
 
         assertTrue(b.get(11,63));
@@ -35,6 +31,7 @@ class BBoardTest {
 
     @Test
     void move() {
+        BBoard b = new BBoard();
         b.set(5,32);
 
         assertTrue(b.get(5,32));
@@ -440,5 +437,14 @@ class BBoardTest {
         boardFromMove.makeMove(new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4")), false);
 
         assertEquals(boardFromFen.state.getZobristKey(), boardFromMove.state.getZobristKey());
+    }
+
+    @Test
+    public void testZobrist_e4() {
+        BBoard boardFromFen = new BBoard();
+        BBoard boardFromMove = new BBoard();
+        boardFromMove.makeMove(new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4")), false);
+
+        assertNotEquals(boardFromFen.state.getZobristKey(), boardFromMove.state.getZobristKey());
     }
 }
