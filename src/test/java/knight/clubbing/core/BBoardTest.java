@@ -1,13 +1,10 @@
 package knight.clubbing.core;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class BBoardTest {
-
-
 
     @Test
     void setAndGet() {
@@ -473,4 +470,23 @@ class BBoardTest {
 
         assertNotEquals(boardFromFen.state.getZobristKey(), boardFromMove.state.getZobristKey());
     }
+
+    @Test
+    public void testZobrist_sideToMoveChange() {
+        BBoard whiteToMove = new BBoard("8/8/8/8/8/8/8/4k3 w - - 0 1");
+        BBoard blackToMove = new BBoard("8/8/8/8/8/8/8/4k3 b - - 0 1");
+
+        assertNotEquals(whiteToMove.state.getZobristKey(), blackToMove.state.getZobristKey());
+    }
+
+    @Test
+    public void testZobrist_fenRoundTrip() {
+        String fen = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
+        BBoard board1 = new BBoard(fen);
+        BBoard board2 = new BBoard(board1.exportFen());
+
+        assertEquals(board1.exportFen(), board2.exportFen());
+        assertEquals(board1.state.getZobristKey(), board2.state.getZobristKey());
+    }
+
 }
