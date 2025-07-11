@@ -431,6 +431,32 @@ class BBoardTest {
     }
 
     @Test
+    public void testZobrist_move_castling() {
+        BBoard boardFromFen = new BBoard("rnbqk2r/pppp1ppp/5n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w Qq - 8 6");
+        BBoard boardFromMove = new BBoard("rnbqk2r/pppp1ppp/5n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4");
+
+        boardFromMove.makeMove(new BMove(BBoardHelper.stringCoordToIndex("h1"), BBoardHelper.stringCoordToIndex("g1")), false);
+        boardFromMove.makeMove(new BMove(BBoardHelper.stringCoordToIndex("h8"), BBoardHelper.stringCoordToIndex("g8")), false);
+        boardFromMove.makeMove(new BMove(BBoardHelper.stringCoordToIndex("g1"), BBoardHelper.stringCoordToIndex("h1")), false);
+        boardFromMove.makeMove(new BMove(BBoardHelper.stringCoordToIndex("g8"), BBoardHelper.stringCoordToIndex("h8")), false);
+
+        assertEquals(boardFromFen.exportFen(), boardFromMove.exportFen());
+        assertEquals(boardFromFen.state.getZobristKey(), boardFromMove.state.getZobristKey());
+    }
+
+    @Test
+    public void testZobrist_move_promotion() {
+        BBoard boardFromFen = new BBoard("1Q6/8/7k/8/8/8/8/7K b - - 0 1");
+        BBoard boardFromMove = new BBoard("8/1P6/7k/8/8/8/8/7K w - - 0 1");
+
+        boardFromMove.makeMove(new BMove(BBoardHelper.stringCoordToIndex("b7"), BBoardHelper.stringCoordToIndex("b8"), BMove.promoteToQueenFlag), false);
+
+        assertEquals(boardFromFen.exportFen(), boardFromMove.exportFen());
+        assertEquals(boardFromFen.state.getZobristKey(), boardFromMove.state.getZobristKey());
+    }
+
+
+    @Test
     public void testZobrist_move() {
         BBoard boardFromFen = new BBoard("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
         BBoard boardFromMove = new BBoard();
