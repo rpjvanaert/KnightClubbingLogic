@@ -101,6 +101,7 @@ public class BBoard {
                 captureSquare = targetSquare + (isWhiteToMove ? -BBoardHelper.rowLength : BBoardHelper.rowLength);
                 this.clear(capturedPiece, captureSquare);
                 pieceBoards[captureSquare] = BPiece.none;
+                zobristKey ^= BZobrist.getPiecesArray()[capturedPiece][captureSquare];
             }
 
             if (capturedPieceType != BPiece.pawn) {
@@ -108,10 +109,12 @@ public class BBoard {
             }
 
             zobristKey ^= BZobrist.getPiecesArray()[capturedPiece][captureSquare];
-            this.clear(capturedPiece, targetSquare);
+            this.clear(capturedPiece, captureSquare);
         }
 
         this.move(movedPiece, startSquare, targetSquare);
+        zobristKey ^= BZobrist.getPiecesArray()[movedPiece][startSquare];
+        zobristKey ^= BZobrist.getPiecesArray()[movedPiece][targetSquare];
 
         if (movedPieceType == BPiece.king) {
             kingSquares[moveColorIndex()] = targetSquare;
@@ -162,8 +165,6 @@ public class BBoard {
         }
 
         zobristKey ^= BZobrist.getSideToMove();
-        zobristKey ^= BZobrist.getPiecesArray()[movedPiece][startSquare];
-        zobristKey ^= BZobrist.getPiecesArray()[targetPiece][targetSquare];
         zobristKey ^= BZobrist.getEnPassantFile()[prevEnPassantFile];
 
         if (newCastleRights != prevCastleRights) {
