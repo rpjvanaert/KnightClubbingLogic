@@ -10,16 +10,6 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import java.util.List;
 
 public interface OpeningBookDao {
-    @SqlUpdate("""
-        CREATE TABLE IF NOT EXISTS opening_book (
-        zobrist_key BIGINT NOT NULL,
-        move TEXT NOT NULL,
-        score INTEGER DEFAULT 0,
-        depth INTEGER DEFAULT 1,
-        PRIMARY KEY (zobrist_key, move)
-        );
-    """)
-    void createTable();
 
     @SqlUpdate("""
         INSERT INTO opening_book (zobrist_key, move, score, depth)

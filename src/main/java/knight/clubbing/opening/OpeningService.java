@@ -1,9 +1,18 @@
 package knight.clubbing.opening;
 
+import liquibase.Contexts;
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.List;
 
 public class OpeningService {
@@ -13,18 +22,29 @@ public class OpeningService {
 
     protected static final String memoryUrl = "jdbc:sqlite::memory:";
 
-    private final Jdbi jdbi;
-    private final Handle handle;
-
-    public OpeningService(String jdbcUrl) {
-        this.jdbi = Jdbi.create(jdbcUrl).installPlugin(new SqlObjectPlugin());
-        this.handle = jdbi.open(); // <- keeps the connection open
-        this.openingBookDao = handle.attach(OpeningBookDao.class);
-        this.openingBookDao.createTable();
+    public OpeningService() {
+        this(jdbcUrl);
     }
 
-    public void close() {
-        this.handle.close(); // <- call this at the end of your test
+    public OpeningService(String jdbcUrl) {
+        try {
+            Connection conn = DriverManager.getConnection(jdbcUrl);
+
+            // Run migrations
+            Database database = DatabaseFactory.getInstance()
+                    .findCorrectDatabaseImplementation(new JdbcConnection(conn));
+            Liquibase liquibase = new Liquibase(
+                    "db/changelog/openingbook-changelog.xml",
+                    new ClassLoaderResourceAccessor(),
+                    database
+            );
+            liquibase.update(new Contexts());
+
+            Jdbi jdbi = Jdbi.create(conn).installPlugin(new SqlObjectPlugin());
+            this.openingBookDao = jdbi.onDemand(OpeningBookDao.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Database setup failed", e);
+        }
     }
 
     public void update(OpeningBookEntry entry) {
