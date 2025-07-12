@@ -276,7 +276,7 @@ public class BBoard {
 
         long newZobristKey = state.getZobristKey();
         newZobristKey ^= BZobrist.getSideToMove();
-        newZobristKey ^= BZobrist.getEnPassantFile()[state.getEnPassantFile()]; //todo hier naar kijken
+        newZobristKey ^= BZobrist.getEnPassantFile()[state.getEnPassantFile()];
 
         state = new BGameState(BPiece.none, 0, state.getCastlingRights(), state.getFiftyMoveCounter() + 1, newZobristKey);
         gameStateHistory.push(state);
@@ -289,6 +289,7 @@ public class BBoard {
         isWhiteToMove = !isWhiteToMove;
         plyCount--;
         gameStateHistory.pop();
+        state = gameStateHistory.peek();
         updateOtherBoards();
         hasCachedInCheckValue = true;
         cachedInCheckValue = false;
