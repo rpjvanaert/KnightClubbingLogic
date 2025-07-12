@@ -489,4 +489,27 @@ class BBoardTest {
         assertEquals(board1.state.getZobristKey(), board2.state.getZobristKey());
     }
 
+    @Test
+    public void testZobrist_nullMove() {
+        BBoard board = new BBoard();
+        long initialKey = board.state.getZobristKey();
+
+        board.makeNullMove();
+        assertNotEquals(initialKey, board.state.getZobristKey(), "Zobrist key should change after a null move.");
+
+        board.makeNullMove();
+        assertEquals(initialKey, board.state.getZobristKey(), "Zobrist key should remain unchanged after two null moves.");
+    }
+
+    @Test
+    public void testZobrist_nullMove_enPasasantFile() {
+        BBoard board = new BBoard("rnbqkbnr/1ppp1p1p/p7/4pPp1/4P3/8/PPPP2PP/RNBQKBNR w KQkq g6 0 4");
+        long initialKey = board.state.getZobristKey();
+
+        board.makeNullMove();
+        assertNotEquals(initialKey, board.state.getZobristKey(), "Zobrist key should change after a null move.");
+
+        board.makeNullMove();
+        assertNotEquals(initialKey, board.state.getZobristKey(), "Zobrist key should not be the same after two null moves with enPassantFile.");
+    }
 }
