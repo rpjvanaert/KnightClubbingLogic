@@ -1,4 +1,4 @@
-package knight.clubbing.moveGeneration.magic;
+package knight.clubbing.movegen.magic;
 
 import java.io.Serial;
 import java.io.Serializable;

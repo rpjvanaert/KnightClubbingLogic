@@ -1,6 +1,6 @@
-package knight.clubbing.moveGeneration.magic;
+package knight.clubbing.movegen.magic;
 
-import static knight.clubbing.moveGeneration.magic.PrecomputedMagics.*;
+import static knight.clubbing.movegen.magic.PrecomputedMagics.*;
 
 public final class Magic {
 

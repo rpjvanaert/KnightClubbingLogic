@@ -1,8 +1,8 @@
-package knight.clubbing.moveGeneration.magic;
+package knight.clubbing.movegen.magic;
 
 import knight.clubbing.core.BBoardHelper;
 import knight.clubbing.core.BCoord;
-import knight.clubbing.moveGeneration.MoveUtility;
+import knight.clubbing.movegen.MoveUtility;
 
 import java.util.ArrayList;
 import java.util.List;

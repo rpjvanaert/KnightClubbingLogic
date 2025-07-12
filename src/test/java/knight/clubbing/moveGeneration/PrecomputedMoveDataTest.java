@@ -2,6 +2,7 @@ package knight.clubbing.moveGeneration;
 
 import knight.clubbing.core.BBoardHelper;
 import knight.clubbing.core.BCoord;
+import knight.clubbing.movegen.PrecomputedMoveData;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,11 +1,9 @@
-package knight.clubbing.moveGeneration;
+package knight.clubbing.movegen;
 
 import knight.clubbing.core.*;
-import knight.clubbing.moveGeneration.magic.Magic;
+import knight.clubbing.movegen.magic.Magic;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class MoveGenerator {
 
