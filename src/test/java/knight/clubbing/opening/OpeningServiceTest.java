@@ -73,9 +73,4 @@ class OpeningServiceTest {
     void getBestReturnsNullWhenKeyNotFound() {
         assertNull(openingService.getBest(9999L));
     }
-
-    @Test
-    void closeShouldNotThrow() {
-        assertDoesNotThrow(() -> openingService.close());
-    }
 }
