@@ -70,4 +70,8 @@ public class OpeningService {
     public void deleteAll() {
         this.openingBookDao.deleteAll();
     }
+
+    public boolean exists(long zobristKey) {
+        return this.openingBookDao.existsByZobristKey(zobristKey);
+    }
 }

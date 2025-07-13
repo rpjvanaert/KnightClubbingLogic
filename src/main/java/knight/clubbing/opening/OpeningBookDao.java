@@ -41,4 +41,12 @@ public interface OpeningBookDao {
 
     @SqlUpdate("DELETE FROM opening_book")
     void deleteAll();
+
+    @SqlQuery("""
+    SELECT EXISTS (
+        SELECT 1 FROM opening_book WHERE zobrist_key = :zobristKey
+    )
+""")
+    boolean existsByZobristKey(@Bind("zobristKey") long zobristKey);
+
 }
