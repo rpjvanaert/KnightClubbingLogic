@@ -5,7 +5,12 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <changeSet id="1" author="you">
+    <changeSet id="1" author="rpjvanaert">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="opening_book"/>
+            </not>
+        </preConditions>
         <createTable tableName="opening_book">
             <column name="zobrist_key" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
