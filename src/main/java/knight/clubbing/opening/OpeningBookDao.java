@@ -3,7 +3,6 @@ package knight.clubbing.opening;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
-import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
@@ -48,4 +47,9 @@ public interface OpeningBookDao {
 """)
     boolean existsByZobristKey(@Bind("zobristKey") long zobristKey);
 
+    @SqlQuery("SELECT COUNT(*) FROM opening_book")
+    int countAll();
+
+    @SqlQuery("SELECT COUNT(*) FROM opening_book WHERE zobrist_key = :zobristKey")
+    int countByZobristKey(@Bind("zobristKey") long zobristKey);
 }
