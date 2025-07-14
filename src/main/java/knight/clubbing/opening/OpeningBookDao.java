@@ -18,7 +18,6 @@ public interface OpeningBookDao {
             score = excluded.score,
             depth = excluded.depth
     """)
-    @GetGeneratedKeys
     int upsert(@BindBean OpeningBookEntry entry);
 
     @SqlQuery("SELECT * FROM opening_book")
