@@ -72,4 +72,12 @@ public class OpeningService {
     public boolean exists(long zobristKey) {
         return this.openingBookDao.existsByZobristKey(zobristKey);
     }
+
+    public int count() {
+        return this.openingBookDao.countAll();
+    }
+
+    public int countByZobristKey(long zobristKey) {
+        return this.openingBookDao.countByZobristKey(zobristKey);
+    }
 }
