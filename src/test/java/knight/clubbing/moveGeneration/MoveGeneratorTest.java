@@ -3,7 +3,9 @@ package knight.clubbing.moveGeneration;
 import knight.clubbing.core.BBoard;
 import knight.clubbing.core.BBoardHelper;
 import knight.clubbing.core.BMove;
-import knight.clubbing.moveGeneration.magic.PrecomputedMagics;
+import knight.clubbing.movegen.MoveGenerator;
+import knight.clubbing.movegen.PrecomputedMoveData;
+import knight.clubbing.movegen.magic.PrecomputedMagics;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

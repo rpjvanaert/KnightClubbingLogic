@@ -1,8 +1,8 @@
 package knight.clubbing.moveGeneration;
 
-import knight.clubbing.moveGeneration.magic.Magic;
-import knight.clubbing.moveGeneration.magic.MagicHelper;
-import knight.clubbing.moveGeneration.magic.PrecomputedMagics;
+import knight.clubbing.movegen.magic.Magic;
+import knight.clubbing.movegen.magic.MagicHelper;
+import knight.clubbing.movegen.magic.PrecomputedMagics;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -1,4 +1,4 @@
-package knight.clubbing.moveGeneration.magic;
+package knight.clubbing.movegen.magic;
 
 import knight.clubbing.FileUtil;
 

@@ -3,7 +3,7 @@ package knight.clubbing;
 import knight.clubbing.core.BBoard;
 import knight.clubbing.core.BMove;
 import knight.clubbing.core.BPiece;
-import knight.clubbing.moveGeneration.MoveGenerator;
+import knight.clubbing.movegen.MoveGenerator;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -31,8 +31,8 @@ public class PerftTest {
 
     @Test @Tag("perft")
     void perftPosition1() {
-        int nodes = 4865609;
-        int depth = 5;
+        int nodes = 119060324;
+        int depth = 6;
 
         BBoard board = new BBoard();
         MoveGenerator moveGenerator = new MoveGenerator(board);
