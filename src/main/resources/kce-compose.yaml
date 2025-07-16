@@ -1,0 +1,16 @@
+version: '3.8'
+# podman compose -f kce-compose.yaml up -d
+
+services:
+  postgres:
+    image: postgres
+    container_name: kce-db
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+
+volumes:
+  dbdata:

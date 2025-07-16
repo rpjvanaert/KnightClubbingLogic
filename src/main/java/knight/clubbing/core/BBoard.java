@@ -1,7 +1,7 @@
 package knight.clubbing.core;
 
-import knight.clubbing.moveGeneration.MoveUtility;
-import knight.clubbing.moveGeneration.magic.Magic;
+import knight.clubbing.movegen.MoveUtility;
+import knight.clubbing.movegen.magic.Magic;
 
 import java.util.*;
 
