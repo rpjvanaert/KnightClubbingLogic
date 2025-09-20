@@ -11,12 +11,14 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 
 public class OpeningService {
     private final OpeningBookDao openingBookDao;
 
-    public static final String jdbcUrl = "jdbc:postgresql://localhost:5432/postgres?user=postgres&password=mysecretpassword";
+    public static final String jdbcUrl = "jdbc:postgresql://127.0.0.1:5432/knight_clubbing_db";
 
     protected static final String memoryUrl = "jdbc:sqlite::memory:";
 
@@ -26,7 +28,13 @@ public class OpeningService {
 
     public OpeningService(String jdbcUrl) {
         try {
-            Connection conn = DriverManager.getConnection(jdbcUrl);
+            Properties props = new Properties();
+            props.setProperty("user", "kce");
+            props.setProperty("password", "");
+
+            Connection conn = DriverManager.getConnection(jdbcUrl, props);
+
+            printConnection(conn);
 
             // Run migrations
             Database database = DatabaseFactory.getInstance()
@@ -40,8 +48,32 @@ public class OpeningService {
 
             Jdbi jdbi = Jdbi.create(conn).installPlugin(new SqlObjectPlugin());
             this.openingBookDao = jdbi.onDemand(OpeningBookDao.class);
+
+            verifyConnection();
         } catch (Exception e) {
             throw new RuntimeException("Database setup failed", e);
+        }
+    }
+
+    private void printConnection(Connection conn) {
+        try {
+            System.out.println(conn.getMetaData().getURL());
+            System.out.println("Connected to " + conn.getMetaData().getDatabaseProductName() + " " + conn.getMetaData().getDatabaseProductVersion());
+            System.out.println("Driver: " + conn.getMetaData().getDriverName() + " " + conn.getMetaData().getDriverVersion());
+            System.out.println("User: " + conn.getMetaData().getUserName());
+            System.out.println("Auto Commit: " + conn.getAutoCommit());
+        } catch (SQLException e) {
+            System.err.println("Failed to get DB metadata: " + e.getMessage());
+        }
+    }
+
+    private void verifyConnection() {
+        try {
+            // Try a simple query to ensure the DB is accessible and the table exists
+            int count = this.openingBookDao.countAll();
+            // Optionally, check for a minimum expected count or other invariants
+        } catch (Exception e) {
+            throw new RuntimeException("Database connection established but verification failed: " + e.getMessage(), e);
         }
     }
 
