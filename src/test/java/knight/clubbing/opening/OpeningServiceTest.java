@@ -11,7 +11,8 @@ class OpeningServiceTest {
 
     @BeforeEach
     void setUp() {
-        this.openingService = new OpeningService(OpeningService.memoryUrl);
+        String uniqueMemoryUrl = "jdbc:sqlite:file:memdb" + System.nanoTime() + "?mode=memory&cache=shared";
+        this.openingService = new OpeningService(uniqueMemoryUrl);
         this.openingService.deleteAll();
         assertNotNull(openingService);
         assertTrue(openingService.getAll().isEmpty());

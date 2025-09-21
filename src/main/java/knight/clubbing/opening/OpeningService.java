@@ -8,6 +8,7 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.postgresql.ds.PGSimpleDataSource;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,9 +19,9 @@ import java.util.Properties;
 public class OpeningService {
     private final OpeningBookDao openingBookDao;
 
-    public static final String jdbcUrl = "jdbc:postgresql://127.0.0.1:5432/knight_clubbing_db";
+    public static final String jdbcUrl = "jdbc:postgresql://127.0.0.1:5432/knight_clubbing_db?ssl=false";
 
-    protected static final String memoryUrl = "jdbc:sqlite::memory:";
+    protected static final String memoryUrl = "jdbc:sqlite:file:memdb1?mode=memory&cache=shared";
 
     public OpeningService() {
         this(jdbcUrl);
@@ -32,22 +33,43 @@ public class OpeningService {
             props.setProperty("user", "kce");
             props.setProperty("password", "");
 
-            Connection conn = DriverManager.getConnection(jdbcUrl, props);
+            Connection migrationConn = null;
+            if (jdbcUrl.startsWith("jdbc:sqlite:")) {
+                migrationConn = DriverManager.getConnection(jdbcUrl, props);
+                Database database = DatabaseFactory.getInstance()
+                        .findCorrectDatabaseImplementation(new JdbcConnection(migrationConn));
+                Liquibase liquibase = new Liquibase(
+                        "db/changelog/openingbook-changelog.xml",
+                        new ClassLoaderResourceAccessor(),
+                        database
+                );
+                liquibase.update(new Contexts());
 
-            printConnection(conn);
-
-            // Run migrations
-            Database database = DatabaseFactory.getInstance()
-                    .findCorrectDatabaseImplementation(new JdbcConnection(conn));
-            Liquibase liquibase = new Liquibase(
-                    "db/changelog/openingbook-changelog.xml",
-                    new ClassLoaderResourceAccessor(),
-                    database
-            );
-            liquibase.update(new Contexts());
-
-            Jdbi jdbi = Jdbi.create(conn).installPlugin(new SqlObjectPlugin());
-            this.openingBookDao = jdbi.onDemand(OpeningBookDao.class);
+                Jdbi jdbi = Jdbi.create(migrationConn).installPlugin(new SqlObjectPlugin());
+                this.openingBookDao = jdbi.onDemand(OpeningBookDao.class);
+            } else {
+                try (Connection conn = DriverManager.getConnection(jdbcUrl, props)) {
+                    Database database = DatabaseFactory.getInstance()
+                            .findCorrectDatabaseImplementation(new JdbcConnection(conn));
+                    Liquibase liquibase = new Liquibase(
+                            "db/changelog/openingbook-changelog.xml",
+                            new ClassLoaderResourceAccessor(),
+                            database
+                    );
+                    liquibase.update(new Contexts());
+                }
+                Jdbi jdbi;
+                if (jdbcUrl.startsWith("jdbc:postgresql:")) {
+                    PGSimpleDataSource ds = new PGSimpleDataSource();
+                    ds.setUrl(jdbcUrl);
+                    ds.setUser("kce");
+                    ds.setPassword("");
+                    jdbi = Jdbi.create(ds).installPlugin(new SqlObjectPlugin());
+                } else {
+                    throw new IllegalArgumentException("Unsupported JDBC URL: " + jdbcUrl);
+                }
+                this.openingBookDao = jdbi.onDemand(OpeningBookDao.class);
+            }
 
             verifyConnection();
         } catch (Exception e) {
