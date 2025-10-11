@@ -77,18 +77,6 @@ public class OpeningService {
         }
     }
 
-    private void printConnection(Connection conn) {
-        try {
-            System.out.println(conn.getMetaData().getURL());
-            System.out.println("Connected to " + conn.getMetaData().getDatabaseProductName() + " " + conn.getMetaData().getDatabaseProductVersion());
-            System.out.println("Driver: " + conn.getMetaData().getDriverName() + " " + conn.getMetaData().getDriverVersion());
-            System.out.println("User: " + conn.getMetaData().getUserName());
-            System.out.println("Auto Commit: " + conn.getAutoCommit());
-        } catch (SQLException e) {
-            System.err.println("Failed to get DB metadata: " + e.getMessage());
-        }
-    }
-
     private void verifyConnection() {
         try {
             // Try a simple query to ensure the DB is accessible and the table exists
