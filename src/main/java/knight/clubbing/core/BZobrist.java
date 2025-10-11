@@ -47,8 +47,6 @@ public class BZobrist {
             }
         }
 
-        zobristKey ^= enPassantFile[board.state.getEnPassantFile()];
-
         if (!board.isWhiteToMove) {
             zobristKey ^= sideToMove;
         }
@@ -56,7 +54,7 @@ public class BZobrist {
         zobristKey ^= castlingRights[board.state.getCastlingRights()];
 
         int epFile = board.state.getEnPassantFile();
-        if (epFile >= 0 && epFile < enPassantFile.length) {
+        if (epFile >= 0) {
             zobristKey ^= enPassantFile[epFile];
         }
 
