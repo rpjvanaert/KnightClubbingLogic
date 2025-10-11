@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class ParameterizedPerftTest {
 
