@@ -1,4 +1,4 @@
-package knight.clubbing;
+package knight.clubbing.perft;
 
 import knight.clubbing.core.BBoard;
 import knight.clubbing.core.BMove;
@@ -261,6 +261,5 @@ public class PerftTest {
         double elapsedSeconds = elapsedNs / 1000000000.0;
         double mnps = nodes / elapsedSeconds / 1_000_000.0;
         logger.info(String.format("%.3f Mnps", mnps));
-
     }
 }
