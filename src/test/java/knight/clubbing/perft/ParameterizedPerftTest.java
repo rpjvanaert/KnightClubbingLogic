@@ -131,11 +131,7 @@ public class ParameterizedPerftTest {
 
         @Override
         public String toString() {
-            return "PerftCase{" +
-                    "fen='" + fen + '\'' +
-                    ", depth=" + depth +
-                    ", expectedNodes=" + expectedNodes +
-                    '}';
+            return "D" + depth + " n:" + expectedNodes + " := " + fen;
         }
     }
 }
