@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -57,14 +58,15 @@ public class ParameterizedPerftTest {
                     String[] parts = line.split(";");
                     for (String part : parts) {
                         part = part.trim();
-                        if (part.startsWith("D3")) {
-                            int depth = 3;
+                        if (part.startsWith("D5")) {
+                            int depth = 5;
                             long expectedNodes = Long.parseLong(part.split(" ")[1]);
                             return new PerftCase(fen, depth, expectedNodes);
                         }
                     }
-                    throw new IllegalArgumentException("Invalid line " + line);
-                });
+                    return null;
+                })
+                .filter(Objects::nonNull);
     }
 
     long perft(MoveGenerator moveGenerator, int depth) {
