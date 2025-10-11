@@ -164,6 +164,18 @@ public class BBoard {
             }
         }
 
+        if (movedPieceType == BPiece.rook) {
+            if (startSquare == BBoardHelper.h1) {
+                newCastleRights &= BGameState.clearWhiteKingsideMask;
+            } else if (startSquare == BBoardHelper.a1) {
+                newCastleRights &= BGameState.clearWhiteQueensideMask;
+            } else if (startSquare == BBoardHelper.h8) {
+                newCastleRights &= BGameState.clearBlackKingsideMask;
+            } else if (startSquare == BBoardHelper.a8) {
+                newCastleRights &= BGameState.clearBlackQueensideMask;
+            }
+        }
+
         zobristKey ^= BZobrist.getSideToMove();
         zobristKey ^= BZobrist.getEnPassantFile()[prevEnPassantFile];
 
