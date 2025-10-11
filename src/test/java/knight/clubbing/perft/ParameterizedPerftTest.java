@@ -4,6 +4,7 @@ import knight.clubbing.core.BBoard;
 import knight.clubbing.core.BMove;
 import knight.clubbing.core.BPiece;
 import knight.clubbing.movegen.MoveGenerator;
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -55,10 +56,11 @@ public class ParameterizedPerftTest {
                 .map(line -> {
                     String fen = line.split(";")[0].trim();
                     String[] parts = line.split(";");
+                    ArrayUtils.reverse(parts);
                     for (String part : parts) {
                         part = part.trim();
-                        if (part.startsWith("D5")) {
-                            int depth = 5;
+                        if (part.startsWith("D")) {
+                            int depth = Integer.parseInt(part.split(" ")[0].substring(1));
                             long expectedNodes = Long.parseLong(part.split(" ")[1]);
                             return new PerftCase(fen, depth, expectedNodes);
                         }
