@@ -512,4 +512,37 @@ class BBoardTest {
         board.makeNullMove();
         assertNotEquals(initialKey, board.state.getZobristKey(), "Zobrist key should not be the same after two null moves with enPassantFile.");
     }
+
+    @Test
+    public void testCastling_inSearch1() {
+        // Arrange
+        BBoard board = new BBoard("4k2r/8/8/8/8/8/8/4K3 b k - 0 1");
+        BMove move1 = new BMove(BBoardHelper.stringCoordToIndex("h8"), BBoardHelper.stringCoordToIndex("h1"));
+        BMove move2 = new BMove(BBoardHelper.stringCoordToIndex("e1"), BBoardHelper.stringCoordToIndex("d2"));
+
+        // Act
+        board.makeMove(move1, true);
+        board.makeMove(move2, true);
+        board.undoMove(move2, true);
+        board.undoMove(move1, true);
+
+        // Assert
+        assertEquals("4k2r/8/8/8/8/8/8/4K3 b k - 0 1", board.exportFen(), "Expected FEN to be unchanged after castling and undoing the move.");
+    }
+
+    @Test
+    public void testCastling_inSearch2() {
+        // Arrange
+        BBoard board = new BBoard("4k2r/8/8/8/8/8/8/4K3 b k - 0 1");
+        BMove move1 = new BMove(BBoardHelper.stringCoordToIndex("h8"), BBoardHelper.stringCoordToIndex("h1"));
+        BMove move2 = new BMove(BBoardHelper.stringCoordToIndex("e1"), BBoardHelper.stringCoordToIndex("d2"));
+        BMove move3 = new BMove(BBoardHelper.stringCoordToIndex("e8"), BBoardHelper.stringCoordToIndex("g8"), BMove.castleFlag);
+
+        // Act
+        board.makeMove(move1, true);
+        board.makeMove(move2, true);
+
+        // Assert
+        assertEquals("4k3/8/8/8/8/8/3K4/7r b - - 2 2", board.exportFen(), "Expected FEN to reflect moves made.");
+    }
 }
