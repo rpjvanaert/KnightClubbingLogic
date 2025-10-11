@@ -1,12 +1,17 @@
-version: '3.8'
 # podman compose -f kce-compose.yaml up -d
 
+# docker compose -f kce-compose.yaml up -d
+# docker compose -f kce-compose.yaml down -v
+
+name: knight-clubbing
 services:
   postgres:
     image: postgres
     container_name: kce-db
     environment:
-      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: kce
+      POSTGRES_DB: knight_clubbing_db
     ports:
       - "5432:5432"
     volumes:

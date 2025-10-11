@@ -101,6 +101,7 @@ public class BBoard {
                 captureSquare = targetSquare + (isWhiteToMove ? -BBoardHelper.rowLength : BBoardHelper.rowLength);
                 this.clear(capturedPiece, captureSquare);
                 pieceBoards[captureSquare] = BPiece.none;
+                zobristKey ^= BZobrist.getPiecesArray()[capturedPiece][captureSquare];
             }
 
             if (capturedPieceType != BPiece.pawn) {
@@ -108,10 +109,12 @@ public class BBoard {
             }
 
             zobristKey ^= BZobrist.getPiecesArray()[capturedPiece][captureSquare];
-            this.clear(capturedPiece, targetSquare);
+            this.clear(capturedPiece, captureSquare);
         }
 
         this.move(movedPiece, startSquare, targetSquare);
+        zobristKey ^= BZobrist.getPiecesArray()[movedPiece][startSquare];
+        zobristKey ^= BZobrist.getPiecesArray()[movedPiece][targetSquare];
 
         if (movedPieceType == BPiece.king) {
             kingSquares[moveColorIndex()] = targetSquare;
@@ -140,7 +143,7 @@ public class BBoard {
             zobristKey ^= BZobrist.getPiecesArray()[promotionPiece][targetSquare];
         }
 
-        if (moveFlag == BMove.pawnTwoUpFlag /*&& todo isEnPassantPossible(targetSquare)*/) {
+        if (moveFlag == BMove.pawnTwoUpFlag && isEnPassantPossible(targetSquare)) {
             int enPassantFile = BBoardHelper.fileIndex(targetSquare) + 1;
             newEnPassantFile = enPassantFile;
             zobristKey ^= BZobrist.getEnPassantFile()[enPassantFile];
@@ -161,9 +164,19 @@ public class BBoard {
             }
         }
 
+        if (movedPieceType == BPiece.rook) {
+            if (startSquare == BBoardHelper.h1) {
+                newCastleRights &= BGameState.clearWhiteKingsideMask;
+            } else if (startSquare == BBoardHelper.a1) {
+                newCastleRights &= BGameState.clearWhiteQueensideMask;
+            } else if (startSquare == BBoardHelper.h8) {
+                newCastleRights &= BGameState.clearBlackKingsideMask;
+            } else if (startSquare == BBoardHelper.a8) {
+                newCastleRights &= BGameState.clearBlackQueensideMask;
+            }
+        }
+
         zobristKey ^= BZobrist.getSideToMove();
-        zobristKey ^= BZobrist.getPiecesArray()[movedPiece][startSquare];
-        zobristKey ^= BZobrist.getPiecesArray()[targetPiece][targetSquare];
         zobristKey ^= BZobrist.getEnPassantFile()[prevEnPassantFile];
 
         if (newCastleRights != prevCastleRights) {
@@ -186,8 +199,7 @@ public class BBoard {
             newFiftyMoveCounter = 0;
         }
 
-        long newZobristKey = BZobrist.CalculateZobristKey(this);
-        BGameState newState = new BGameState(capturedPieceType, newEnPassantFile, newCastleRights, newFiftyMoveCounter, newZobristKey);
+        BGameState newState = new BGameState(capturedPieceType, newEnPassantFile, newCastleRights, newFiftyMoveCounter, zobristKey);
         gameStateHistory.push(newState);
         state = newState;
         hasCachedInCheckValue = false;
@@ -276,10 +288,9 @@ public class BBoard {
 
         long newZobristKey = state.getZobristKey();
         newZobristKey ^= BZobrist.getSideToMove();
-        newZobristKey ^= BZobrist.getEnPassantFile()[state.getEnPassantFile()]; //todo hier naar kijken
+        newZobristKey ^= BZobrist.getEnPassantFile()[state.getEnPassantFile()];
 
-        BGameState newState = new BGameState(BPiece.none, 0, state.getCastlingRights(), state.getFiftyMoveCounter() + 1, newZobristKey);
-        state = newState;
+        state = new BGameState(BPiece.none, 0, state.getCastlingRights(), state.getFiftyMoveCounter() + 1, newZobristKey);
         gameStateHistory.push(state);
         updateOtherBoards();
         hasCachedInCheckValue = true;
@@ -290,6 +301,7 @@ public class BBoard {
         isWhiteToMove = !isWhiteToMove;
         plyCount--;
         gameStateHistory.pop();
+        state = gameStateHistory.peek();
         updateOtherBoards();
         hasCachedInCheckValue = true;
         cachedInCheckValue = false;
@@ -424,15 +436,20 @@ public class BBoard {
 
     private boolean isEnPassantPossible(int targetSquare) {
         int file = BBoardHelper.fileIndex(targetSquare);
-        int epCaptureRank = isWhiteToMove ? 4 : 3; // because white e2→e4 puts ep target at e3 (rank 3)
+        int epCaptureRank = isWhiteToMove ? 3 : 4;
 
-        for (int df = -1; df <= 1; df += 2) {
-            int adjFile = file + df;
-            if (adjFile < 0 || adjFile > 7) continue;
+        int fileLeft = file - 1;
+        int fileRight = file + 1;
+        if (fileLeft >= 0) {
+            int opponentSquare = BBoardHelper.indexFromCoord(fileLeft, epCaptureRank);
+            if (get(BPiece.makePiece(BPiece.pawn, opponentColor()), opponentSquare)) {
+                return true;
+            }
+        }
 
-            int adjSquare = BBoardHelper.indexFromCoord(adjFile, epCaptureRank);
-            int adjPiece = pieceBoards[adjSquare];
-            if (BPiece.getPieceType(adjPiece) == BPiece.pawn && BPiece.getPieceColor(adjPiece) == opponentColor()) {
+        if (fileRight <= 7) {
+            int opponentSquare = BBoardHelper.indexFromCoord(fileRight, epCaptureRank);
+            if (get(BPiece.makePiece(BPiece.pawn, opponentColor()), opponentSquare)) {
                 return true;
             }
         }

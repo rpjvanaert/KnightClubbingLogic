@@ -8,17 +8,20 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.postgresql.ds.PGSimpleDataSource;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 
 public class OpeningService {
     private final OpeningBookDao openingBookDao;
 
-    public static final String jdbcUrl = "jdbc:postgresql://localhost:5432/postgres?user=postgres&password=mysecretpassword";
+    public static final String jdbcUrl = "jdbc:postgresql://127.0.0.1:5432/knight_clubbing_db?ssl=false";
 
-    protected static final String memoryUrl = "jdbc:sqlite::memory:";
+    protected static final String memoryUrl = "jdbc:sqlite:file:memdb1?mode=memory&cache=shared";
 
     public OpeningService() {
         this(jdbcUrl);
@@ -26,22 +29,61 @@ public class OpeningService {
 
     public OpeningService(String jdbcUrl) {
         try {
-            Connection conn = DriverManager.getConnection(jdbcUrl);
+            Properties props = new Properties();
+            props.setProperty("user", "kce");
+            props.setProperty("password", "");
 
-            // Run migrations
-            Database database = DatabaseFactory.getInstance()
-                    .findCorrectDatabaseImplementation(new JdbcConnection(conn));
-            Liquibase liquibase = new Liquibase(
-                    "db/changelog/openingbook-changelog.xml",
-                    new ClassLoaderResourceAccessor(),
-                    database
-            );
-            liquibase.update(new Contexts());
+            Connection migrationConn = null;
+            if (jdbcUrl.startsWith("jdbc:sqlite:")) {
+                migrationConn = DriverManager.getConnection(jdbcUrl, props);
+                Database database = DatabaseFactory.getInstance()
+                        .findCorrectDatabaseImplementation(new JdbcConnection(migrationConn));
+                Liquibase liquibase = new Liquibase(
+                        "db/changelog/openingbook-changelog.xml",
+                        new ClassLoaderResourceAccessor(),
+                        database
+                );
+                liquibase.update(new Contexts());
 
-            Jdbi jdbi = Jdbi.create(conn).installPlugin(new SqlObjectPlugin());
-            this.openingBookDao = jdbi.onDemand(OpeningBookDao.class);
+                Jdbi jdbi = Jdbi.create(migrationConn).installPlugin(new SqlObjectPlugin());
+                this.openingBookDao = jdbi.onDemand(OpeningBookDao.class);
+            } else {
+                try (Connection conn = DriverManager.getConnection(jdbcUrl, props)) {
+                    Database database = DatabaseFactory.getInstance()
+                            .findCorrectDatabaseImplementation(new JdbcConnection(conn));
+                    Liquibase liquibase = new Liquibase(
+                            "db/changelog/openingbook-changelog.xml",
+                            new ClassLoaderResourceAccessor(),
+                            database
+                    );
+                    liquibase.update(new Contexts());
+                }
+                Jdbi jdbi;
+                if (jdbcUrl.startsWith("jdbc:postgresql:")) {
+                    PGSimpleDataSource ds = new PGSimpleDataSource();
+                    ds.setUrl(jdbcUrl);
+                    ds.setUser("kce");
+                    ds.setPassword("");
+                    jdbi = Jdbi.create(ds).installPlugin(new SqlObjectPlugin());
+                } else {
+                    throw new IllegalArgumentException("Unsupported JDBC URL: " + jdbcUrl);
+                }
+                this.openingBookDao = jdbi.onDemand(OpeningBookDao.class);
+            }
+
+            verifyConnection();
         } catch (Exception e) {
             throw new RuntimeException("Database setup failed", e);
+        }
+    }
+
+    private void verifyConnection() {
+        try {
+            // Try a simple query to ensure the DB is accessible and the table exists
+            int count = this.openingBookDao.countAll();
+            // Optionally, check for a minimum expected count or other invariants
+        } catch (Exception e) {
+            throw new RuntimeException("Database connection established but verification failed: " + e.getMessage(), e);
         }
     }
 
