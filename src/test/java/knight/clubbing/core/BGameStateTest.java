@@ -58,4 +58,96 @@ class BGameStateTest {
         assertEquals(0b0111, BGameState.clearBlackQueensideMask);
     }
 
+    @Test
+    void testEquals_Reflexive() {
+        BGameState state = new BGameState(1, 2, 3, 4, 5L);
+        assertEquals(state, state);
+    }
+
+    @Test
+    void testEquals_Symmetric() {
+        BGameState state1 = new BGameState(1, 2, 3, 4, 5L);
+        BGameState state2 = new BGameState(1, 2, 3, 4, 5L);
+
+        assertEquals(state1, state2);
+        assertEquals(state2, state1);
+    }
+
+    @Test
+    void testEquals_WithNull() {
+        BGameState state = new BGameState(1, 2, 3, 4, 5L);
+        assertNotEquals(state, null);
+    }
+
+    @Test
+    void testEquals_WithDifferentClass() {
+        BGameState state = new BGameState(1, 2, 3, 4, 5L);
+        String other = "not a BGameState";
+        assertNotEquals(state, other);
+    }
+
+    @Test
+    void testEquals_IdenticalStates() {
+        BGameState state1 = new BGameState(10, 5, 7, 25, 0xDEADBEEFL);
+        BGameState state2 = new BGameState(10, 5, 7, 25, 0xDEADBEEFL);
+
+        assertEquals(state1, state2);
+    }
+
+    @Test
+    void testEquals_DifferentCapturedPiece() {
+        BGameState state1 = new BGameState(1, 2, 3, 4, 5L);
+        BGameState state2 = new BGameState(99, 2, 3, 4, 5L);
+
+        assertNotEquals(state1, state2);
+    }
+
+    @Test
+    void testEquals_DifferentEnPassantFile() {
+        BGameState state1 = new BGameState(1, 2, 3, 4, 5L);
+        BGameState state2 = new BGameState(1, 99, 3, 4, 5L);
+
+        assertNotEquals(state1, state2);
+    }
+
+    @Test
+    void testEquals_DifferentCastlingRights() {
+        BGameState state1 = new BGameState(1, 2, 3, 4, 5L);
+        BGameState state2 = new BGameState(1, 2, 99, 4, 5L);
+
+        assertNotEquals(state1, state2);
+    }
+
+    @Test
+    void testEquals_DifferentFiftyMoveCounter() {
+        BGameState state1 = new BGameState(1, 2, 3, 4, 5L);
+        BGameState state2 = new BGameState(1, 2, 3, 99, 5L);
+
+        assertNotEquals(state1, state2);
+    }
+
+    @Test
+    void testEquals_DifferentZobristKey() {
+        BGameState state1 = new BGameState(1, 2, 3, 4, 5L);
+        BGameState state2 = new BGameState(1, 2, 3, 4, 999L);
+
+        assertNotEquals(state1, state2);
+    }
+
+    @Test
+    void testEquals_CopyConstructor() {
+        BGameState original = new BGameState(7, 8, 9, 10, 0xABCDEF123L);
+        BGameState copy = new BGameState(original);
+
+        assertEquals(original, copy);
+    }
+
+    @Test
+    void testEquals_DefaultConstructors() {
+        BGameState state1 = new BGameState();
+        BGameState state2 = new BGameState();
+
+        assertEquals(state1, state2);
+    }
+
 }
