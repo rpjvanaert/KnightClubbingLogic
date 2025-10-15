@@ -66,4 +66,28 @@ public class BGameState {
     public long getZobristKey() {
         return zobristKey;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BGameState that = (BGameState) o;
+
+        if (capturedPiece != that.capturedPiece) return false;
+        if (enPassantFile != that.enPassantFile) return false;
+        if (castlingRights != that.castlingRights) return false;
+        if (fiftyMoveCounter != that.fiftyMoveCounter) return false;
+        return zobristKey == that.zobristKey;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = capturedPiece;
+        result = 31 * result + enPassantFile;
+        result = 31 * result + castlingRights;
+        result = 31 * result + fiftyMoveCounter;
+        result = 31 * result + (int) (zobristKey ^ (zobristKey >>> 32));
+        return result;
+    }
 }

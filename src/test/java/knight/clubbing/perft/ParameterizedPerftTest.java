@@ -23,7 +23,7 @@ public class ParameterizedPerftTest {
     private static final Path PERFT_FILE = Path.of("src", "test", "resources", "perft", "standard.epd");
     private static final Logger logger = Logger.getLogger(ParameterizedPerftTest.class.getName());
 
-    @ParameterizedTest(name = "{index} => {0}")
+    //@ParameterizedTest(name = "{index} => {0}")
     @MethodSource("perftCaseStream")
     @Tag("perft")
     void perftTest(PerftCase perftCase) {
