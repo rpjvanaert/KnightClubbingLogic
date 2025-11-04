@@ -51,6 +51,19 @@ public class ParameterizedPerftTest {
         logPerformance(timeEnd, timeStart, perftCase.expectedNodes);
     }
 
+    @ParameterizedTest(name = "{index} => {0}")
+    @MethodSource("perftCaseStream")
+    @Tag("perft")
+    void perftTestParallelCopy(PerftCase perftCase) {
+        System.out.println("Testing FEN: " + perftCase.fen + " at depth " + perftCase.depth + " expecting " + perftCase.expectedNodes + " nodes");
+        BBoard board = new BBoard(perftCase.fen);
+
+        long timeStart = System.nanoTime();
+        assertEquals(perftCase.expectedNodes, perftParallelCopy(board, perftCase.depth));
+        long timeEnd = System.nanoTime();
+        logPerformance(timeEnd, timeStart, perftCase.expectedNodes);
+    }
+
     private static Stream<PerftCase> perftCaseStream() throws Exception {
         return Files.lines(PERFT_FILE)
                 .map(line -> {
@@ -88,6 +101,31 @@ public class ParameterizedPerftTest {
         return nodes;
     }
 
+    long perftCopy(BBoard board, int depth) {
+        if (depth == 0) return 1;
+
+        long nodes = 0;
+
+        MoveGenerator moveGenerator = new MoveGenerator(board);
+        BMove[] moves = moveGenerator.generateMoves(false);
+
+        for (BMove move : moves) {
+            assertNotNull(move);
+
+            BBoard childBoard = board.copy();
+            assertTrue(board.equals(childBoard));
+
+            // apply move to the copy (use the "copy" variant of makeMove if that's the intended behavior)
+            childBoard.makeMove(move, true);
+
+            nodes += perftCopy(childBoard, depth - 1);
+
+            // no undo required — childBoard is discarded after this branch
+        }
+
+        return nodes;
+    }
+
     long perftParallel(MoveGenerator moveGenerator, int depth) {
         if (depth == 0) return 1;
 
@@ -100,12 +138,33 @@ public class ParameterizedPerftTest {
             assertEquals(moveGenerator.getBoard().isWhiteToMove, BPiece.isWhite(piece));
             assertNotEquals("unknown", move.moveFlagName(), "unknown moveFlagName: " + move.moveFlagName());
 
-            BBoard childBoard = new BBoard(moveGenerator.getBoard());
+            BBoard childBoard = moveGenerator.getBoard().copy();
             MoveGenerator childMoveGenerator = new MoveGenerator(childBoard);
 
             childBoard.makeMove(move, true);
 
             long result = perft(childMoveGenerator, depth - 1);
+
+            childBoard.undoMove(move, true);
+
+            return result;
+        }).sum();
+    }
+
+    long perftParallelCopy(BBoard board, int depth) {
+        if (depth == 0) return 1;
+
+        MoveGenerator moveGenerator = new MoveGenerator(board);
+        BMove[] moves = moveGenerator.generateMoves(false);
+
+        return Arrays.stream(moves).parallel().mapToLong(move -> {
+
+            BBoard childBoard = board.copy();
+            assertTrue(board.equals(childBoard));
+
+            childBoard.makeMove(move, true);
+
+            long result = perftCopy(childBoard, depth - 1);
 
             childBoard.undoMove(move, true);
 
