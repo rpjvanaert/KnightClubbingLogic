@@ -10,11 +10,14 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.postgresql.ds.PGSimpleDataSource;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.LogManager;
 
 public class OpeningService {
     private final OpeningBookDao openingBookDao;
@@ -28,6 +31,7 @@ public class OpeningService {
     }
 
     public OpeningService(String jdbcUrl) {
+        silenceAll();
         try {
             Properties props = new Properties();
             props.setProperty("user", "kce");
@@ -79,12 +83,40 @@ public class OpeningService {
 
     private void verifyConnection() {
         try {
-            // Try a simple query to ensure the DB is accessible and the table exists
             int count = this.openingBookDao.countAll();
-            // Optionally, check for a minimum expected count or other invariants
         } catch (Exception e) {
             throw new RuntimeException("Database connection established but verification failed: " + e.getMessage(), e);
         }
+    }
+
+    public static void silenceAll() {
+        LogManager.getLogManager().reset();
+
+        try {
+            Class<?> bridge = Class.forName("org.slf4j.bridge.SLF4JBridgeHandler");
+            Method remove = bridge.getMethod("removeHandlersForRootLogger");
+            Method install = bridge.getMethod("install");
+            remove.invoke(null);
+            install.invoke(null);
+        } catch (ClassNotFoundException cnf) {
+            // SLF4J bridge not on classpath — ignore
+        } catch (Throwable t) {
+            // Any other reflection failure — ignore to avoid breaking startup
+        }
+
+
+        final PrintStream original = System.out;
+        PrintStream filtered = new PrintStream(new ByteArrayOutputStream()) {
+            @Override
+            public void println(String x) {
+                if (x == null) return;
+                if (x.startsWith("Liquibase:") || x.startsWith("Running Changeset") || x.contains("Rows affected")) {
+                    return;
+                }
+                original.println(x);
+            }
+        };
+        System.setOut(filtered);
     }
 
     public void update(OpeningBookEntry entry) {

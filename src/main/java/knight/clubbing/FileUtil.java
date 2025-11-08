@@ -20,7 +20,6 @@ public class FileUtil {
 
     public static <T> T load(Class<T> clazz, Path path) {
         Path fullPath = resolveToData(path);
-        System.out.println(fullPath.toAbsolutePath());
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fullPath.toFile()))) {
             Object obj = ois.readObject();
             return clazz.cast(obj);
@@ -33,7 +32,6 @@ public class FileUtil {
         Path fullPath = resolveToData(path);
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fullPath.toFile()))) {
             oos.writeObject(object);
-            System.out.println("Saved to: " + fullPath);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save: " + e.getMessage());
         }
