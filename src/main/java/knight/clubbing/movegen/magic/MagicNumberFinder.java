@@ -47,8 +47,6 @@ public class MagicNumberFinder {
             ROOK_MASKS[sq] = mask;
             ROOK_MAGICS[sq] = magic;
             ROOK_ATTACKS[sq] = attackTable;
-
-            System.out.printf("Rook square %2d done, magic = 0x%016X\n", sq, magic);
         }
     }
 
@@ -78,7 +76,6 @@ public class MagicNumberFinder {
             BISHOP_MAGICS[sq] = magic;
             BISHOP_ATTACKS[sq] = attackTable;
 
-            System.out.printf("Bishop square %2d done, magic = 0x%016X\n", sq, magic);
         }
     }
 
