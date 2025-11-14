@@ -22,7 +22,7 @@ import java.util.logging.LogManager;
 public class OpeningService {
     private final OpeningBookDao openingBookDao;
 
-    public static final String jdbcUrl = "jdbc:postgresql://127.0.0.1:5432/knight_clubbing_db?ssl=false";
+    public static final String jdbcUrl = "jdbc:postgresql://172.18.0.2:5432/knight_clubbing_db?ssl=false";
 
     protected static final String memoryUrl = "jdbc:sqlite:file:memdb1?mode=memory&cache=shared";
 
