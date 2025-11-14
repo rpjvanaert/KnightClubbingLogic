@@ -31,7 +31,7 @@ class OpeningServiceTest {
         openingService.insert(entry);
 
         assertEquals(1, openingService.getAll().size());
-        assertEquals(entry, openingService.getAll().getFirst());
+        assertEquals(entry, openingService.getAll().get(0));
         assertEquals(entry, openingService.getBest(1L));
     }
 
@@ -67,7 +67,7 @@ class OpeningServiceTest {
         openingService.remove(1L, "e2e4");
 
         assertEquals(1, openingService.getAll().size());
-        assertEquals("d2d4", openingService.getAll().getFirst().getMove());
+        assertEquals("d2d4", openingService.getAll().get(0).getMove());
     }
 
     @Test

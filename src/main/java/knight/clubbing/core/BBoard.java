@@ -263,7 +263,7 @@ public class BBoard {
             repetitionPositionHistory.pop();
         }
         if (!inSearch) {
-            allGameMoves.removeLast();
+            allGameMoves.remove(allGameMoves.size() - 1);
         }
 
         gameStateHistory.pop();
