@@ -1,5 +1,7 @@
 package knight.clubbing.opening;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -8,7 +10,6 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import org.postgresql.ds.PGSimpleDataSource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -21,8 +22,10 @@ import java.util.logging.LogManager;
 
 public class OpeningService {
     private final OpeningBookDao openingBookDao;
+    private final Jdbi jdbi;
 
-    public static final String jdbcUrl = "jdbc:postgresql://172.18.0.2:5432/knight_clubbing_db?ssl=false";
+    // Use localhost by default, the compose file exposes port 5432
+    public static final String jdbcUrl = "jdbc:postgresql://localhost:5432/knight_clubbing_db?ssl=false";
 
     protected static final String memoryUrl = "jdbc:sqlite:file:memdb1?mode=memory&cache=shared";
 
@@ -50,6 +53,7 @@ public class OpeningService {
                 liquibase.update(new Contexts());
 
                 Jdbi jdbi = Jdbi.create(migrationConn).installPlugin(new SqlObjectPlugin());
+                this.jdbi = jdbi;
                 this.openingBookDao = jdbi.onDemand(OpeningBookDao.class);
             } else {
                 try (Connection conn = DriverManager.getConnection(jdbcUrl, props)) {
@@ -61,23 +65,44 @@ public class OpeningService {
                             database
                     );
                     liquibase.update(new Contexts());
+                } catch (Exception e) {
+                    String errorMsg = "Failed to connect to database at: " + jdbcUrl + "\n" +
+                            "Please ensure the database is running. You can start it with:\n" +
+                            "  docker compose -f src/main/resources/kce-compose.yaml up -d\n" +
+                            "  OR\n" +
+                            "  podman compose -f src/main/resources/kce-compose.yaml up -d";
+                    throw new RuntimeException(errorMsg, e);
                 }
                 Jdbi jdbi;
                 if (jdbcUrl.startsWith("jdbc:postgresql:")) {
-                    PGSimpleDataSource ds = new PGSimpleDataSource();
-                    ds.setUrl(jdbcUrl);
-                    ds.setUser("kce");
-                    ds.setPassword("");
+                    HikariConfig config = new HikariConfig();
+                    config.setJdbcUrl(jdbcUrl);
+                    config.setUsername("kce");
+                    config.setPassword("");
+
+                    config.setMaximumPoolSize(10);
+                    config.setMinimumIdle(2);
+                    config.setConnectionTimeout(10_000);
+                    config.setIdleTimeout(60_000);
+                    config.setMaxLifetime(10 * 60_000);
+                    config.setValidationTimeout(5_000);
+
+                    config.setConnectionTestQuery("SELECT 1");
+
+                    HikariDataSource ds = new HikariDataSource(config);
                     jdbi = Jdbi.create(ds).installPlugin(new SqlObjectPlugin());
                 } else {
                     throw new IllegalArgumentException("Unsupported JDBC URL: " + jdbcUrl);
                 }
+                this.jdbi = jdbi;
                 this.openingBookDao = jdbi.onDemand(OpeningBookDao.class);
             }
 
             verifyConnection();
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Database setup failed", e);
+            throw new RuntimeException("Database setup failed: " + e.getMessage(), e);
         }
     }
 
@@ -153,5 +178,31 @@ public class OpeningService {
 
     public int countByZobristKey(long zobristKey) {
         return this.openingBookDao.countByZobristKey(zobristKey);
+    }
+
+    /**
+     * Insert multiple entries in a single transaction to reduce connection churn.
+     * This is much more efficient than calling insert() repeatedly.
+     *
+     * @param entries List of OpeningBookEntry objects to insert
+     */
+    public void insertBatch(List<OpeningBookEntry> entries) {
+        if (entries == null || entries.isEmpty()) {
+            return;
+        }
+
+        jdbi.useHandle(handle -> {
+            handle.begin();
+            try {
+                OpeningBookDao dao = handle.attach(OpeningBookDao.class);
+                for (OpeningBookEntry entry : entries) {
+                    dao.upsert(entry);
+                }
+                handle.commit();
+            } catch (Throwable t) {
+                handle.rollback();
+                throw t;
+            }
+        });
     }
 }
