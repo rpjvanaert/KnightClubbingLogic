@@ -18,6 +18,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
+          distribution: adopt
           java-version: '17'
           
       # Cache Maven dependencies for faster builds
