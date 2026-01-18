@@ -30,10 +30,14 @@ public class OpeningService {
     protected static final String memoryUrl = "jdbc:sqlite:file:memdb1?mode=memory&cache=shared";
 
     public OpeningService() {
-        this(jdbcUrl);
+        this(jdbcUrl, OpeningServiceConfig.defaultConfig());
     }
 
     public OpeningService(String jdbcUrl) {
+        this(jdbcUrl, OpeningServiceConfig.defaultConfig());
+    }
+
+    public OpeningService(String jdbcUrl, OpeningServiceConfig serviceConfig) {
         silenceAll();
         try {
             Properties props = new Properties();
@@ -80,12 +84,14 @@ public class OpeningService {
                     config.setUsername("kce");
                     config.setPassword("");
 
-                    config.setMaximumPoolSize(10);
-                    config.setMinimumIdle(2);
-                    config.setConnectionTimeout(10_000);
-                    config.setIdleTimeout(60_000);
-                    config.setMaxLifetime(10 * 60_000);
-                    config.setValidationTimeout(5_000);
+                    config.setMaximumPoolSize(serviceConfig.maximumPoolSize());
+                    config.setMinimumIdle(serviceConfig.minimumIdle());
+                    config.setConnectionTimeout(serviceConfig.connectionTimeout());
+                    config.setIdleTimeout(serviceConfig.idleTimeout());
+                    config.setMaxLifetime(serviceConfig.maxLifetime());
+                    config.setValidationTimeout(serviceConfig.validationTimeout());
+                    config.setConnectionTestQuery("SELECT 1");
+                    config.setLeakDetectionThreshold(serviceConfig.leakDetectionThreshold());
 
                     config.setConnectionTestQuery("SELECT 1");
 
