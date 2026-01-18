@@ -152,26 +152,17 @@ public class BBoard {
         if (prevCastleRights != 0) {
             if (targetSquare == BBoardHelper.h1 || startSquare == BBoardHelper.h1) {
                 newCastleRights &= BGameState.clearWhiteKingsideMask;
-
-            } else if (targetSquare == BBoardHelper.a1 || startSquare == BBoardHelper.a1) {
-                newCastleRights &= BGameState.clearWhiteQueensideMask;
-
-            } else if (targetSquare == BBoardHelper.h8 || startSquare == BBoardHelper.h8) {
-                newCastleRights &= BGameState.clearBlackKingsideMask;
-
-            } else if (targetSquare == BBoardHelper.a8 || startSquare == BBoardHelper.a8) {
-                newCastleRights &= BGameState.clearBlackQueensideMask;
             }
-        }
 
-        if (movedPieceType == BPiece.rook) {
-            if (startSquare == BBoardHelper.h1) {
-                newCastleRights &= BGameState.clearWhiteKingsideMask;
-            } else if (startSquare == BBoardHelper.a1) {
+            if (targetSquare == BBoardHelper.a1 || startSquare == BBoardHelper.a1) {
                 newCastleRights &= BGameState.clearWhiteQueensideMask;
-            } else if (startSquare == BBoardHelper.h8) {
+            }
+
+            if (targetSquare == BBoardHelper.h8 || startSquare == BBoardHelper.h8) {
                 newCastleRights &= BGameState.clearBlackKingsideMask;
-            } else if (startSquare == BBoardHelper.a8) {
+            }
+
+            if (targetSquare == BBoardHelper.a8 || startSquare == BBoardHelper.a8) {
                 newCastleRights &= BGameState.clearBlackQueensideMask;
             }
         }
@@ -272,11 +263,15 @@ public class BBoard {
             repetitionPositionHistory.pop();
         }
         if (!inSearch) {
-            allGameMoves.removeLast();
+            allGameMoves.remove(allGameMoves.size() - 1);
         }
 
         gameStateHistory.pop();
         state = gameStateHistory.peek();
+
+        if (repetitionPositionHistory.isEmpty())
+            repetitionPositionHistory.push(state.getZobristKey());
+
         plyCount--;
         hasCachedInCheckValue = false;
     }
@@ -612,4 +607,31 @@ public class BBoard {
     public BBoard copy() {
         return new BBoard(this);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BBoard other = (BBoard) o;
+        if (this.isWhiteToMove != other.isWhiteToMove) return false;
+        if (!Objects.equals(this.state, other.state)) return false;
+        if (this.allPiecesBoard != other.allPiecesBoard) return false;
+        if (this.whiteOrthogonalSliderBoard != other.whiteOrthogonalSliderBoard) return false;
+        if (this.blackOrthogonalSliderBoard != other.blackOrthogonalSliderBoard) return false;
+        if (this.whiteDiagonalSliderBoard != other.whiteDiagonalSliderBoard) return false;
+        if (this.blackDiagonalSliderBoard != other.blackDiagonalSliderBoard) return false;
+        if (this.totalPieceCountWithoutPawnsAndKings != other.totalPieceCountWithoutPawnsAndKings) return false;
+        if (this.plyCount != other.plyCount) return false;
+        if (!Arrays.equals(this.bitboards, other.bitboards)) return false;
+        if (!Arrays.equals(this.pieceBoards, other.pieceBoards)) return false;
+        if (!Arrays.equals(this.colorBoards, other.colorBoards)) return false;
+        if (!Arrays.equals(this.kingSquares, other.kingSquares)) return false;
+        if (!Objects.equals(this.allGameMoves, other.allGameMoves)) return false;
+        if (!Objects.equals(new ArrayList<>(this.repetitionPositionHistory), new ArrayList<>(other.repetitionPositionHistory))) return false;
+
+        return true;
+    }
+
+
 }

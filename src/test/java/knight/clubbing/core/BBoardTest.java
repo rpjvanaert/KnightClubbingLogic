@@ -536,7 +536,6 @@ class BBoardTest {
         BBoard board = new BBoard("4k2r/8/8/8/8/8/8/4K3 b k - 0 1");
         BMove move1 = new BMove(BBoardHelper.stringCoordToIndex("h8"), BBoardHelper.stringCoordToIndex("h1"));
         BMove move2 = new BMove(BBoardHelper.stringCoordToIndex("e1"), BBoardHelper.stringCoordToIndex("d2"));
-        BMove move3 = new BMove(BBoardHelper.stringCoordToIndex("e8"), BBoardHelper.stringCoordToIndex("g8"), BMove.castleFlag);
 
         // Act
         board.makeMove(move1, true);
@@ -544,5 +543,205 @@ class BBoardTest {
 
         // Assert
         assertEquals("4k3/8/8/8/8/8/3K4/7r b - - 2 2", board.exportFen(), "Expected FEN to reflect moves made.");
+    }
+
+    @Test
+    public void testCopy1() {
+        BBoard original = new BBoard("1rbqkb1r/1pp2ppp/p1p2n2/4p3/4P3/2N2N2/PPPP1PPP/1RBQK2R b Kk - 0 1");
+        BBoard copy = original.copy();
+
+        assertEquals(original.exportFen(), copy.exportFen(), "Copied board should have the same FEN as the original.");
+        assertEquals(original.state.getZobristKey(), copy.state.getZobristKey(), "Copied board should have the same Zobrist key as the original.");
+    }
+
+    @Test
+    void testEquals_Reflexive() {
+        BBoard board = new BBoard();
+        assertEquals(board, board);
+    }
+
+    @Test
+    void testEquals_Symmetric() {
+        BBoard board1 = new BBoard();
+        BBoard board2 = new BBoard();
+
+        assertEquals(board1, board2);
+        assertEquals(board2, board1);
+    }
+
+    @Test
+    void testEquals_WithNull() {
+        BBoard board = new BBoard();
+        assertNotEquals(board, null);
+    }
+
+    @Test
+    void testEquals_WithDifferentClass() {
+        BBoard board = new BBoard();
+        String other = "not a BBoard";
+        assertNotEquals(board, other);
+    }
+
+    @Test
+    void testEquals_IdenticalStartPosition() {
+        BBoard board1 = new BBoard();
+        BBoard board2 = new BBoard();
+
+        assertEquals(board1, board2);
+    }
+
+    @Test
+    void testEquals_IdenticalCustomPosition() {
+        String fen = "r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3";
+        BBoard board1 = new BBoard(fen);
+        BBoard board2 = new BBoard(fen);
+
+        assertEquals(board1, board2);
+    }
+
+    @Test
+    void testEquals_DifferentSideToMove() {
+        BBoard board1 = new BBoard("8/8/8/8/8/8/8/4k3 w - - 0 1");
+        BBoard board2 = new BBoard("8/8/8/8/8/8/8/4k3 b - - 0 1");
+
+        assertNotEquals(board1, board2);
+    }
+
+    @Test
+    void testEquals_DifferentPiecePosition() {
+        BBoard board1 = new BBoard();
+        BBoard board2 = new BBoard();
+
+        BMove move = new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4"));
+        board2.makeMove(move, false);
+
+        assertNotEquals(board1, board2);
+    }
+
+    @Test
+    void testEquals_DifferentCastlingRights() {
+        BBoard board1 = new BBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        BBoard board2 = new BBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w Kq - 0 1");
+
+        assertNotEquals(board1, board2);
+    }
+
+    @Test
+    void testEquals_DifferentEnPassantFile() {
+        BBoard board1 = new BBoard("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
+        BBoard board2 = new BBoard("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
+
+        assertNotEquals(board1, board2);
+    }
+
+    @Test
+    void testEquals_DifferentFiftyMoveCounter() {
+        BBoard board1 = new BBoard("8/8/8/8/8/8/8/4k3 w - - 0 1");
+        BBoard board2 = new BBoard("8/8/8/8/8/8/8/4k3 w - - 5 1");
+
+        assertNotEquals(board1, board2);
+    }
+
+    @Test
+    void testEquals_CopyConstructor() {
+        BBoard original = new BBoard("r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3");
+        BBoard copy = new BBoard(original);
+
+        assertEquals(original, copy);
+    }
+
+    @Test
+    void testEquals_CopyMethod() {
+        BBoard original = new BBoard("r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3");
+        BBoard copy = original.copy();
+
+        assertEquals(original, copy);
+    }
+
+    @Test
+    void testEquals_AfterMoveAndUndo() {
+        BBoard board1 = new BBoard();
+        BBoard board2 = new BBoard();
+
+        BMove move = new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4"));
+
+        assertEquals(board1, board2);
+
+        board2.makeMove(move, false);
+        board2.undoMove(move, false);
+
+        assertEquals(board1, board2);
+    }
+
+    @Test
+    void testEquals_DifferentGameMoveHistory() {
+        BBoard board1 = new BBoard();
+        BBoard board2 = new BBoard();
+
+        BMove move1 = new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4"));
+        BMove move2 = new BMove(BBoardHelper.stringCoordToIndex("e7"), BBoardHelper.stringCoordToIndex("e5"));
+
+        // Same position but different move history
+        board1.makeMove(move1, false);
+        board1.makeMove(move2, false);
+
+        board2.makeMove(move1, false);
+        board2.makeMove(move2, false);
+
+        assertEquals(board1, board2);
+    }
+
+    @Test
+    void testEquals_WithCachedCheckValues() {
+        BBoard board1 = new BBoard("3k4/8/8/8/8/8/8/R3K3 b - - 0 1");
+        BBoard board2 = new BBoard("3k4/8/8/8/8/8/8/R3K3 b - - 0 1");
+
+        // Force calculation of cached check values
+        board1.isInCheck();
+        board2.isInCheck();
+
+        assertEquals(board1, board2);
+    }
+
+    @Test
+    void testEquals_DifferentCachedCheckState() {
+        BBoard board1 = new BBoard("3k4/8/8/8/8/8/8/R3K3 b - - 0 1");
+        BBoard board2 = new BBoard("3k4/8/8/8/8/8/8/R3K3 b - - 0 1");
+
+        // Only calculate for one board
+        board1.isInCheck();
+
+        // They should still be equal (one has cached value, other doesn't)
+        assertEquals(board1, board2);
+    }
+
+    @Test
+    void testEquals_ComplexPosition() {
+        String fen = "r2q1rk1/ppp2ppp/2n1bn2/2b1p3/3pP3/3P1N2/PPP1BPPP/RNBQ1RK1 w - - 0 8";
+        BBoard board1 = new BBoard(fen);
+        BBoard board2 = new BBoard(fen);
+
+        assertEquals(board1, board2);
+    }
+
+    @Test
+    void testEquals_AfterMultipleMoves() {
+        BBoard board1 = new BBoard();
+        BBoard board2 = new BBoard();
+
+        // Make the same sequence of moves on both boards
+        BMove[] moves = {
+            new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4")),
+            new BMove(BBoardHelper.stringCoordToIndex("e7"), BBoardHelper.stringCoordToIndex("e5")),
+            new BMove(BBoardHelper.stringCoordToIndex("g1"), BBoardHelper.stringCoordToIndex("f3")),
+            new BMove(BBoardHelper.stringCoordToIndex("b8"), BBoardHelper.stringCoordToIndex("c6"))
+        };
+
+        for (BMove move : moves) {
+            board1.makeMove(move, false);
+            board2.makeMove(move, false);
+        }
+
+        assertEquals(board1, board2);
     }
 }
