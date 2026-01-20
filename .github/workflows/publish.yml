@@ -10,18 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
         
-      # Set up JDK
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
           distribution: adopt
           java-version: '17'
           
-      # Cache Maven dependencies for faster builds
       - name: Cache Maven dependencies
         uses: actions/cache@v3
         with:
@@ -30,9 +27,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Build the project
       - name: Build the project
         run: mvn clean install
+
       - name: Configure Maven for GitHub Packages
         run: |
           mkdir -p ~/.m2
@@ -45,9 +42,12 @@ jobs:
               </server>
             </servers>
           </settings>' > ~/.m2/settings.xml
-        
-      # Publish the dependency to GitHub Packages
+
+      # Debugging Step: Print settings.xml
+      - name: Debug Maven Settings
+        run: cat ~/.m2/settings.xml
+
       - name: Publish to GitHub Packages
-        run: mvn deploy
+        run: mvn deploy -X
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
