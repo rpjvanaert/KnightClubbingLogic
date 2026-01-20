@@ -30,6 +30,9 @@ jobs:
     - name: List Files in Workspace
       run: ls -la $GITHUB_WORKSPACE
 
+    - name: Display settings.xml
+      run: cat $GITHUB_WORKSPACE/settings.xml
+
     - name: Publish to GitHub Packages Apache Maven
       run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
       env:
