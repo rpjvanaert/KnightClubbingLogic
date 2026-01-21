@@ -19,6 +19,10 @@
             <id>github</id>
             <url>https://maven.pkg.github.com/rpjvanaert/KnightClubbingLogic</url>
         </repository>
+        <snapshotRepository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/rpjvanaert/KnightClubbingLogic</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <dependencies>
