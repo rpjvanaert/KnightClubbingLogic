@@ -26,6 +26,7 @@ jobs:
 
     - name: Create settings.xml for Maven
       run: |
+        mkdir -p ~/.m2
         echo "<settings>
           <servers>
             <server>
