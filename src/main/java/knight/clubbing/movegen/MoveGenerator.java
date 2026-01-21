@@ -1,7 +1,7 @@
 package knight.clubbing.movegen;
 
 import knight.clubbing.core.*;
-import rpjvanaert.core.*;
+import knight.clubbing.core.*;
 import knight.clubbing.movegen.magic.Magic;
 
 import java.util.Arrays;
