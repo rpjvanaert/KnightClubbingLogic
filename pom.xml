@@ -8,22 +8,18 @@
     <artifactId>KnightClubbingLogic</artifactId>
     <version>1.0</version>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <distributionManagement>
         <repository>
             <id>github</id>
             <url>https://maven.pkg.github.com/rpjvanaert/KnightClubbingLogic</url>
         </repository>
-        <snapshotRepository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/rpjvanaert/KnightClubbingLogic</url>
-        </snapshotRepository>
     </distributionManagement>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
