@@ -27,7 +27,7 @@ jobs:
         server-password: GITHUB_TOKEN
     - name: Publish to Github Packages
 
-      run: mvn deploy
+      run: mvn deploy -X
       env:
         GITHUB_ACTOR: ${{ github.actor }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
