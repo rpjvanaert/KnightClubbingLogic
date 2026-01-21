@@ -25,6 +25,13 @@ jobs:
         server-id: github
         server-username: GITHUB_ACTOR
         server-password: GITHUB_TOKEN
+
+    - name: Set unique version
+      run: |
+        VERSION="1.0.${{ github.run_number }}"
+        mvn versions:set -DnewVersion=$VERSION
+
+        
     - name: Publish to Github Packages
 
       run: mvn deploy -X
