@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  publish:
 
     runs-on: ubuntu-latest
     permissions:
@@ -14,7 +14,7 @@ jobs:
       packages: write
 
     steps:
-    - name: Checkout
+    - name: Checkout Code
       uses: actions/checkout@v4
 
     - name: Set up JDK 17
@@ -22,20 +22,20 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        server-id: github
-        server-username: GITHUB_ACTOR
-        server-password: GITHUB_TOKEN
 
-    - name: Set unique version
+    - name: Append Build Number to Version
       run: |
-        VERSION="1.0.${{ github.run_number }}"
+        # Extract the version from the POM
+        BASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+
+        # Append GitHub run number to the extracted version
+        VERSION="${BASE_VERSION}-${{ github.run_number }}"
+
+        # Update the POM with the new version
         mvn versions:set -DnewVersion=$VERSION
+      shell: bash
 
-        
-    - name: Publish to Github Packages
-
+    - name: Publish to GitHub Packages
       run: mvn deploy -X
       env:
-        GITHUB_ACTOR: ${{ github.actor }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
