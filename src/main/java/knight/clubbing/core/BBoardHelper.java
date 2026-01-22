@@ -39,6 +39,11 @@ public class BBoardHelper {
     public static final long FILE_G = 0x4040404040404040L;
     public static final long FILE_H = 0x8080808080808080L;
 
+    public static final long[] FILE_MASKS = {
+            FILE_A, FILE_B, FILE_C, FILE_D,
+            FILE_E, FILE_F, FILE_G, FILE_H
+    };
+
     public static int rankIndex(int squareIndex) {
         return squareIndex >> 3;
     }

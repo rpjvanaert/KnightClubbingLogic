@@ -185,4 +185,18 @@ class BBoardHelperTest {
             }
         }
     }
+
+    @Test
+    void testFileMasks() {
+        for (int fileIndex = 0; fileIndex < BBoardHelper.FILE_MASKS.length; fileIndex++) {
+            long fileMask = BBoardHelper.FILE_MASKS[fileIndex];
+            for (int squareIndex = 0; squareIndex < 64; squareIndex++) {
+                boolean isInFile = BBoardHelper.fileIndex(squareIndex) == fileIndex;
+                assertEquals(isInFile, BBoardHelper.containsSquare(fileMask, squareIndex),
+                        "Square " + BBoardHelper.indexToStringCoord(squareIndex) +
+                                " incorrect for file mask " + BBoardHelper.fileChars.charAt(fileIndex));
+            }
+        }
+    }
+
 }
