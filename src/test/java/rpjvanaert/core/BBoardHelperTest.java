@@ -168,4 +168,21 @@ class BBoardHelperTest {
         assertThrows(IllegalArgumentException.class, () -> BBoardHelper.indexToStringCoord(999));
     }
 
+    @Test
+    void testFiles() {
+        long[] files = {
+                BBoardHelper.FILE_A, BBoardHelper.FILE_B, BBoardHelper.FILE_C, BBoardHelper.FILE_D,
+                BBoardHelper.FILE_E, BBoardHelper.FILE_F, BBoardHelper.FILE_G, BBoardHelper.FILE_H
+        };
+
+        for (int fileIndex = 0; fileIndex < files.length; fileIndex++) {
+            long fileBitboard = files[fileIndex];
+            for (int squareIndex = 0; squareIndex < 64; squareIndex++) {
+                boolean isInFile = BBoardHelper.fileIndex(squareIndex) == fileIndex;
+                assertEquals(isInFile, BBoardHelper.containsSquare(fileBitboard, squareIndex),
+                        "Square " + BBoardHelper.indexToStringCoord(squareIndex) +
+                                " incorrect for file " + BBoardHelper.fileChars.charAt(fileIndex));
+            }
+        }
+    }
 }
