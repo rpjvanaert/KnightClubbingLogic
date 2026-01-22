@@ -30,6 +30,15 @@ public class BBoardHelper {
 
     public static final long allBitsSet = 0xFFFFFFFFFFFFFFFFL;
 
+    public static final long FILE_A = 0x0101010101010101L;
+    public static final long FILE_B = 0x0202020202020202L;
+    public static final long FILE_C = 0x0404040404040404L;
+    public static final long FILE_D = 0x0808080808080808L;
+    public static final long FILE_E = 0x1010101010101010L;
+    public static final long FILE_F = 0x2020202020202020L;
+    public static final long FILE_G = 0x4040404040404040L;
+    public static final long FILE_H = 0x8080808080808080L;
+
     public static int rankIndex(int squareIndex) {
         return squareIndex >> 3;
     }
