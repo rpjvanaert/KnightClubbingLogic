@@ -536,6 +536,12 @@ public class BBoard {
         throw new IndexOutOfBoundsException();
     }
 
+    public boolean isDrawByRepetition() {
+        long currentZobristKey = state.getZobristKey();
+
+        return repetitionPositionHistory.stream().filter(entry -> entry == currentZobristKey).count() >= 3;
+    }
+
     public void move(int piece, int fromSquare, int toSquare) {
         if (this.get(piece, fromSquare)) {
             this.clear(piece, fromSquare);

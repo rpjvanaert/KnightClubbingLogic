@@ -696,7 +696,7 @@ class BBoardTest {
         BBoard board1 = new BBoard("3k4/8/8/8/8/8/8/R3K3 b - - 0 1");
         BBoard board2 = new BBoard("3k4/8/8/8/8/8/8/R3K3 b - - 0 1");
 
-        // Force calculation of cached check values
+        // Force calculation of check values
         board1.isInCheck();
         board2.isInCheck();
 
@@ -708,10 +708,9 @@ class BBoardTest {
         BBoard board1 = new BBoard("3k4/8/8/8/8/8/8/R3K3 b - - 0 1");
         BBoard board2 = new BBoard("3k4/8/8/8/8/8/8/R3K3 b - - 0 1");
 
-        // Only calculate for one board
         board1.isInCheck();
 
-        // They should still be equal (one has cached value, other doesn't)
+        // They should still be equal
         assertEquals(board1, board2);
     }
 
@@ -729,7 +728,6 @@ class BBoardTest {
         BBoard board1 = new BBoard();
         BBoard board2 = new BBoard();
 
-        // Make the same sequence of moves on both boards
         BMove[] moves = {
             new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4")),
             new BMove(BBoardHelper.stringCoordToIndex("e7"), BBoardHelper.stringCoordToIndex("e5")),
@@ -743,5 +741,60 @@ class BBoardTest {
         }
 
         assertEquals(board1, board2);
+    }
+
+    @Test
+    void testIsDrawByRepetition_True() {
+        // Arrange
+        BBoard board = new BBoard();
+
+        BMove initialMoveWhite = new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4"));
+        BMove initialMoveBlack = new BMove(BBoardHelper.stringCoordToIndex("e7"), BBoardHelper.stringCoordToIndex("e5"));
+
+        BMove whiteKnightForward = new BMove(BBoardHelper.stringCoordToIndex("g1"), BBoardHelper.stringCoordToIndex("f3"));
+        BMove blackKnightForward = new BMove(BBoardHelper.stringCoordToIndex("g8"), BBoardHelper.stringCoordToIndex("f5"));
+        BMove whiteKnightBackward = new BMove(BBoardHelper.stringCoordToIndex("f3"), BBoardHelper.stringCoordToIndex("g1"));
+        BMove blackKnightBackward = new BMove(BBoardHelper.stringCoordToIndex("f5"), BBoardHelper.stringCoordToIndex("g8"));
+
+        // Act
+        board.makeMove(initialMoveWhite, false);
+        board.makeMove(initialMoveBlack, false);
+
+        assertFalse(board.isDrawByRepetition());
+
+        board.makeMove(whiteKnightForward, false);
+        board.makeMove(blackKnightForward, false);
+        board.makeMove(whiteKnightBackward, false);
+        board.makeMove(blackKnightBackward, false);
+
+        assertFalse(board.isDrawByRepetition());
+
+        board.makeMove(whiteKnightForward, false);
+        board.makeMove(blackKnightForward, false);
+        board.makeMove(whiteKnightBackward, false);
+        board.makeMove(blackKnightBackward, false);
+
+        // Assert
+        assertTrue(board.isDrawByRepetition(), "Expected draw by repetition after three repetitions of the same position.");
+    }
+
+    @Test
+    void testIsDrawByRepetition_False() {
+        // Arrange
+        BBoard board = new BBoard();
+
+        BMove move1 = new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4"));
+        BMove move2 = new BMove(BBoardHelper.stringCoordToIndex("e7"), BBoardHelper.stringCoordToIndex("e5"));
+        BMove move3 = new BMove(BBoardHelper.stringCoordToIndex("g1"), BBoardHelper.stringCoordToIndex("f3"));
+        BMove move4 = new BMove(BBoardHelper.stringCoordToIndex("b8"), BBoardHelper.stringCoordToIndex("c6"));
+
+        // Act
+        board.makeMove(move1, false);
+        board.makeMove(move2, false);
+        board.makeMove(move3, false);
+        board.makeMove(move4, false);
+
+        // Assert
+        assertFalse(board.isDrawByRepetition(), "Expected no draw by repetition as the position has not repeated three times.");
     }
 }
