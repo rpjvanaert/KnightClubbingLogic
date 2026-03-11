@@ -214,7 +214,7 @@ public class PerftTest {
 
             int piece = moveGenerator.getBoard().getPieceBoards()[move.startSquare()];
             assertNotEquals(0, piece, "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
-            assertEquals(moveGenerator.getBoard().isWhiteToMove, BPiece.isWhite(piece));
+            assertEquals(moveGenerator.getBoard().isWhiteToMove(), BPiece.isWhite(piece));
             assertNotEquals("unknown", move.moveFlagName(), "unknown moveFlagName: " + move.moveFlagName());
 
             BBoard childBoard = new BBoard(moveGenerator.getBoard());
@@ -241,7 +241,7 @@ public class PerftTest {
             assertNotNull(move);
             int piece = moveGenerator.getBoard().getPieceBoards()[move.startSquare()];
             assertNotEquals(0, piece, "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
-            assertEquals(moveGenerator.getBoard().isWhiteToMove, BPiece.isWhite(piece));
+            assertEquals(moveGenerator.getBoard().isWhiteToMove(), BPiece.isWhite(piece));
             assertNotEquals("unknown", move.moveFlagName(), "unknown moveFlagName: " + move.moveFlagName());
 
             moveGenerator.getBoard().makeMove(move, false);

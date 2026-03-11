@@ -44,27 +44,27 @@ class BBoardTest {
         BBoard board = new BBoard();
 
         for (int i = 8; i < 16; i++) {
-            assertEquals(BPiece.whitePawn, board.pieceBoards[i], "Expected white pawn at " + i);
+            assertEquals(BPiece.whitePawn, board.getPieceBoards()[i], "Expected white pawn at " + i);
             assertTrue((board.getBitboard(BPiece.whitePawn) & (1L << i)) != 0, "Bitboard missing white pawn at " + i);
         }
 
         for (int i = 48; i < 56; i++) {
-            assertEquals(BPiece.blackPawn, board.pieceBoards[i], "Expected black pawn at " + i);
+            assertEquals(BPiece.blackPawn, board.getPieceBoards()[i], "Expected black pawn at " + i);
             assertTrue((board.getBitboard(BPiece.blackPawn) & (1L << i)) != 0, "Bitboard missing black pawn at " + i);
         }
 
         for (int i = 16; i < 48; i++) {
-            assertEquals(BPiece.none, board.pieceBoards[i], "Expected none at " + i);
+            assertEquals(BPiece.none, board.getPieceBoards()[i], "Expected none at " + i);
         }
 
-        assertEquals(BPiece.makePiece(BPiece.rook, BPiece.white), board.pieceBoards[0]);
+        assertEquals(BPiece.makePiece(BPiece.rook, BPiece.white), board.getPieceBoards()[0]);
         assertEquals(129L, board.getBitboard(BPiece.whiteRook));
         assertEquals(66L, board.getBitboard(BPiece.whiteKnight));
 
-        assertEquals(0b1111, board.state.getCastlingRights(), "Expected full castling rights");
-        assertTrue(board.isWhiteToMove, "Expected white to move");
-        assertEquals(0, board.state.getEnPassantFile(), "Expected no en passant file");
-        assertNotEquals(0, board.state.getZobristKey(), "Expected non-zero Zobrist key");
+        assertEquals(0b1111, board.getState().getCastlingRights(), "Expected full castling rights");
+        assertTrue(board.isWhiteToMove(), "Expected white to move");
+        assertEquals(0, board.getState().getEnPassantFile(), "Expected no en passant file");
+        assertNotEquals(0, board.getState().getZobristKey(), "Expected non-zero Zobrist key");
     }
 
     @Test
@@ -72,24 +72,24 @@ class BBoardTest {
         String fen = "r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3";
         BBoard board = new BBoard(fen);
 
-        assertFalse(board.isWhiteToMove, "It should be Black to move");
-        assertEquals(BPiece.whiteKnight, board.pieceBoards[BBoardHelper.f1 + BBoardHelper.rowLength * 2], "White knight should be on f3");
-        assertEquals(BPiece.blackKnight, board.pieceBoards[BBoardHelper.c1 + BBoardHelper.rowLength * 5], "Black knight should be on c6");
-        assertEquals(BPiece.whiteBishop, board.pieceBoards[BBoardHelper.b1 + BBoardHelper.rowLength * 4], "White bishop should be on b5");
-        assertEquals(BPiece.blackPawn, board.pieceBoards[BBoardHelper.e1 + BBoardHelper.rowLength * 4], "Black pawn should be on e5");
+        assertFalse(board.isWhiteToMove(), "It should be Black to move");
+        assertEquals(BPiece.whiteKnight, board.getPieceBoards()[BBoardHelper.f1 + BBoardHelper.rowLength * 2], "White knight should be on f3");
+        assertEquals(BPiece.blackKnight, board.getPieceBoards()[BBoardHelper.c1 + BBoardHelper.rowLength * 5], "Black knight should be on c6");
+        assertEquals(BPiece.whiteBishop, board.getPieceBoards()[BBoardHelper.b1 + BBoardHelper.rowLength * 4], "White bishop should be on b5");
+        assertEquals(BPiece.blackPawn, board.getPieceBoards()[BBoardHelper.e1 + BBoardHelper.rowLength * 4], "Black pawn should be on e5");
     }
 
     @Test
     void testBasicMove() {
         BBoard board = new BBoard();
         BMove move = new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4"), BMove.pawnTwoUpFlag);
-        long keyBefore = board.state.getZobristKey();
+        long keyBefore = board.getState().getZobristKey();
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("e4")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("e2")]);
-        assertNotEquals(keyBefore, board.state.getZobristKey());
+        assertEquals(BPiece.whitePawn, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("e4")]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("e2")]);
+        assertNotEquals(keyBefore, board.getState().getZobristKey());
     }
 
     @Test
@@ -99,9 +99,9 @@ class BBoardTest {
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("d6")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("e5")]);
-        assertEquals(0, board.state.getFiftyMoveCounter());
+        assertEquals(BPiece.whitePawn, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("d6")]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("e5")]);
+        assertEquals(0, board.getState().getFiftyMoveCounter());
     }
 
     @Test
@@ -111,8 +111,8 @@ class BBoardTest {
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whiteQueen, board.pieceBoards[BBoardHelper.a8]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("a7")]);
+        assertEquals(BPiece.whiteQueen, board.getPieceBoards()[BBoardHelper.a8]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("a7")]);
     }
 
     @Test
@@ -122,9 +122,9 @@ class BBoardTest {
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("e6")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("f5")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("e5")]);
+        assertEquals(BPiece.whitePawn, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("e6")]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("f5")]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("e5")]);
     }
 
     @Test
@@ -134,10 +134,10 @@ class BBoardTest {
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whiteKing, board.pieceBoards[BBoardHelper.g1]);
-        assertEquals(BPiece.whiteRook, board.pieceBoards[BBoardHelper.f1]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.e1]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.h1]);
+        assertEquals(BPiece.whiteKing, board.getPieceBoards()[BBoardHelper.g1]);
+        assertEquals(BPiece.whiteRook, board.getPieceBoards()[BBoardHelper.f1]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.e1]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.h1]);
     }
 
     @Test
@@ -147,29 +147,29 @@ class BBoardTest {
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whiteKing, board.pieceBoards[BBoardHelper.c1]);
-        assertEquals(BPiece.whiteRook, board.pieceBoards[BBoardHelper.d1]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.e1]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.a1]);
+        assertEquals(BPiece.whiteKing, board.getPieceBoards()[BBoardHelper.c1]);
+        assertEquals(BPiece.whiteRook, board.getPieceBoards()[BBoardHelper.d1]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.e1]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.a1]);
     }
 
     @Test
     void testBasicUndoMove() {
         BBoard board = new BBoard();
         BMove move = new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4"), BMove.pawnTwoUpFlag);
-        long keyBefore = board.state.getZobristKey();
+        long keyBefore = board.getState().getZobristKey();
         long[] bitboardsBefore = board.getCopyBitboards();
         int[] pieceBoardsBefore = board.getCopyPieceBoards();
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("e4")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("e2")]);
-        assertNotEquals(keyBefore, board.state.getZobristKey());
+        assertEquals(BPiece.whitePawn, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("e4")]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("e2")]);
+        assertNotEquals(keyBefore, board.getState().getZobristKey());
 
         board.undoMove(move, false);
 
-        assertEquals(keyBefore, board.state.getZobristKey());
+        assertEquals(keyBefore, board.getState().getZobristKey());
         assertArrayEquals(bitboardsBefore, board.getBitboards());
         assertArrayEquals(pieceBoardsBefore, board.getPieceBoards());
     }
@@ -178,19 +178,19 @@ class BBoardTest {
     void testUndoCapture() {
         BBoard board = new BBoard("rnbqkbnr/ppp1pppp/3p4/4P3/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2");
         BMove move = new BMove(BBoardHelper.stringCoordToIndex("e5"), BBoardHelper.stringCoordToIndex("d6"));
-        long keyBefore = board.state.getZobristKey();
+        long keyBefore = board.getState().getZobristKey();
         long[] bitboardsBefore = board.getCopyBitboards();
         int[] pieceBoardsBefore = board.getCopyPieceBoards();
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("d6")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("e5")]);
-        assertEquals(0, board.state.getFiftyMoveCounter());
+        assertEquals(BPiece.whitePawn, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("d6")]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("e5")]);
+        assertEquals(0, board.getState().getFiftyMoveCounter());
 
         board.undoMove(move, false);
 
-        assertEquals(keyBefore, board.state.getZobristKey());
+        assertEquals(keyBefore, board.getState().getZobristKey());
         assertArrayEquals(bitboardsBefore, board.getBitboards());
         assertArrayEquals(pieceBoardsBefore, board.getPieceBoards());
     }
@@ -199,18 +199,18 @@ class BBoardTest {
     void testUndoPromotion() {
         BBoard board = new BBoard("8/P7/8/8/8/8/8/k6K w - - 0 1");
         BMove move = new BMove(BBoardHelper.stringCoordToIndex("a7"), BBoardHelper.stringCoordToIndex("a8"), BMove.promoteToQueenFlag);
-        long keyBefore = board.state.getZobristKey();
+        long keyBefore = board.getState().getZobristKey();
         long[] bitboardsBefore = board.getCopyBitboards();
         int[] pieceBoardsBefore = board.getCopyPieceBoards();
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whiteQueen, board.pieceBoards[BBoardHelper.a8]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("a7")]);
+        assertEquals(BPiece.whiteQueen, board.getPieceBoards()[BBoardHelper.a8]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("a7")]);
 
         board.undoMove(move, false);
 
-        assertEquals(keyBefore, board.state.getZobristKey());
+        assertEquals(keyBefore, board.getState().getZobristKey());
         assertArrayEquals(bitboardsBefore, board.getBitboards());
         assertArrayEquals(pieceBoardsBefore, board.getPieceBoards());
     }
@@ -219,19 +219,19 @@ class BBoardTest {
     void testUndoEnPassant() {
         BBoard board = new BBoard("8/8/8/4pP2/8/8/8/8 w - e6 0 1");
         BMove move = new BMove(BBoardHelper.stringCoordToIndex("f5"), BBoardHelper.stringCoordToIndex("e6"), BMove.enPassantCaptureFlag);
-        long keyBefore = board.state.getZobristKey();
+        long keyBefore = board.getState().getZobristKey();
         long[] bitboardsBefore = board.getCopyBitboards();
         int[] pieceBoardsBefore = board.getCopyPieceBoards();
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("e6")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("f5")]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.stringCoordToIndex("e5")]);
+        assertEquals(BPiece.whitePawn, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("e6")]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("f5")]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("e5")]);
 
         board.undoMove(move, false);
 
-        assertEquals(keyBefore, board.state.getZobristKey());
+        assertEquals(keyBefore, board.getState().getZobristKey());
         assertArrayEquals(bitboardsBefore, board.getBitboards());
         assertArrayEquals(pieceBoardsBefore, board.getPieceBoards());
     }
@@ -240,20 +240,20 @@ class BBoardTest {
     void testUndoKingsideCastle() {
         BBoard board = new BBoard("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
         BMove move = new BMove(BBoardHelper.e1, BBoardHelper.g1, BMove.castleFlag);
-        long keyBefore = board.state.getZobristKey();
+        long keyBefore = board.getState().getZobristKey();
         long[] bitboardsBefore = board.getCopyBitboards();
         int[] pieceBoardsBefore = board.getCopyPieceBoards();
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whiteKing, board.pieceBoards[BBoardHelper.g1]);
-        assertEquals(BPiece.whiteRook, board.pieceBoards[BBoardHelper.f1]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.e1]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.h1]);
+        assertEquals(BPiece.whiteKing, board.getPieceBoards()[BBoardHelper.g1]);
+        assertEquals(BPiece.whiteRook, board.getPieceBoards()[BBoardHelper.f1]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.e1]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.h1]);
 
         board.undoMove(move, false);
 
-        assertEquals(keyBefore, board.state.getZobristKey());
+        assertEquals(keyBefore, board.getState().getZobristKey());
         assertArrayEquals(bitboardsBefore, board.getBitboards());
         assertArrayEquals(pieceBoardsBefore, board.getPieceBoards());
     }
@@ -262,20 +262,20 @@ class BBoardTest {
     void testUndoQueensideCastle() {
         BBoard board = new BBoard("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w KQkq - 0 1");
         BMove move = new BMove(BBoardHelper.e1, BBoardHelper.c1, BMove.castleFlag);
-        long keyBefore = board.state.getZobristKey();
+        long keyBefore = board.getState().getZobristKey();
         long[] bitboardsBefore = board.getCopyBitboards();
         int[] pieceBoardsBefore = board.getCopyPieceBoards();
 
         board.makeMove(move, false);
 
-        assertEquals(BPiece.whiteKing, board.pieceBoards[BBoardHelper.c1]);
-        assertEquals(BPiece.whiteRook, board.pieceBoards[BBoardHelper.d1]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.e1]);
-        assertEquals(BPiece.none, board.pieceBoards[BBoardHelper.a1]);
+        assertEquals(BPiece.whiteKing, board.getPieceBoards()[BBoardHelper.c1]);
+        assertEquals(BPiece.whiteRook, board.getPieceBoards()[BBoardHelper.d1]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.e1]);
+        assertEquals(BPiece.none, board.getPieceBoards()[BBoardHelper.a1]);
 
         board.undoMove(move, false);
 
-        assertEquals(keyBefore, board.state.getZobristKey());
+        assertEquals(keyBefore, board.getState().getZobristKey());
         assertArrayEquals(bitboardsBefore, board.getBitboards());
         assertArrayEquals(pieceBoardsBefore, board.getPieceBoards());
     }
@@ -387,16 +387,16 @@ class BBoardTest {
     @Test
     void testZobrist_basicRestore() {
         BBoard board = new BBoard();
-        long originalKey = board.state.getZobristKey();
+        long originalKey = board.getState().getZobristKey();
         BMove move = new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4"));
 
         board.makeMove(move, false);
-        long newKey = board.state.getZobristKey();
+        long newKey = board.getState().getZobristKey();
 
         assertNotEquals(originalKey, newKey);
 
         board.undoMove(move, false);
-        long undoKey = board.state.getZobristKey();
+        long undoKey = board.getState().getZobristKey();
 
         assertEquals(originalKey, undoKey);
     }
@@ -408,7 +408,7 @@ class BBoardTest {
         BBoard board1 = new BBoard(fen);
         BBoard board2 = new BBoard(fen);
 
-        assertEquals(board1.state.getZobristKey(), board2.state.getZobristKey());
+        assertEquals(board1.getState().getZobristKey(), board2.getState().getZobristKey());
     }
 
     @Test
@@ -416,7 +416,7 @@ class BBoardTest {
         BBoard board1 = new BBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         BBoard board2 = new BBoard("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
 
-        assertNotEquals(board1.state.getZobristKey(), board2.state.getZobristKey());
+        assertNotEquals(board1.getState().getZobristKey(), board2.getState().getZobristKey());
     }
 
     @Test
@@ -424,7 +424,7 @@ class BBoardTest {
         BBoard board1 = new BBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         BBoard board2 = new BBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w Qkq - 0 1");
 
-        assertNotEquals(board1.state.getZobristKey(), board2.state.getZobristKey());
+        assertNotEquals(board1.getState().getZobristKey(), board2.getState().getZobristKey());
     }
 
     @Test
@@ -438,7 +438,7 @@ class BBoardTest {
         boardFromMove.makeMove(new BMove(BBoardHelper.stringCoordToIndex("g8"), BBoardHelper.stringCoordToIndex("h8")), false);
 
         assertEquals(boardFromFen.exportFen(), boardFromMove.exportFen());
-        assertEquals(boardFromFen.state.getZobristKey(), boardFromMove.state.getZobristKey());
+        assertEquals(boardFromFen.getState().getZobristKey(), boardFromMove.getState().getZobristKey());
     }
 
     @Test
@@ -449,7 +449,7 @@ class BBoardTest {
         boardFromMove.makeMove(new BMove(BBoardHelper.stringCoordToIndex("b7"), BBoardHelper.stringCoordToIndex("b8"), BMove.promoteToQueenFlag), false);
 
         assertEquals(boardFromFen.exportFen(), boardFromMove.exportFen());
-        assertEquals(boardFromFen.state.getZobristKey(), boardFromMove.state.getZobristKey());
+        assertEquals(boardFromFen.getState().getZobristKey(), boardFromMove.getState().getZobristKey());
     }
 
 
@@ -459,7 +459,7 @@ class BBoardTest {
         BBoard boardFromMove = new BBoard();
         boardFromMove.makeMove(new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4")), false);
 
-        assertEquals(boardFromFen.state.getZobristKey(), boardFromMove.state.getZobristKey());
+        assertEquals(boardFromFen.getState().getZobristKey(), boardFromMove.getState().getZobristKey());
     }
 
     @Test
@@ -468,7 +468,7 @@ class BBoardTest {
         BBoard boardFromMove = new BBoard();
         boardFromMove.makeMove(new BMove(BBoardHelper.stringCoordToIndex("e2"), BBoardHelper.stringCoordToIndex("e4")), false);
 
-        assertNotEquals(boardFromFen.state.getZobristKey(), boardFromMove.state.getZobristKey());
+        assertNotEquals(boardFromFen.getState().getZobristKey(), boardFromMove.getState().getZobristKey());
     }
 
     @Test
@@ -476,7 +476,7 @@ class BBoardTest {
         BBoard whiteToMove = new BBoard("8/8/8/8/8/8/8/4k3 w - - 0 1");
         BBoard blackToMove = new BBoard("8/8/8/8/8/8/8/4k3 b - - 0 1");
 
-        assertNotEquals(whiteToMove.state.getZobristKey(), blackToMove.state.getZobristKey());
+        assertNotEquals(whiteToMove.getState().getZobristKey(), blackToMove.getState().getZobristKey());
     }
 
     @Test
@@ -486,31 +486,31 @@ class BBoardTest {
         BBoard board2 = new BBoard(board1.exportFen());
 
         assertEquals(board1.exportFen(), board2.exportFen());
-        assertEquals(board1.state.getZobristKey(), board2.state.getZobristKey());
+        assertEquals(board1.getState().getZobristKey(), board2.getState().getZobristKey());
     }
 
     @Test
     public void testZobrist_nullMove() {
         BBoard board = new BBoard();
-        long initialKey = board.state.getZobristKey();
+        long initialKey = board.getState().getZobristKey();
 
         board.makeNullMove();
-        assertNotEquals(initialKey, board.state.getZobristKey(), "Zobrist key should change after a null move.");
+        assertNotEquals(initialKey, board.getState().getZobristKey(), "Zobrist key should change after a null move.");
 
         board.makeNullMove();
-        assertEquals(initialKey, board.state.getZobristKey(), "Zobrist key should remain unchanged after two null moves.");
+        assertEquals(initialKey, board.getState().getZobristKey(), "Zobrist key should remain unchanged after two null moves.");
     }
 
     @Test
     public void testZobrist_nullMove_enPasasantFile() {
         BBoard board = new BBoard("rnbqkbnr/1ppp1p1p/p7/4pPp1/4P3/8/PPPP2PP/RNBQKBNR w KQkq g6 0 4");
-        long initialKey = board.state.getZobristKey();
+        long initialKey = board.getState().getZobristKey();
 
         board.makeNullMove();
-        assertNotEquals(initialKey, board.state.getZobristKey(), "Zobrist key should change after a null move.");
+        assertNotEquals(initialKey, board.getState().getZobristKey(), "Zobrist key should change after a null move.");
 
         board.makeNullMove();
-        assertNotEquals(initialKey, board.state.getZobristKey(), "Zobrist key should not be the same after two null moves with enPassantFile.");
+        assertNotEquals(initialKey, board.getState().getZobristKey(), "Zobrist key should not be the same after two null moves with enPassantFile.");
     }
 
     @Test
@@ -551,7 +551,7 @@ class BBoardTest {
         BBoard copy = original.copy();
 
         assertEquals(original.exportFen(), copy.exportFen(), "Copied board should have the same FEN as the original.");
-        assertEquals(original.state.getZobristKey(), copy.state.getZobristKey(), "Copied board should have the same Zobrist key as the original.");
+        assertEquals(original.getState().getZobristKey(), copy.getState().getZobristKey(), "Copied board should have the same Zobrist key as the original.");
     }
 
     @Test

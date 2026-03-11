@@ -1,7 +1,6 @@
 package knight.clubbing.movegen;
 
 import knight.clubbing.core.*;
-import knight.clubbing.core.*;
 import knight.clubbing.movegen.magic.Magic;
 
 import java.util.Arrays;
@@ -81,7 +80,7 @@ public class MoveGenerator {
         checkRayBitmask = 0;
         pinRays = 0;
 
-        isWhiteToMove = board.isWhiteToMove;
+        isWhiteToMove = board.isWhiteToMove();
         friendlyColor = board.moveColor();
         opponentColor = board.opponentColor();
         friendlyKingSquare = board.getKingSquare(board.moveColorIndex());
@@ -189,7 +188,7 @@ public class MoveGenerator {
             inDoubleCheck = inCheck;
             inCheck = true;
 
-            long possiblePawnAttackOrigins = board.isWhiteToMove ? MoveUtility.WhitePawnAttacks[friendlyKingSquare] : MoveUtility.BlackPawnAttacks[friendlyKingSquare];
+            long possiblePawnAttackOrigins = board.isWhiteToMove() ? MoveUtility.WhitePawnAttacks[friendlyKingSquare] : MoveUtility.BlackPawnAttacks[friendlyKingSquare];
             long pawnCheckMap = opponentPawns & possiblePawnAttackOrigins;
             checkRayBitmask |= pawnCheckMap;
         }
@@ -243,19 +242,19 @@ public class MoveGenerator {
         if (!inCheck && generateQuietMoves) {
             long castleBlockers = opponentAttackMap | board.getAllPiecesBoard();
 
-            if (board.state.hasKingSideCastleRight(board.isWhiteToMove)) {
-                long castleMask = board.isWhiteToMove ? MoveUtility.WHITE_KINGSIDE_MASK : MoveUtility.BLACK_KINGSIDE_MASK;
+            if (board.getState().hasKingSideCastleRight(board.isWhiteToMove())) {
+                long castleMask = board.isWhiteToMove() ? MoveUtility.WHITE_KINGSIDE_MASK : MoveUtility.BLACK_KINGSIDE_MASK;
                 if ((castleMask & castleBlockers) == 0) {
-                    int targetSquare = board.isWhiteToMove ? BBoardHelper.g1 : BBoardHelper.g8;
+                    int targetSquare = board.isWhiteToMove() ? BBoardHelper.g1 : BBoardHelper.g8;
                     moveBuffer[moveCount++] = new BMove(friendlyKingSquare, targetSquare, BMove.castleFlag);
                 }
             }
 
-            if (board.state.hasQueenSideCastleRight(board.isWhiteToMove)) {
-                long castleMask = board.isWhiteToMove ? MoveUtility.WHITE_QUEENSIDE_MASK2 : MoveUtility.BLACK_QUEENSIDE_MASK2;
-                long castleBlockMask = board.isWhiteToMove ? MoveUtility.WHITE_QUEENSIDE_MASK : MoveUtility.BLACK_QUEENSIDE_MASK;
+            if (board.getState().hasQueenSideCastleRight(board.isWhiteToMove())) {
+                long castleMask = board.isWhiteToMove() ? MoveUtility.WHITE_QUEENSIDE_MASK2 : MoveUtility.BLACK_QUEENSIDE_MASK2;
+                long castleBlockMask = board.isWhiteToMove() ? MoveUtility.WHITE_QUEENSIDE_MASK : MoveUtility.BLACK_QUEENSIDE_MASK;
                 if ((castleMask & castleBlockers) == 0 && (castleBlockMask & board.getAllPiecesBoard()) == 0) {
-                    int targetSquare = board.isWhiteToMove ? BBoardHelper.c1 : BBoardHelper.c8;
+                    int targetSquare = board.isWhiteToMove() ? BBoardHelper.c1 : BBoardHelper.c8;
                     moveBuffer[moveCount++] = new BMove(friendlyKingSquare, targetSquare, BMove.castleFlag);
                 }
             }
@@ -335,18 +334,18 @@ public class MoveGenerator {
     }
 
     private void generatePawnMoves() {
-        int pushDir = board.isWhiteToMove ? 1 : -1;
+        int pushDir = board.isWhiteToMove() ? 1 : -1;
         int pushOffset = pushDir * 8;
 
         int friendlyPawnPiece = BPiece.makePiece(BPiece.pawn, friendlyColor);
         long pawns = board.getBitboard(friendlyPawnPiece);
 
-        long promotionRankMask = board.isWhiteToMove ? MoveUtility.Rank8 : MoveUtility.Rank1;
+        long promotionRankMask = board.isWhiteToMove() ? MoveUtility.Rank8 : MoveUtility.Rank1;
         long singlePush = (MoveUtility.shift(pawns, pushOffset)) & emptySquares;
         long pushPromotions = singlePush & promotionRankMask & checkRayBitmask;
 
-        long captureEdgeFileMask = board.isWhiteToMove ? MoveUtility.notAFile : MoveUtility.notHFile;
-        long captureEdgeFileMask2 = board.isWhiteToMove ? MoveUtility.notHFile : MoveUtility.notAFile;
+        long captureEdgeFileMask = board.isWhiteToMove() ? MoveUtility.notAFile : MoveUtility.notHFile;
+        long captureEdgeFileMask2 = board.isWhiteToMove() ? MoveUtility.notHFile : MoveUtility.notAFile;
         long captureA = MoveUtility.shift(pawns & captureEdgeFileMask, pushDir * 7) & enemyPieces;
         long captureB = MoveUtility.shift(pawns & captureEdgeFileMask2, pushDir * 9) & enemyPieces;
 
@@ -371,7 +370,7 @@ public class MoveGenerator {
                 }
             }
 
-            long doublePushTargetRankMask = board.isWhiteToMove ? MoveUtility.Rank4: MoveUtility.Rank5;
+            long doublePushTargetRankMask = board.isWhiteToMove() ? MoveUtility.Rank4: MoveUtility.Rank5;
             long doublePush = MoveUtility.shift(singlePush, pushOffset) & emptySquares & doublePushTargetRankMask & checkRayBitmask;
 
             while (doublePush != 0) {
@@ -446,15 +445,15 @@ public class MoveGenerator {
             }
         }
 
-        if (board.state.getEnPassantFile() > 0) {
-            int epFileIndex = board.state.getEnPassantFile() - 1;
-            int epRankIndex = board.isWhiteToMove ? 5 : 2;
+        if (board.getState().getEnPassantFile() > 0) {
+            int epFileIndex = board.getState().getEnPassantFile() - 1;
+            int epRankIndex = board.isWhiteToMove() ? 5 : 2;
             int targetSquare = epRankIndex * 8 + epFileIndex;
-            int capturedPawnSquare = targetSquare + (board.isWhiteToMove ? -8 : 8);
+            int capturedPawnSquare = targetSquare + (board.isWhiteToMove() ? -8 : 8);
 
             if (MoveUtility.containsSquare(checkRayBitmask, capturedPawnSquare)) {
 
-                long pawnsThatCanCaptureEp = pawns & MoveUtility.pawnAttacks(1L << targetSquare, !board.isWhiteToMove);
+                long pawnsThatCanCaptureEp = pawns & MoveUtility.pawnAttacks(1L << targetSquare, !board.isWhiteToMove());
 
                 while (pawnsThatCanCaptureEp != 0) {
 

@@ -20,7 +20,7 @@ public class FenHelper {
             int empty = 0;
             for (int file = 0; file < 8; file++) {
                 int index = rank * 8 + file;
-                int piece = board.pieceBoards[index];
+                int piece = board.getPieceBoards()[index];
 
                 if (piece == BPiece.none) {
                     empty++;
@@ -58,25 +58,25 @@ public class FenHelper {
         }
 
         // Side to move
-        String side = board.isWhiteToMove ? "w" : "b";
+        String side = board.isWhiteToMove() ? "w" : "b";
 
         // Castling rights
         StringBuilder castling = new StringBuilder();
-        if (board.state.hasKingSideCastleRight(true)) castling.append("K");
-        if (board.state.hasQueenSideCastleRight(true)) castling.append("Q");
-        if (board.state.hasKingSideCastleRight(false)) castling.append("k");
-        if (board.state.hasQueenSideCastleRight(false)) castling.append("q");
+        if (board.getState().hasKingSideCastleRight(true)) castling.append("K");
+        if (board.getState().hasQueenSideCastleRight(true)) castling.append("Q");
+        if (board.getState().hasKingSideCastleRight(false)) castling.append("k");
+        if (board.getState().hasQueenSideCastleRight(false)) castling.append("q");
         if (castling.isEmpty()) castling.append("-");
 
         // En passant
         String ep = "-";
-        int epFile = board.state.getEnPassantFile();
+        int epFile = board.getState().getEnPassantFile();
         if (epFile > 0 && epFile <= 8) {
-            int rankOffset = board.isWhiteToMove ? 5 : 2;
+            int rankOffset = board.isWhiteToMove() ? 5 : 2;
             ep = BBoardHelper.fileChars.charAt(epFile - 1) + Integer.toString(rankOffset + 1);
         }
 
-        int halfMoveClock = board.state.getFiftyMoveCounter();
+        int halfMoveClock = board.getState().getFiftyMoveCounter();
         int fullMoveNumber = 1 + (board.getPlyCount() / 2);
 
         return String.format("%s %s %s %s %d %d",

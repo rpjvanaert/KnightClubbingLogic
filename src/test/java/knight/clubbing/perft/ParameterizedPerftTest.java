@@ -142,7 +142,7 @@ public class ParameterizedPerftTest {
 
             int piece = moveGenerator.getBoard().getPieceBoards()[move.startSquare()];
             assertNotEquals(0, piece, "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
-            assertEquals(moveGenerator.getBoard().isWhiteToMove, BPiece.isWhite(piece));
+            assertEquals(moveGenerator.getBoard().isWhiteToMove(), BPiece.isWhite(piece));
             assertNotEquals("unknown", move.moveFlagName(), "unknown moveFlagName: " + move.moveFlagName());
 
             BBoard childBoard = moveGenerator.getBoard().copy();

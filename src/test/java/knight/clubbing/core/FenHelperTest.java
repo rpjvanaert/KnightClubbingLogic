@@ -22,8 +22,8 @@ class FenHelperTest {
                         12, 10, 11, 13, 14, 11, 10, 12
                 };
 
-        assertArrayEquals(expectedPieceBoards, board.pieceBoards);
-        assertEquals(0, board.state.getEnPassantFile());
+        assertArrayEquals(expectedPieceBoards, board.getPieceBoards());
+        assertEquals(0, board.getState().getEnPassantFile());
 
         String result = board.exportFen();
 
@@ -37,18 +37,18 @@ class FenHelperTest {
         BBoard board = new BBoard();
         board.loadPosition(customFen);
 
-        assertEquals(BPiece.whitePawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("d4")]);
-        assertEquals(BPiece.blackPawn, board.pieceBoards[BBoardHelper.stringCoordToIndex("e4")]);
+        assertEquals(BPiece.whitePawn, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("d4")]);
+        assertEquals(BPiece.blackPawn, board.getPieceBoards()[BBoardHelper.stringCoordToIndex("e4")]);
 
 
-        assertTrue(board.state.hasKingSideCastleRight(true));
-        assertFalse(board.state.hasQueenSideCastleRight(true));
-        assertFalse(board.state.hasKingSideCastleRight(false));
-        assertTrue(board.state.hasQueenSideCastleRight(false));
+        assertTrue(board.getState().hasKingSideCastleRight(true));
+        assertFalse(board.getState().hasQueenSideCastleRight(true));
+        assertFalse(board.getState().hasKingSideCastleRight(false));
+        assertTrue(board.getState().hasQueenSideCastleRight(false));
 
-        assertEquals(4, board.state.getEnPassantFile());
-        assertFalse(board.isWhiteToMove);
-        assertEquals(4, board.state.getFiftyMoveCounter());
+        assertEquals(4, board.getState().getEnPassantFile());
+        assertFalse(board.isWhiteToMove());
+        assertEquals(4, board.getState().getFiftyMoveCounter());
         assertEquals(13, board.getPlyCount());
 
         String exportedFen = board.exportFen();

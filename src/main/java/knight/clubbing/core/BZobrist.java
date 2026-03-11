@@ -40,20 +40,20 @@ public class BZobrist {
         long zobristKey = 0;
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++) {
-            int piece = board.pieceBoards[squareIndex];
+            int piece = board.getPieceBoards()[squareIndex];
 
             if (BPiece.getPieceType(piece) != BPiece.none) {
                 zobristKey ^= piecesArray[piece][squareIndex];
             }
         }
 
-        if (!board.isWhiteToMove) {
+        if (!board.isWhiteToMove()) {
             zobristKey ^= sideToMove;
         }
 
-        zobristKey ^= castlingRights[board.state.getCastlingRights()];
+        zobristKey ^= castlingRights[board.getState().getCastlingRights()];
 
-        int epFile = board.state.getEnPassantFile();
+        int epFile = board.getState().getEnPassantFile();
         if (epFile >= 0) {
             zobristKey ^= enPassantFile[epFile];
         }
