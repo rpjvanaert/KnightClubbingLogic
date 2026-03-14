@@ -50,7 +50,7 @@ public class ParameterizedPerftTest {
         logPerformance(timeEnd, timeStart, perftCase.expectedNodes);
     }
 
-    //@ParameterizedTest(name = "{index} => {0}")
+    @ParameterizedTest(name = "{index} => {0}")
     @MethodSource("perftCaseStream")
     @Tag("perft")
     void perftTestParallelCopy(PerftCase perftCase) {
