@@ -25,6 +25,7 @@ public class BBoard {
     private BGameState state;
     private int plyCount;
     private Deque<Long> repetitionPositionHistory;
+    private Map<Long, Integer> repetitionCount;
     private Deque<BGameState> gameStateHistory;
 
     private boolean cachedInCheckValue;
@@ -194,6 +195,7 @@ public class BBoard {
         if (movedPieceType == BPiece.pawn || capturedPieceType != BPiece.none) {
             if (!inSearch) {
                 repetitionPositionHistory.clear();
+                repetitionCount.clear();
             }
             newFiftyMoveCounter = 0;
         }
@@ -205,6 +207,7 @@ public class BBoard {
 
         if (!inSearch) {
             repetitionPositionHistory.push(newState.getZobristKey());
+            repetitionCount.merge(newState.getZobristKey(), 1, Integer::sum);
             allGameMoves.add(move);
         }
     }
@@ -267,7 +270,8 @@ public class BBoard {
 
 
         if (!inSearch && !repetitionPositionHistory.isEmpty()) {
-            repetitionPositionHistory.pop();
+            long key = repetitionPositionHistory.pop();
+            repetitionCount.merge(key, -1, Integer::sum);
         }
         if (!inSearch) {
             allGameMoves.remove(allGameMoves.size() - 1);
@@ -401,6 +405,7 @@ public class BBoard {
         state = new BGameState(BPiece.none, posData.getEpFile(), castlingRights, posData.getFiftyMovePlyCount(), zobristKey);
 
         repetitionPositionHistory.push(zobristKey);
+        repetitionCount.put(zobristKey, 1);
 
         gameStateHistory.push(state);
     }
@@ -415,6 +420,7 @@ public class BBoard {
         pieceBoards = new int[64];
 
         repetitionPositionHistory = new ArrayDeque<>();
+        repetitionCount = new HashMap<>();
         gameStateHistory = new ArrayDeque<>();
 
         state = new BGameState();
@@ -538,9 +544,7 @@ public class BBoard {
     }
 
     public boolean isDrawByRepetition() {
-        long currentZobristKey = state.getZobristKey();
-
-        return repetitionPositionHistory.stream().filter(entry -> entry == currentZobristKey).count() >= 3;
+        return repetitionCount.getOrDefault(state.getZobristKey(), 0) >= 3;
     }
 
     public void move(int piece, int fromSquare, int toSquare) {
@@ -596,6 +600,7 @@ public class BBoard {
         this.plyCount = other.plyCount;
 
         this.repetitionPositionHistory = new ArrayDeque<>(other.repetitionPositionHistory);
+        this.repetitionCount = new HashMap<>(other.repetitionCount);
         this.gameStateHistory = new ArrayDeque<>();
         for (BGameState s : other.gameStateHistory) {
             this.gameStateHistory.push(new BGameState(s));
