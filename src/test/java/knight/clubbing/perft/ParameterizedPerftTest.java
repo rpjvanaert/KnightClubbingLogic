@@ -4,7 +4,6 @@ import knight.clubbing.core.BBoard;
 import knight.clubbing.core.BMove;
 import knight.clubbing.core.BPiece;
 import knight.clubbing.movegen.MoveGenerator;
-import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -69,7 +68,7 @@ public class ParameterizedPerftTest {
                 .map(line -> {
                     String fen = line.split(";")[0].trim();
                     String[] parts = line.split(";");
-                    ArrayUtils.reverse(parts);
+                    reverse(parts);
                     for (String part : parts) {
                         part = part.trim();
                         if (part.startsWith("D")) {
@@ -81,6 +80,14 @@ public class ParameterizedPerftTest {
                     return null;
                 })
                 .filter(Objects::nonNull);
+    }
+
+    private static void reverse(String[] parts) {
+        for (int i = 0; i < parts.length / 2; i++) {
+            String temp = parts[i];
+            parts[i] = parts[parts.length - 1 - i];
+            parts[parts.length - 1 - i] = temp;
+        }
     }
 
     long perft(MoveGenerator moveGenerator, int depth) {
@@ -135,7 +142,7 @@ public class ParameterizedPerftTest {
 
             int piece = moveGenerator.getBoard().getPieceBoards()[move.startSquare()];
             assertNotEquals(0, piece, "piece=0 fault: " + move + " for FEN: " + moveGenerator.getBoard().exportFen());
-            assertEquals(moveGenerator.getBoard().isWhiteToMove, BPiece.isWhite(piece));
+            assertEquals(moveGenerator.getBoard().isWhiteToMove(), BPiece.isWhite(piece));
             assertNotEquals("unknown", move.moveFlagName(), "unknown moveFlagName: " + move.moveFlagName());
 
             BBoard childBoard = moveGenerator.getBoard().copy();

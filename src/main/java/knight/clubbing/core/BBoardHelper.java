@@ -39,10 +39,29 @@ public class BBoardHelper {
     public static final long FILE_G = 0x4040404040404040L;
     public static final long FILE_H = 0x8080808080808080L;
 
+    public static final long[] FILE_MASKS = {
+            FILE_A, FILE_B, FILE_C, FILE_D,
+            FILE_E, FILE_F, FILE_G, FILE_H
+    };
+
+    /**
+     * rank index
+     * bit operation equal to squareIndex / 8
+     *
+     * @param squareIndex
+     * @return 0-7 for ranks 1-8 accordingly
+     */
     public static int rankIndex(int squareIndex) {
         return squareIndex >> 3;
     }
 
+    /**
+     * fileIndex
+     * bit operation equal to squareIndex % 8
+     *
+     * @param squareIndex
+     * @return 0-7 for files a-h accordingly
+     */
     public static int fileIndex(int squareIndex) {
         return squareIndex & 0b000111;
     }
@@ -103,7 +122,7 @@ public class BBoardHelper {
     public static String bitboardToDisplay(long bitboard) {
         StringBuilder sb = new StringBuilder();
 
-        String binary = String.format("%64s", Long.toBinaryString(bitboard)).replace(' ', '0');
+        String binary = bitboardToString(bitboard);
         for (int rank = 0; rank < 8; rank++) {
             for (int file = 0; file < 8; file++) {
                 int index = rank * 8 + file;

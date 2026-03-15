@@ -88,8 +88,8 @@ public record BMove(short value) {
 
         int flag = BMove.noFlag;
 
-        int movePiece = board.pieceBoards[from];
-        int targetPiece = board.pieceBoards[to];
+        int movePiece = board.getPieceBoards()[from];
+        int targetPiece = board.getPieceBoards()[to];
 
         int movePieceType = BPiece.getPieceType(movePiece);
         boolean isPawn = movePieceType == BPiece.pawn;

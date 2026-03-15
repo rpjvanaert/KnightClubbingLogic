@@ -11,7 +11,7 @@ public class BBoard {
     private long[] bitboards;
 
     // 64-size int array. Representation for board using BPiece int-structure for pieces
-    public int[] pieceBoards;
+    private int[] pieceBoards;
 
     // 64 bit bitboards for white/blackpieces
     private long[] colorBoards;
@@ -19,49 +19,58 @@ public class BBoard {
     public static final int whiteIndex = 0;
     public static final int blackIndex = 1;
 
-    // 64 bit bitboard for every piece
-    private long allPiecesBoard;
-
-    // 64 bit bitboard for different type of pieces
-    private long whiteOrthogonalSliderBoard;
-    private long blackOrthogonalSliderBoard;
-    private long whiteDiagonalSliderBoard;
-    private long blackDiagonalSliderBoard;
-
     private int totalPieceCountWithoutPawnsAndKings;
 
     private List<BMove> allGameMoves;
-    public BGameState state;
+    private BGameState state;
     private int plyCount;
     private Deque<Long> repetitionPositionHistory;
+    private Map<Long, Integer> repetitionCount;
     private Deque<BGameState> gameStateHistory;
 
     private boolean cachedInCheckValue;
     private boolean hasCachedInCheckValue;
 
-    public boolean isWhiteToMove;
+    private boolean isWhiteToMove;
+
     public int moveColor() {
-        return isWhiteToMove ? BPiece.white : BPiece.black;
+        return isWhiteToMove() ? BPiece.white : BPiece.black;
     }
 
     public int opponentColor() {
-        return isWhiteToMove ? BPiece.black : BPiece.white;
+        return isWhiteToMove() ? BPiece.black : BPiece.white;
     }
 
     public int moveColorIndex() {
-        return isWhiteToMove ? whiteIndex : blackIndex;
+        return isWhiteToMove() ? whiteIndex : blackIndex;
     }
 
     public int opponentColorIndex() {
-        return isWhiteToMove ? blackIndex : whiteIndex;
+        return isWhiteToMove() ? blackIndex : whiteIndex;
     }
 
     private long opponentDiagonalSliderBoard() {
-        return isWhiteToMove ? blackDiagonalSliderBoard : whiteDiagonalSliderBoard;
+        return isWhiteToMove() ? blackDiagonalSliderBoard() : whiteDiagonalSliderBoard();
+    }
+
+    private long whiteDiagonalSliderBoard() {
+        return bitboards[BPiece.whiteBishop] | bitboards[BPiece.whiteQueen];
+    }
+
+    private long blackDiagonalSliderBoard() {
+        return bitboards[BPiece.blackBishop] | bitboards[BPiece.blackQueen];
     }
 
     private long opponentOrthogonalSliderBoard() {
-        return isWhiteToMove ? blackOrthogonalSliderBoard : whiteOrthogonalSliderBoard;
+        return isWhiteToMove() ? blackOrthogonalSliderBoard() : whiteOrthogonalSliderBoard();
+    }
+
+    private long whiteOrthogonalSliderBoard() {
+        return bitboards[BPiece.whiteRook] | bitboards[BPiece.whiteQueen];
+    }
+
+    private long blackOrthogonalSliderBoard() {
+        return bitboards[BPiece.blackRook] | bitboards[BPiece.blackQueen];
     }
 
     public BBoard(String fen) {
@@ -98,7 +107,7 @@ public class BBoard {
             int captureSquare = targetSquare;
 
             if (isEnPassant) {
-                captureSquare = targetSquare + (isWhiteToMove ? -BBoardHelper.rowLength : BBoardHelper.rowLength);
+                captureSquare = targetSquare + (isWhiteToMove() ? -BBoardHelper.rowLength : BBoardHelper.rowLength);
                 this.clear(capturedPiece, captureSquare);
                 pieceBoards[captureSquare] = BPiece.none;
                 zobristKey ^= BZobrist.getPiecesArray()[capturedPiece][captureSquare];
@@ -118,7 +127,7 @@ public class BBoard {
 
         if (movedPieceType == BPiece.king) {
             kingSquares[moveColorIndex()] = targetSquare;
-            newCastleRights &= isWhiteToMove ? 0b1100 : 0b0011;
+            newCastleRights &= isWhiteToMove() ? 0b1100 : 0b0011;
 
             if (moveFlag == BMove.castleFlag) {
 
@@ -175,7 +184,7 @@ public class BBoard {
             zobristKey ^= BZobrist.getCastlingRights()[newCastleRights];
         }
 
-        isWhiteToMove = !isWhiteToMove;
+        isWhiteToMove = !isWhiteToMove();
 
         plyCount++;
         int newFiftyMoveCounter = state.getFiftyMoveCounter() + 1;
@@ -186,6 +195,7 @@ public class BBoard {
         if (movedPieceType == BPiece.pawn || capturedPieceType != BPiece.none) {
             if (!inSearch) {
                 repetitionPositionHistory.clear();
+                repetitionCount.clear();
             }
             newFiftyMoveCounter = 0;
         }
@@ -197,14 +207,15 @@ public class BBoard {
 
         if (!inSearch) {
             repetitionPositionHistory.push(newState.getZobristKey());
+            repetitionCount.merge(newState.getZobristKey(), 1, Integer::sum);
             allGameMoves.add(move);
         }
     }
 
     public void undoMove(BMove move, boolean inSearch) {
-        isWhiteToMove = !isWhiteToMove;
+        isWhiteToMove = !isWhiteToMove();
 
-        boolean undoingWhiteMove = isWhiteToMove;
+        boolean undoingWhiteMove = isWhiteToMove();
 
         int movedFrom = move.startSquare();
         int movedTo = move.targetSquare();
@@ -255,12 +266,12 @@ public class BBoard {
             }
         }
 
-        allPiecesBoard = colorBoards[whiteIndex] | colorBoards[blackIndex];
         updateOtherBoards();
 
 
         if (!inSearch && !repetitionPositionHistory.isEmpty()) {
-            repetitionPositionHistory.pop();
+            long key = repetitionPositionHistory.pop();
+            repetitionCount.merge(key, -1, Integer::sum);
         }
         if (!inSearch) {
             allGameMoves.remove(allGameMoves.size() - 1);
@@ -277,7 +288,7 @@ public class BBoard {
     }
 
     public void makeNullMove() {
-        isWhiteToMove = !isWhiteToMove;
+        isWhiteToMove = !isWhiteToMove();
 
         plyCount++;
 
@@ -293,7 +304,7 @@ public class BBoard {
     }
 
     public void undoNullMove() {
-        isWhiteToMove = !isWhiteToMove;
+        isWhiteToMove = !isWhiteToMove();
         plyCount--;
         gameStateHistory.pop();
         state = gameStateHistory.peek();
@@ -314,7 +325,7 @@ public class BBoard {
 
     public boolean calculateInCheckState() {
         int kingSquare = kingSquares[moveColorIndex()];
-        long blockers = allPiecesBoard;
+        long blockers = getAllPiecesBoard();
 
         if (opponentOrthogonalSliderBoard() != 0) {
             long rookAttacks = Magic.getRookAttacks(kingSquare, blockers);
@@ -333,7 +344,7 @@ public class BBoard {
             return true;
 
         long enemyPawns = bitboards[BPiece.makePiece(BPiece.pawn, opponentColor())];
-        long pawnAttackMask = isWhiteToMove ? MoveUtility.WhitePawnAttacks[kingSquare] : MoveUtility.BlackPawnAttacks[kingSquare];
+        long pawnAttackMask = isWhiteToMove() ? MoveUtility.WhitePawnAttacks[kingSquare] : MoveUtility.BlackPawnAttacks[kingSquare];
         if ((pawnAttackMask & enemyPawns) != 0)
             return true;
 
@@ -350,14 +361,6 @@ public class BBoard {
                 colorBoards[blackIndex] |= bitboards[piece];
             }
         }
-
-        allPiecesBoard = colorBoards[whiteIndex] | colorBoards[blackIndex];
-
-        whiteOrthogonalSliderBoard = bitboards[BPiece.whiteRook] | bitboards[BPiece.whiteQueen];
-        whiteDiagonalSliderBoard = bitboards[BPiece.whiteBishop] | bitboards[BPiece.whiteQueen];
-
-        blackOrthogonalSliderBoard = bitboards[BPiece.blackRook] | bitboards[BPiece.blackQueen];
-        blackDiagonalSliderBoard = bitboards[BPiece.blackBishop] | bitboards[BPiece.blackQueen];
     }
 
     public void loadStartPosition() {
@@ -389,20 +392,20 @@ public class BBoard {
 
         isWhiteToMove = posData.isWhiteToMove();
 
-        allPiecesBoard = colorBoards[whiteIndex] | colorBoards[blackIndex];
         updateOtherBoards();
 
         int whiteCastle = (posData.isWhiteCastlingKingside() ? 1 << 0 : 0) | (posData.isWhiteCastlingQueenside() ? 1 << 1 : 0);
         int blackCastle = (posData.isBlackCastlingKingside() ? 1 << 2 : 0) | (posData.isBlackCastlingQueenside() ? 1 << 3 : 0);
         int castlingRights = whiteCastle | blackCastle;
 
-        plyCount = (posData.getMoveCount() - 1) * 2 + (isWhiteToMove ? 0 : 1);
+        plyCount = (posData.getMoveCount() - 1) * 2 + (isWhiteToMove() ? 0 : 1);
 
         state = new BGameState(BPiece.none, posData.getEpFile(), castlingRights, posData.getFiftyMovePlyCount(), 0);
         long zobristKey = BZobrist.CalculateZobristKey(this);
         state = new BGameState(BPiece.none, posData.getEpFile(), castlingRights, posData.getFiftyMovePlyCount(), zobristKey);
 
         repetitionPositionHistory.push(zobristKey);
+        repetitionCount.put(zobristKey, 1);
 
         gameStateHistory.push(state);
     }
@@ -417,6 +420,7 @@ public class BBoard {
         pieceBoards = new int[64];
 
         repetitionPositionHistory = new ArrayDeque<>();
+        repetitionCount = new HashMap<>();
         gameStateHistory = new ArrayDeque<>();
 
         state = new BGameState();
@@ -426,12 +430,11 @@ public class BBoard {
 
         bitboards = new long[BPiece.maxPieceIndex + 1];
         colorBoards = new long[2];
-        allPiecesBoard = 0;
     }
 
     private boolean isEnPassantPossible(int targetSquare) {
         int file = BBoardHelper.fileIndex(targetSquare);
-        int epCaptureRank = isWhiteToMove ? 3 : 4;
+        int epCaptureRank = isWhiteToMove() ? 3 : 4;
 
         int fileLeft = file - 1;
         int fileRight = file + 1;
@@ -496,6 +499,10 @@ public class BBoard {
         return plyCount;
     }
 
+    public BGameState getState() {
+        return state;
+    }
+
     public int getKingSquare(int colorIndex) {
         if (colorIndex != whiteIndex && colorIndex != blackIndex)
             throw new IndexOutOfBoundsException();
@@ -509,7 +516,7 @@ public class BBoard {
     }
 
     public long getAllPiecesBoard() {
-        return allPiecesBoard;
+        return colorBoards[whiteIndex] | colorBoards[blackIndex];
     }
 
     public List<BMove> getAllGameMoves() {
@@ -518,22 +525,26 @@ public class BBoard {
 
     public long getDiagonalSliders(int colorIndex) {
         if (colorIndex == whiteIndex)
-            return whiteDiagonalSliderBoard;
+            return whiteDiagonalSliderBoard();
 
         if (colorIndex == blackIndex)
-            return blackDiagonalSliderBoard;
+            return blackDiagonalSliderBoard();
 
         throw new IndexOutOfBoundsException();
     }
 
     public long getOrthogonalSliders(int colorIndex) {
         if (colorIndex == whiteIndex)
-            return whiteOrthogonalSliderBoard;
+            return whiteOrthogonalSliderBoard();
 
         if (colorIndex == blackIndex)
-            return blackOrthogonalSliderBoard;
+            return blackOrthogonalSliderBoard();
 
         throw new IndexOutOfBoundsException();
+    }
+
+    public boolean isDrawByRepetition() {
+        return repetitionCount.getOrDefault(state.getZobristKey(), 0) >= 3;
     }
 
     public void move(int piece, int fromSquare, int toSquare) {
@@ -581,11 +592,6 @@ public class BBoard {
         this.colorBoards = Arrays.copyOf(other.colorBoards, other.colorBoards.length);
         this.kingSquares = Arrays.copyOf(other.kingSquares, other.kingSquares.length);
 
-        this.allPiecesBoard = other.allPiecesBoard;
-        this.whiteOrthogonalSliderBoard = other.whiteOrthogonalSliderBoard;
-        this.blackOrthogonalSliderBoard = other.blackOrthogonalSliderBoard;
-        this.whiteDiagonalSliderBoard = other.whiteDiagonalSliderBoard;
-        this.blackDiagonalSliderBoard = other.blackDiagonalSliderBoard;
         this.totalPieceCountWithoutPawnsAndKings = other.totalPieceCountWithoutPawnsAndKings;
 
         this.allGameMoves = new ArrayList<>(other.allGameMoves);
@@ -594,14 +600,15 @@ public class BBoard {
         this.plyCount = other.plyCount;
 
         this.repetitionPositionHistory = new ArrayDeque<>(other.repetitionPositionHistory);
+        this.repetitionCount = new HashMap<>(other.repetitionCount);
         this.gameStateHistory = new ArrayDeque<>();
         for (BGameState s : other.gameStateHistory) {
-            this.gameStateHistory.push(new BGameState(s));
+            this.gameStateHistory.addLast(new BGameState(s));
         }
 
         this.cachedInCheckValue = other.cachedInCheckValue;
         this.hasCachedInCheckValue = other.hasCachedInCheckValue;
-        this.isWhiteToMove = other.isWhiteToMove;
+        this.isWhiteToMove = other.isWhiteToMove();
     }
 
     public BBoard copy() {
@@ -614,13 +621,8 @@ public class BBoard {
         if (o == null || getClass() != o.getClass()) return false;
 
         BBoard other = (BBoard) o;
-        if (this.isWhiteToMove != other.isWhiteToMove) return false;
+        if (this.isWhiteToMove() != other.isWhiteToMove()) return false;
         if (!Objects.equals(this.state, other.state)) return false;
-        if (this.allPiecesBoard != other.allPiecesBoard) return false;
-        if (this.whiteOrthogonalSliderBoard != other.whiteOrthogonalSliderBoard) return false;
-        if (this.blackOrthogonalSliderBoard != other.blackOrthogonalSliderBoard) return false;
-        if (this.whiteDiagonalSliderBoard != other.whiteDiagonalSliderBoard) return false;
-        if (this.blackDiagonalSliderBoard != other.blackDiagonalSliderBoard) return false;
         if (this.totalPieceCountWithoutPawnsAndKings != other.totalPieceCountWithoutPawnsAndKings) return false;
         if (this.plyCount != other.plyCount) return false;
         if (!Arrays.equals(this.bitboards, other.bitboards)) return false;
@@ -634,4 +636,7 @@ public class BBoard {
     }
 
 
+    public boolean isWhiteToMove() {
+        return isWhiteToMove;
+    }
 }
