@@ -66,6 +66,10 @@ public class BBoardHelper {
         return squareIndex & 0b000111;
     }
 
+    public static int mirrorSquare(int squareIndex) {
+        return squareIndex ^ 56;
+    }
+
     public static int stringCoordToIndex(String stringCoord) {
         if (stringCoord == null || stringCoord.length() != 2) {
             throw new IllegalArgumentException("Invalid coordinate: " + stringCoord);

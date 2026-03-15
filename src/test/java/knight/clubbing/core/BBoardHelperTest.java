@@ -199,4 +199,13 @@ class BBoardHelperTest {
         }
     }
 
+    @Test
+    void testMirror() {
+        assertEquals(7, BBoardHelper.mirrorSquare(63));
+        assertEquals(63, BBoardHelper.mirrorSquare(7));
+        assertEquals(0, BBoardHelper.mirrorSquare(56));
+        assertEquals(56, BBoardHelper.mirrorSquare(0));
+        assertEquals(36, BBoardHelper.mirrorSquare(28));
+        assertEquals(28, BBoardHelper.mirrorSquare(36));
+    }
 }
