@@ -603,7 +603,7 @@ public class BBoard {
         this.repetitionCount = new HashMap<>(other.repetitionCount);
         this.gameStateHistory = new ArrayDeque<>();
         for (BGameState s : other.gameStateHistory) {
-            this.gameStateHistory.push(new BGameState(s));
+            this.gameStateHistory.addLast(new BGameState(s));
         }
 
         this.cachedInCheckValue = other.cachedInCheckValue;
